@@ -62,3 +62,28 @@ In TeamBoard, a User:
 ### Data Ownership
 - Users reference organizationId (not stored in Organization)
 - Prevents duplication and keeps relationships normalized
+
+
+## Authentication Flow
+
+### Register Flow
+- User submits name, email, password, and organization name
+- Backend validates input and checks for duplicate email
+- Password is hashed using bcrypt
+- Organization is created
+- User is created with role 'owner' and linked to organization
+- Organization ownerId is updated to the created user
+- JWT token is generated and returned
+
+### Login Flow
+- User submits email and password
+- Backend validates credentials
+- Account lockout enforced after repeated failures
+- JWT token generated upon successful login
+
+### JWT Payload
+- userId
+- organizationId
+- role
+
+This enables multi-tenant request scoping and RBAC enforcement.
