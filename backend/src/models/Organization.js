@@ -11,7 +11,7 @@ const organizationSchema = new mongoose.Schema(
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      //required: true,
       index: true,
     },
   },
