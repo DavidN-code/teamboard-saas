@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       index: true,
     },
-    passwordHash: {
+    password: {
       type: String,
       required: true,
       select: false, // hides the password by default

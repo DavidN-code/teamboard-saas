@@ -19,21 +19,21 @@ const register = async (req, res) => {
   
       // 3. Hash password
       const saltRounds = 10;
-      const passwordHash = await bcrypt.hash(password, saltRounds);
-  
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+
       // 4. Create organization
       const organization = await Organization.create({
         name: organizationName
       });
   
       // 5. Create user (owner)
-      const user = await User.create({
-        name,
-        email,
-        passwordHash,
-        role: 'owner',
-        organizationId: organization._id
-      });
+     const user = await User.create({
+  name,
+  email,
+  password: hashedPassword,
+  role: 'owner',
+  organizationId: organization._id
+});
   
       // 6. Link owner to organization
       organization.ownerId = user._id;
