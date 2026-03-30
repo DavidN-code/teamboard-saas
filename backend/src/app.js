@@ -17,3 +17,7 @@ app.get('/api/health', (req, res) => {
 });
 
 module.exports = app;
+
+
+const boardRoutes = require("./routes/boardRoutes");
+app.use("/api/boards", boardRoutes);
