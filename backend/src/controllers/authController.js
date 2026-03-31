@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const Organization = require('../models/Organization');
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
     try {
       const { name, email, password, organizationName } = req.body;
   
@@ -47,18 +47,14 @@ const register = async (req, res) => {
       });
   
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ 
-        message: 'Server error', 
-        error: error.message 
-      });
+      next(error);
     }
   };
 
 
   const jwt = require("jsonwebtoken");
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -92,11 +88,7 @@ const login = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Server error",
-      error: error.message
-    });
+    next(error);
   }
 };
 

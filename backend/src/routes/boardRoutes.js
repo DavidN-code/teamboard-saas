@@ -4,13 +4,14 @@ const authMiddleware = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
 const orgMiddleware = require("../middleware/orgMiddleware");
 const Board = require("../models/Board");
+const mongoose = require("mongoose");
 
 // Create a new board (only owner can do this)
 router.post(
   "/",
   authMiddleware,
   roleMiddleware("owner"),
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       const { name } = req.body;
       const board = await Board.create({
@@ -20,14 +21,13 @@ router.post(
       });
       res.status(201).json({ message: "Board created", board });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Server error", error: error.message });
+      next(error);
     }
   }
 );
 
 //get a list
-router.get("/", authMiddleware, async (req, res) => {
+router.get("/", authMiddleware, async (req, res, next) => {
   try {
     const boards = await Board.find({
       organizationId: req.user.organizationId
@@ -36,17 +36,18 @@ router.get("/", authMiddleware, async (req, res) => {
     res.json({ boards });
 
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message
-    });
+    next(error);
   }
 });
 
 
 // Get a single board (any user in the same org can access)
-router.get("/:id", authMiddleware, async (req, res) => {
+router.get("/:id", authMiddleware, async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid board ID" });
+    }
+
     const board = await Board.findById(req.params.id);
 
     if (!board) {
@@ -61,17 +62,16 @@ router.get("/:id", authMiddleware, async (req, res) => {
     res.json({ board });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Server error",
-      error: error.message
-    });
+    next(error);
   }
 });
 
 
-router.put("/:id", authMiddleware, async (req, res) => {
+router.put("/:id", authMiddleware, async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid board ID" });
+    }
     const { name } = req.body;
 
     const board = await Board.findById(req.params.id);
@@ -95,13 +95,16 @@ router.put("/:id", authMiddleware, async (req, res) => {
     res.json({ message: "Board updated", board });
 
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    next(error);
   }
 });
 
 
-router.delete("/:id", authMiddleware, async (req, res) => {
+router.delete("/:id", authMiddleware, async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid board ID" });
+    }
     const board = await Board.findById(req.params.id);
     if (!board) {
       return res.status(404).json({ message: "Board not found" });
@@ -122,7 +125,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     res.json({ message: "Board deleted" });
 
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    next(error);
   }
 });
 
