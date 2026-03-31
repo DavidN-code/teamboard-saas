@@ -26,6 +26,24 @@ router.post(
   }
 );
 
+//get a list
+router.get("/", authMiddleware, async (req, res) => {
+  try {
+    const boards = await Board.find({
+      organizationId: req.user.organizationId
+    });
+
+    res.json({ boards });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message
+    });
+  }
+});
+
+
 // Get a single board (any user in the same org can access)
 router.get("/:id", authMiddleware, async (req, res) => {
   try {
@@ -107,6 +125,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+
 
 
 module.exports = router;
