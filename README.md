@@ -1,91 +1,151 @@
-# teamboard-saas
-Secure multi-tenant SaaS task management platform demonstrating RBAC, JWT authentication, and audit logging.
-# TeamBoard – Secure Multi-Tenant SaaS Platform
+# TeamBoard SaaS
+
+Backend-focused SaaS application for managing boards within organizations.
+Built with Node.js, Express, and MongoDB to demonstrate authentication, authorization, and scalable backend architecture.
+
+---
 
 ## 🚀 Overview
 
-TeamBoard is a production-style multi-tenant task management platform designed to demonstrate secure SaaS architecture, role-based access control (RBAC), and audit logging.
+TeamBoard is a multi-tenant backend system where users belong to organizations and manage boards securely.
 
-The goal of this project is to simulate real-world backend system design rather than build a simple CRUD application.
-
----
-
-## 🧱 Architecture Overview
-
-### Tech Stack
-
-#### Backend
-- Node.js
-- Express
-- MongoDB (Atlas)
-- Mongoose
-- JWT (Access + Refresh Tokens)
-- bcrypt
-- express-rate-limit
-- helmet
-
-#### Frontend
-- React
-- React Router
-- Axios
-
-#### Deployment
-- Backend → Render
-- Frontend → Vercel
-- Database → MongoDB Atlas
+This project focuses on real-world backend concepts such as JWT authentication, role-based access, and clean API design.
 
 ---
 
-## 🔐 Security Design
+## 🧱 Tech Stack
 
-- Multi-tenant data isolation (organizationId scoping)
-- Role-Based Access Control (Owner, Admin, Member)
-- JWT authentication with refresh tokens
-- Password hashing using bcrypt
-- Account lockout after failed login attempts
-- Rate limiting for authentication routes
-- Centralized input validation middleware
-- Structured audit logging system
-- No sensitive stack trace exposure in production
+* Node.js
+* Express.js
+* MongoDB (Atlas)
+* Mongoose
+* JSON Web Tokens (JWT)
+* bcrypt
 
 ---
 
-## 🏗 Core Data Models
+## 🔑 Current Features
 
-- User
-- Organization
-- Task
-- AuditLog
+* User registration with organization creation
+* Secure login with JWT authentication
+* Password hashing using bcrypt
+* Multi-tenant architecture (organization-based data isolation)
+* Role-based access (owner role)
+* Protected API routes
+* Full CRUD operations for Boards
+* Centralized error handling
+* ObjectId validation for routes
 
 ---
 
-## 🗂 Planned Folder Structure
+## 📂 Project Structure
 
+```
 backend/
-src/
-controllers/
-middleware/
-models/
-routes/
-services/
-utils/
-config/
-app.js
-server.js
-
-frontend/
-src/
-components/
-pages/
-context/
-services/
+  src/
+    controllers/
+    middleware/
+    models/
+    routes/
+  app.js
+  server.js
+```
 
 ---
 
-## 🎯 Learning Objectives
+## ⚙️ Getting Started
 
-- Demonstrate production-level backend architecture
-- Implement secure multi-tenant logic
-- Implement RBAC correctly
-- Build logging and audit trail system
-- Deploy a full-stack application properly
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/DavidN-code/teamboard-saas.git
+cd teamboard-saas/backend
+```
+
+---
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+---
+
+### 3. Create environment variables
+
+Create a `.env` file in the `backend/` folder:
+
+```
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+PORT=5050
+```
+
+---
+
+### 4. Run the server
+
+```bash
+npm start
+```
+
+Server runs at:
+
+```
+http://localhost:5050
+```
+
+---
+
+## 🔐 Authentication Example
+
+### Login
+
+```bash
+curl -X POST http://localhost:5050/api/auth/login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "test@example.com",
+  "password": "test1234"
+}'
+```
+
+---
+
+### Access Protected Route
+
+```bash
+curl http://localhost:5050/api/boards \
+-H "Authorization: Bearer YOUR_TOKEN"
+```
+
+---
+
+## 📌 API Endpoints
+
+### Auth
+
+* POST /api/auth/register
+* POST /api/auth/login
+
+### Boards (Protected)
+
+* GET /api/boards
+* POST /api/boards
+* GET /api/boards/:id
+* PUT /api/boards/:id
+* DELETE /api/boards/:id
+
+---
+
+## 🧠 Future Improvements
+
+See `ROADMAP.md` for planned features.
+
+---
+
+## 👨‍💻 Author
+
+David Neagoy
+https://github.com/DavidN-code
