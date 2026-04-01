@@ -5,6 +5,14 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 const orgMiddleware = require("../middleware/orgMiddleware");
 const Board = require("../models/Board");
 const mongoose = require("mongoose");
+const { getBoards, createBoard, getBoardById } = require("../controllers/boardController");
+const { authMiddleware } = require("../middleware/authMiddleware");
+
+router.use(authMiddleware);
+
+router.get("/", getBoards);
+router.post("/", createBoard);
+router.get("/:id", getBoardById);
 
 // Create a new board (only owner can do this)
 router.post(
