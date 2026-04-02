@@ -10,7 +10,7 @@ exports.createTask = async (req, res, next) => {
       status,
       assignedTo,
       organizationId: req.user.organizationId,
-      createdBy: req.user._id,
+      createdBy: req.user.userId,
     });
     res.status(201).json(task);
   } catch (err) {

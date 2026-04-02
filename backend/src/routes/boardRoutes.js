@@ -17,12 +17,12 @@ router.get("/", getBoards);
 router.get("/:id", getBoardById);
 
 // CREATE a new board → only Owner or Admin
-router.post("/", allowRoles("Owner", "Admin"), createBoard);
+router.post("/", allowRoles("owner", "admin"), createBoard);
 
 // UPDATE a board → only Owner
-router.put("/:id", allowRoles("Owner"), updateBoard);
+router.put("/:id", allowRoles("owner"), updateBoard);
 
 // DELETE a board → only Owner
-router.delete("/:id", allowRoles("Owner"), deleteBoard);
+router.delete("/:id", allowRoles("owner"), deleteBoard);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { protect } = require("../middleware/authMiddleware"); // JWT auth
+const protect = require("../middleware/authMiddleware"); // JWT auth
 const allowRoles = require("../middleware/roleMiddleware");
 
 const {
@@ -22,12 +22,12 @@ router.get("/", getTasks);
 router.get("/:id", getTaskById);
 
 // CREATE a task → only Owner or Admin
-router.post("/", allowRoles("Owner", "Admin"), createTask);
+router.post("/", allowRoles("owner", "admin"), createTask);
 
 // UPDATE a task → only Owner or Admin (adjust if you want only Owner)
-router.put("/:id", allowRoles("Owner", "Admin"), updateTask);
+router.put("/:id", allowRoles("owner", "admin"), updateTask);
 
 // DELETE a task → only Owner or Admin
-router.delete("/:id", allowRoles("Owner", "Admin"), deleteTask);
+router.delete("/:id", allowRoles("owner", "admin"), deleteTask);
 
 module.exports = router;
