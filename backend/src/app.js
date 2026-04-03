@@ -5,7 +5,9 @@ const authRoutes = require('./routes/authRoutes');
 const boardRoutes = require("./routes/boardRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const errorMiddleware = require("./middleware/errorMiddleware");
+const auditLogRoutes = require("./routes/auditLogRoutes");
 
+app.use("/api/audit-logs", auditLogRoutes);
 
 // Middleware
 app.use(express.json());
