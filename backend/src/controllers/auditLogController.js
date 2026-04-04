@@ -5,6 +5,8 @@ exports.getAuditLogs = async (req, res, next) => {
   try {
     const { action, resourceType } = req.query;
 
+    const limit = parseInt(req.query.limit) || 100;
+
     // Base query: only logs from user's organization
     const query = {
       organizationId: req.user.organizationId,
@@ -21,7 +23,7 @@ exports.getAuditLogs = async (req, res, next) => {
 
     const logs = await AuditLog.find(query)
       .sort({ createdAt: -1 }) // newest first
-      .limit(100); // prevent huge responses
+      .limit(limit); // prevent huge responses
 
     res.json(logs);
 
