@@ -1,5 +1,7 @@
 import { useState } from "react";
 import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [form, setForm] = useState({
@@ -8,6 +10,10 @@ const Login = () => {
   });
 
   const [message, setMessage] = useState("");
+
+  // ✅ ADD THIS
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -21,8 +27,9 @@ const Login = () => {
 
       const token = res.data.token;
 
-      // 🔥 Store token (important step)
-      localStorage.setItem("token", token);
+      // ✅ USE CONTEXT INSTEAD OF localStorage DIRECTLY
+      login(token);
+      navigate("/dashboard");
 
       setMessage("Login successful!");
 
