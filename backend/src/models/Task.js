@@ -29,6 +29,10 @@ const taskSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  boardId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Board",
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);

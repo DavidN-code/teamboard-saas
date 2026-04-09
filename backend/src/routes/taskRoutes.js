@@ -10,9 +10,13 @@ const {
   getTaskById,
   updateTask,
   deleteTask,
+  getTasksByBoard,
 } = require("../controllers/taskController");
 
-// All routes require authentication
+// ✅ GET tasks by board ID (requires auth)
+router.get("/boards/:boardId/tasks", protect, getTasksByBoard);
+
+// All routes below require authentication
 router.use(protect);
 
 // GET all tasks for the user's organization
@@ -26,6 +30,9 @@ router.post("/", allowRoles("Owner", "Admin"), createTask);
 
 // UPDATE a task → only Owner or Admin (adjust if you want only Owner)
 router.put("/:id", allowRoles("Owner", "Admin"), updateTask);
+
+// UPDATE a task → only Owner or Admin
+router.put("/:id", allowRoles("owner", "admin"), updateTask);
 
 // DELETE a task → only Owner or Admin
 router.delete("/:id", allowRoles("Owner", "Admin"), deleteTask);

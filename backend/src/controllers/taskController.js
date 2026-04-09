@@ -42,6 +42,21 @@ exports.getTaskById = async (req, res, next) => {
   }
 };
 
+exports.getTasksByBoard = async (req, res, next) => {
+  try {
+    const { boardId } = req.params;
+
+    const tasks = await Task.find({
+      boardId,
+      organizationId: req.user.organizationId
+    });
+
+    res.json(tasks);
+  } catch (err) {
+    next(err);
+  }
+};
+
 // UPDATE a task
 exports.updateTask = async (req, res, next) => {
   try {

@@ -33,6 +33,21 @@ exports.getBoardById = async (req, res, next) => {
   }
 };
 
+exports.getTasksByBoard = async (req, res, next) => {
+  try {
+    const { boardId } = req.params;
+
+    const tasks = await Task.find({
+      boardId,
+      organizationId: req.user.organizationId
+    });
+
+    res.json(tasks);
+  } catch (err) {
+    next(err);
+  }
+};
+
 // CREATE a new board (only Owner can create)
 exports.createBoard = async (req, res, next) => {
   try {
