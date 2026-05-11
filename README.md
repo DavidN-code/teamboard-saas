@@ -15,7 +15,7 @@ TeamBoard allows users to:
 - Enforce role-based permissions
 - Track system activity through audit logs
 
-The goal is to simulate a **real-world SaaS backend**, not just a simple CRUD app.
+The goal is to simulate a **full-stack SaaS platform**, not just a simple CRUD app.
 
 ---
 
@@ -33,6 +33,7 @@ The goal is to simulate a **real-world SaaS backend**, not just a simple CRUD ap
 - React
 - React Router
 - Axios
+- Vite
 
 ### Deployment (planned)
 - Backend → Render
@@ -48,6 +49,10 @@ The goal is to simulate a **real-world SaaS backend**, not just a simple CRUD ap
 - Password hashing using bcrypt
 - Protected API routes
 - Multi-tenant data isolation via `organizationId`
+- frontend authentication UI
+- protected frontend routes
+- persistent login sessions
+- dashboard interface
 
 ---
 
@@ -116,8 +121,20 @@ backend/
     models/
     routes/
     utils/
-  app.js
-  server.js
+    app.js
+    server.js
+frontend/
+  src/
+    api/
+    assets/
+    components/
+    context/
+    hooks/
+    pages/
+    services/
+    utils/
+    App.jsx
+    main.jsx
 ~~~
 
 ---
