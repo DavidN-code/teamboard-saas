@@ -4,13 +4,14 @@ const logAction = require("../utils/auditLogger");
 // CREATE a new Task
 exports.createTask = async (req, res, next) => {
   try {
-    const { title, description, status, assignedTo } = req.body;
+    const { title, description, status, assignedTo, board } = req.body;
 
     const task = await Task.create({
       title,
       description,
       status,
       assignedTo,
+      board,
       organizationId: req.user.organizationId,
       createdBy: req.user.userId,
     });
@@ -38,6 +39,34 @@ exports.getTasks = async (req, res, next) => {
   try {
     const tasks = await Task.find({ organizationId: req.user.organizationId });
     res.json(tasks);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getTasksByBoard = async (req, res, next) => {
+  try {
+    const tasks = await Task.find({
+      board: req.params.boardId,
+      organizationId: req.user.organizationId,
+    });
+
+    res.json(tasks);
+
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getTasksByBoard = async (req, res, next) => {
+  try {
+    const tasks = await Task.find({
+      board: req.params.boardId,
+      organizationId: req.user.organizationId,
+    });
+
+    res.json(tasks);
+
   } catch (err) {
     next(err);
   }

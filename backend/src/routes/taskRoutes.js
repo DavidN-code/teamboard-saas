@@ -7,6 +7,7 @@ const allowRoles = require("../middleware/roleMiddleware");
 const {
   createTask,
   getTasks,
+  getTasksByBoard,
   getTaskById,
   updateTask,
   deleteTask,
@@ -17,6 +18,8 @@ router.use(protect);
 
 // GET all tasks for the user's organization
 router.get("/", getTasks);
+
+router.get("/board/:boardId", getTasksByBoard);
 
 // GET a single task by ID
 router.get("/:id", getTaskById);

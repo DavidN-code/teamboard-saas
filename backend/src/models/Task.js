@@ -6,6 +6,11 @@ const taskSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  board: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Board",
+    required: true,
+  },
   description: {
     type: String,
     trim: true,

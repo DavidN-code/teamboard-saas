@@ -1,100 +1,102 @@
 // frontend/src/pages/Dashboard.jsx
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
-import { useAuth } from "../context/AuthContext";
 
-const Dashboard = () => {
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import Sidebar from "../components/layout/Sidebar";
+import { useActiveBoard } from "../context/ActiveBoardContext";
+import { useAuth } from "../context/AuthContext";
+import api from "../api/axios";
+
+export default function Dashboard() {
+  const { activeBoard } = useActiveBoard();
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const [boards, setBoards] = useState([]);
-  const [selectedBoard, setSelectedBoard] = useState(null);
+
   const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loadingTasks, setLoadingTasks] = useState(false);
+  const [taskError, setTaskError] = useState("");
 
   useEffect(() => {
-    const fetchBoardsAndTasks = async () => {
+    const fetchTasks = async () => {
+      if (!activeBoard) return;
+
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          setError("No token found. Please log in.");
-          setLoading(false);
-          return;
-        }
+        setLoadingTasks(true);
+        setTaskError("");
 
-        // 1️⃣ Fetch all boards
-        const boardsRes = await api.get("/boards", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get(
+          `/tasks/board/${activeBoard._id}`
+        );
 
-        const boardsData = boardsRes.data || [];
-        setBoards(boardsData);
-
-        if (boardsData.length === 0) {
-          setError("No boards found for your organization.");
-          setLoading(false);
-          return;
-        }
-
-        // 2️⃣ Select the first board by default
-        const firstBoard = boardsData[0];
-        setSelectedBoard(firstBoard);
-
-        // 3️⃣ Fetch tasks for the selected board
-        const tasksRes = await api.get(`/tasks/boards/${firstBoard._id}/tasks`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setTasks(tasksRes.data || []);
-        setLoading(false);
-
+        setTasks(res.data || []);
       } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || "Failed to load dashboard");
-        setLoading(false);
+        setTaskError("Failed to load tasks");
+      } finally {
+        setLoadingTasks(false);
       }
     };
 
-    fetchBoardsAndTasks();
-  }, []);
-
-  if (loading) return <p>Loading dashboard...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+    fetchTasks();
+  }, [activeBoard]);
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <button
-  onClick={() => {
-    logout();
-    navigate("/login");
-  }}
->
-  Logout
-</button>
+    <div style={{ display: "flex", height: "100vh" }}>
+      
+      {/* Sidebar */}
+      <Sidebar />
 
-      {selectedBoard && (
-        <div style={{ marginTop: "20px" }}>
-          <h2>Board: {selectedBoard.name}</h2>
-          <p>ID: {selectedBoard._id}</p>
+      {/* Main Workspace */}
+      <div style={{ flex: 1, padding: "20px" }}>
+        
+        {/* Header */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <h2>
+            {activeBoard ? activeBoard.name : "Select a Board"}
+          </h2>
+
+          <button
+            onClick={() => {
+              logout();
+              navigate("/login");
+            }}
+          >
+            Logout
+          </button>
         </div>
-      )}
 
-      <h3>Tasks</h3>
-      {tasks.length === 0 ? (
-        <p>No tasks found for this board.</p>
-      ) : (
-        <ul>
-          {tasks.map((task) => (
-            <li key={task._id}>
-              <strong>{task.title}</strong> - {task.status || "No status"}
-            </li>
-          ))}
-        </ul>
-      )}
+        {/* Task Section */}
+        <div style={{ marginTop: "30px" }}>
+          <h3>Tasks</h3>
+
+          {loadingTasks && <p>Loading tasks...</p>}
+
+          {taskError && (
+            <p style={{ color: "red" }}>{taskError}</p>
+          )}
+
+          {!loadingTasks && tasks.length === 0 && (
+            <p>No tasks found for this board.</p>
+          )}
+
+          <ul>
+            {tasks.map((task) => (
+              <li key={task._id}>
+                <strong>{task.title}</strong> —{" "}
+                {task.status || "No status"}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+      </div>
     </div>
   );
-};
-
-export default Dashboard;
+}
