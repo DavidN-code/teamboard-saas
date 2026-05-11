@@ -1,10 +1,12 @@
 // frontend/src/pages/Dashboard.jsx
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
 const Dashboard = () => {
   const { logout } = useAuth();
+  const navigate = useNavigate();
   const [boards, setBoards] = useState([]);
   const [selectedBoard, setSelectedBoard] = useState(null);
   const [tasks, setTasks] = useState([]);
@@ -63,7 +65,14 @@ const Dashboard = () => {
   return (
     <div>
       <h1>Dashboard</h1>
-      <button onClick={logout}>Logout</button>
+      <button
+  onClick={() => {
+    logout();
+    navigate("/login");
+  }}
+>
+  Logout
+</button>
 
       {selectedBoard && (
         <div style={{ marginTop: "20px" }}>
