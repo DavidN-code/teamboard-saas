@@ -8,6 +8,7 @@ import { useActiveBoard } from "../context/ActiveBoardContext";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 import TaskModal from "../components/tasks/TaskModal";
+import TaskDetailsModal from "../components/tasks/TaskDetailsModal";
 
 export default function Dashboard() {
   const { activeBoard } = useActiveBoard();
@@ -19,6 +20,9 @@ export default function Dashboard() {
   const [taskError, setTaskError] = useState("");
 
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -123,10 +127,23 @@ export default function Dashboard() {
 
           <ul>
             {tasks.map((task) => (
-              <li key={task._id}>
-                <strong>{task.title}</strong> —{" "}
-                {task.status || "No status"}
-              </li>
+              <li
+              key={task._id}
+              onClick={() => {
+                setSelectedTask(task);
+                setIsDetailsModalOpen(true);
+              }}
+              style={{
+                cursor: "pointer",
+                padding: "10px",
+                border: "1px solid #ddd",
+                marginBottom: "8px",
+                borderRadius: "6px",
+              }}
+            >
+              <strong>{task.title}</strong> —{" "}
+              {task.status || "No status"}
+            </li>
             ))}
           </ul>
         </div>
@@ -136,6 +153,11 @@ export default function Dashboard() {
   isOpen={isTaskModalOpen}
   onClose={() => setIsTaskModalOpen(false)}
   onCreateTask={handleCreateTask}
+/>
+<TaskDetailsModal
+  task={selectedTask}
+  isOpen={isDetailsModalOpen}
+  onClose={() => setIsDetailsModalOpen(false)}
 />
     </div>
   );
