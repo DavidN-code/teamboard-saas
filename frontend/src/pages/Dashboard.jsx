@@ -7,6 +7,7 @@ import Sidebar from "../components/layout/Sidebar";
 import { useActiveBoard } from "../context/ActiveBoardContext";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
+import TaskModal from "../components/tasks/TaskModal";
 
 export default function Dashboard() {
   const { activeBoard } = useActiveBoard();
@@ -16,6 +17,8 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [loadingTasks, setLoadingTasks] = useState(false);
   const [taskError, setTaskError] = useState("");
+
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -40,6 +43,22 @@ export default function Dashboard() {
 
     fetchTasks();
   }, [activeBoard]);
+
+  const handleCreateTask = async (taskData) => {
+    try {
+      const res = await api.post("/tasks", {
+        ...taskData,
+        board: activeBoard._id,
+      });
+  
+      setTasks((prev) => [...prev, res.data]);
+  
+      setIsTaskModalOpen(false);
+  
+    } catch (err) {
+      console.error("Failed to create task", err);
+    }
+  };
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
@@ -74,7 +93,23 @@ export default function Dashboard() {
 
         {/* Task Section */}
         <div style={{ marginTop: "30px" }}>
-          <h3>Tasks</h3>
+        <div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  }}
+>
+  <h3>Tasks</h3>
+
+  {activeBoard && (
+    <button
+      onClick={() => setIsTaskModalOpen(true)}
+    >
+      + New Task
+    </button>
+  )}
+</div>
 
           {loadingTasks && <p>Loading tasks...</p>}
 
@@ -97,6 +132,11 @@ export default function Dashboard() {
         </div>
 
       </div>
+      <TaskModal
+  isOpen={isTaskModalOpen}
+  onClose={() => setIsTaskModalOpen(false)}
+  onCreateTask={handleCreateTask}
+/>
     </div>
   );
 }
