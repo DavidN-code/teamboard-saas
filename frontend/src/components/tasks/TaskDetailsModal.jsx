@@ -1,9 +1,22 @@
+import { useEffect, useState } from "react";
+
 export default function TaskDetailsModal({
     task,
     isOpen,
     onClose,
+    onUpdateTask,
   }) {
     if (!isOpen || !task) return null;
+
+    const [title, setTitle] = useState(task.title);
+const [description, setDescription] = useState(task.description || "");
+const [status, setStatus] = useState(task.status || "todo");
+
+useEffect(() => {
+  setTitle(task.title);
+  setDescription(task.description || "");
+  setStatus(task.status || "todo");
+}, [task]);
   
     return (
       <div
@@ -40,16 +53,63 @@ export default function TaskDetailsModal({
           </div>
   
           <div style={{ marginBottom: "16px" }}>
-            <strong>Status:</strong>
-            <p>{task.status}</p>
-          </div>
-  
-          <div>
-            <strong>Description:</strong>
-            <p>
-              {task.description || "No description provided."}
-            </p>
-          </div>
+  <strong>Title</strong>
+
+  <input
+    type="text"
+    value={title}
+    onChange={(e) => setTitle(e.target.value)}
+    style={{
+      width: "100%",
+      padding: "10px",
+      marginTop: "6px",
+    }}
+  />
+</div>
+
+<div style={{ marginBottom: "16px" }}>
+  <strong>Status</strong>
+
+  <select
+    value={status}
+    onChange={(e) => setStatus(e.target.value)}
+    style={{
+      width: "100%",
+      padding: "10px",
+      marginTop: "6px",
+    }}
+  >
+    <option value="todo">Todo</option>
+    <option value="in-progress">In Progress</option>
+    <option value="done">Done</option>
+  </select>
+</div>
+
+<div style={{ marginBottom: "16px" }}>
+  <strong>Description</strong>
+
+  <textarea
+    value={description}
+    onChange={(e) => setDescription(e.target.value)}
+    rows={5}
+    style={{
+      width: "100%",
+      padding: "10px",
+      marginTop: "6px",
+    }}
+  />
+</div>
+<button
+  onClick={() =>
+    onUpdateTask(task._id, {
+      title,
+      description,
+      status,
+    })
+  }
+>
+  Save Changes
+</button>
         </div>
       </div>
     );

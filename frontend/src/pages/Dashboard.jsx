@@ -64,6 +64,28 @@ export default function Dashboard() {
     }
   };
 
+  const handleUpdateTask = async (taskId, updatedData) => {
+    try {
+      const res = await api.put(
+        `/tasks/${taskId}`,
+        updatedData
+      );
+  
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task._id === taskId ? res.data : task
+        )
+      );
+  
+      setSelectedTask(res.data);
+  
+      setIsDetailsModalOpen(false);
+  
+    } catch (err) {
+      console.error("Failed to update task", err);
+    }
+  };
+
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       
@@ -158,6 +180,7 @@ export default function Dashboard() {
   task={selectedTask}
   isOpen={isDetailsModalOpen}
   onClose={() => setIsDetailsModalOpen(false)}
+  onUpdateTask={handleUpdateTask}
 />
     </div>
   );
