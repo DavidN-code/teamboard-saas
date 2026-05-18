@@ -10,6 +10,7 @@ import api from "../api/axios";
 import TaskModal from "../components/tasks/TaskModal";
 import TaskDetailsModal from "../components/tasks/TaskDetailsModal";
 
+
 export default function Dashboard() {
   const { activeBoard } = useActiveBoard();
   const { logout } = useAuth();
@@ -119,6 +120,7 @@ export default function Dashboard() {
   const doneTasks = tasks.filter(
     (task) => task.status === "done"
   );
+
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
