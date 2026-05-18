@@ -108,6 +108,18 @@ export default function Dashboard() {
     }
   };
 
+  const todoTasks = tasks.filter(
+    (task) => task.status === "todo"
+  );
+  
+  const inProgressTasks = tasks.filter(
+    (task) => task.status === "in-progress"
+  );
+  
+  const doneTasks = tasks.filter(
+    (task) => task.status === "done"
+  );
+
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       
@@ -169,28 +181,118 @@ export default function Dashboard() {
             <p>No tasks found for this board.</p>
           )}
 
-          <ul>
-            {tasks.map((task) => (
-              <li
-              key={task._id}
-              onClick={() => {
-                setSelectedTask(task);
-                setIsDetailsModalOpen(true);
-              }}
-              style={{
-                cursor: "pointer",
-                padding: "10px",
-                border: "1px solid #ddd",
-                marginBottom: "8px",
-                borderRadius: "6px",
-              }}
-            >
-              <strong>{task.title}</strong> —{" "}
-              {task.status || "No status"}
-            </li>
-            ))}
-          </ul>
+          
         </div>
+        <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: "20px",
+    marginTop: "20px",
+  }}
+>
+<div>
+  <h4>Todo</h4>
+
+  {todoTasks.map((task) => (
+    <div
+      key={task._id}
+      onClick={() => {
+        setSelectedTask(task);
+        setIsDetailsModalOpen(true);
+      }}
+      style={{
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        padding: "12px",
+        marginBottom: "12px",
+        cursor: "pointer",
+        background: "white",
+      }}
+    >
+      <strong>{task.title}</strong>
+
+      <p
+        style={{
+          fontSize: "14px",
+          color: "#666",
+          marginTop: "8px",
+        }}
+      >
+        {task.description || "No description"}
+      </p>
+    </div>
+  ))}
+</div>
+
+<div>
+  <h4>In Progress</h4>
+
+  {inProgressTasks.map((task) => (
+    <div
+      key={task._id}
+      onClick={() => {
+        setSelectedTask(task);
+        setIsDetailsModalOpen(true);
+      }}
+      style={{
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        padding: "12px",
+        marginBottom: "12px",
+        cursor: "pointer",
+        background: "white",
+      }}
+    >
+      <strong>{task.title}</strong>
+
+      <p
+        style={{
+          fontSize: "14px",
+          color: "#666",
+          marginTop: "8px",
+        }}
+      >
+        {task.description || "No description"}
+      </p>
+    </div>
+  ))}
+</div>
+
+<div>
+  <h4>Done</h4>
+
+  {doneTasks.map((task) => (
+    <div
+      key={task._id}
+      onClick={() => {
+        setSelectedTask(task);
+        setIsDetailsModalOpen(true);
+      }}
+      style={{
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        padding: "12px",
+        marginBottom: "12px",
+        cursor: "pointer",
+        background: "white",
+      }}
+    >
+      <strong>{task.title}</strong>
+
+      <p
+        style={{
+          fontSize: "14px",
+          color: "#666",
+          marginTop: "8px",
+        }}
+      >
+        {task.description || "No description"}
+      </p>
+    </div>
+  ))}
+</div>
+</div>
 
       </div>
       <TaskModal
