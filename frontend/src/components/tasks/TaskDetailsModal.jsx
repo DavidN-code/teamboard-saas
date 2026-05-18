@@ -5,6 +5,7 @@ export default function TaskDetailsModal({
     isOpen,
     onClose,
     onUpdateTask,
+    onDeleteTask,
   }) {
     if (!isOpen || !task) return null;
 
@@ -99,17 +100,33 @@ useEffect(() => {
     }}
   />
 </div>
-<button
-  onClick={() =>
-    onUpdateTask(task._id, {
-      title,
-      description,
-      status,
-    })
-  }
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    marginTop: "20px",
+  }}
 >
-  Save Changes
-</button>
+  <button
+    onClick={() =>
+      onDeleteTask(task._id)
+    }
+  >
+    Delete Task
+  </button>
+
+  <button
+    onClick={() =>
+      onUpdateTask(task._id, {
+        title,
+        description,
+        status,
+      })
+    }
+  >
+    Save Changes
+  </button>
+</div>
         </div>
       </div>
     );

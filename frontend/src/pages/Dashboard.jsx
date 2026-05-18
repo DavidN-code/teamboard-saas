@@ -86,6 +86,28 @@ export default function Dashboard() {
     }
   };
 
+  const handleDeleteTask = async (taskId) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this task?"
+    );
+  
+    if (!confirmed) return;
+  
+    try {
+      await api.delete(`/tasks/${taskId}`);
+  
+      setTasks((prevTasks) =>
+        prevTasks.filter((task) => task._id !== taskId)
+      );
+  
+      setIsDetailsModalOpen(false);
+      setSelectedTask(null);
+  
+    } catch (err) {
+      console.error("Failed to delete task", err);
+    }
+  };
+
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       
@@ -181,6 +203,7 @@ export default function Dashboard() {
   isOpen={isDetailsModalOpen}
   onClose={() => setIsDetailsModalOpen(false)}
   onUpdateTask={handleUpdateTask}
+  onDeleteTask={handleDeleteTask}
 />
     </div>
   );
