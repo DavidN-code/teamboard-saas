@@ -12,8 +12,9 @@ import TaskDetailsModal from "../components/tasks/TaskDetailsModal";
 import TaskCard from "../components/tasks/TaskCard";
 import {
   DndContext,
-  closestCenter,
-  useDroppable
+  rectIntersection,
+  useDroppable,
+  DragOverlay,
 } from "@dnd-kit/core";
 
 import {
@@ -52,6 +53,7 @@ export default function Dashboard() {
 
   const [selectedTask, setSelectedTask] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [activeTask, setActiveTask] = useState(null);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -137,6 +139,14 @@ export default function Dashboard() {
     }
   };
 
+  const handleDragStart = (event) => {
+    const taskId = event.active.id;
+  
+    const task = tasks.find((t) => t._id === taskId);
+  
+    setActiveTask(task);
+  };
+
   const handleDragEnd = async (event) => {
     const { active, over } = event;
   
@@ -163,6 +173,7 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Drag update failed", err);
     }
+    setActiveTask(null);
   };
 
   const todoTasks = tasks.filter(
@@ -242,7 +253,8 @@ export default function Dashboard() {
           
         </div>
         <DndContext
-  collisionDetection={closestCenter}
+  collisionDetection={rectIntersection}
+  onDragStart={handleDragStart}
   onDragEnd={handleDragEnd}
 >
         <div
@@ -309,6 +321,14 @@ export default function Dashboard() {
   </SortableContext>
 </Column>
 </div>
+<DragOverlay>
+  {activeTask ? (
+    <TaskCard
+      task={activeTask}
+      onClick={() => {}}
+    />
+  ) : null}
+</DragOverlay>
 </DndContext>
 
       </div>
