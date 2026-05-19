@@ -9,6 +9,7 @@ import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 import TaskModal from "../components/tasks/TaskModal";
 import TaskDetailsModal from "../components/tasks/TaskDetailsModal";
+import TaskCard from "../components/tasks/TaskCard";
 
 
 export default function Dashboard() {
@@ -197,33 +198,14 @@ export default function Dashboard() {
   <h4>Todo</h4>
 
   {todoTasks.map((task) => (
-    <div
-      key={task._id}
-      onClick={() => {
-        setSelectedTask(task);
-        setIsDetailsModalOpen(true);
-      }}
-      style={{
-        border: "1px solid #ddd",
-        borderRadius: "8px",
-        padding: "12px",
-        marginBottom: "12px",
-        cursor: "pointer",
-        background: "white",
-      }}
-    >
-      <strong>{task.title}</strong>
-
-      <p
-        style={{
-          fontSize: "14px",
-          color: "#666",
-          marginTop: "8px",
-        }}
-      >
-        {task.description || "No description"}
-      </p>
-    </div>
+    <TaskCard
+    key={task._id}
+    task={task}
+    onClick={() => {
+      setSelectedTask(task);
+      setIsDetailsModalOpen(true);
+    }}
+  />
   ))}
 </div>
 
@@ -231,33 +213,14 @@ export default function Dashboard() {
   <h4>In Progress</h4>
 
   {inProgressTasks.map((task) => (
-    <div
-      key={task._id}
-      onClick={() => {
-        setSelectedTask(task);
-        setIsDetailsModalOpen(true);
-      }}
-      style={{
-        border: "1px solid #ddd",
-        borderRadius: "8px",
-        padding: "12px",
-        marginBottom: "12px",
-        cursor: "pointer",
-        background: "white",
-      }}
-    >
-      <strong>{task.title}</strong>
-
-      <p
-        style={{
-          fontSize: "14px",
-          color: "#666",
-          marginTop: "8px",
-        }}
-      >
-        {task.description || "No description"}
-      </p>
-    </div>
+    <TaskCard
+    key={task._id}
+    task={task}
+    onClick={() => {
+      setSelectedTask(task);
+      setIsDetailsModalOpen(true);
+    }}
+  />
   ))}
 </div>
 
@@ -265,33 +228,14 @@ export default function Dashboard() {
   <h4>Done</h4>
 
   {doneTasks.map((task) => (
-    <div
-      key={task._id}
-      onClick={() => {
-        setSelectedTask(task);
-        setIsDetailsModalOpen(true);
-      }}
-      style={{
-        border: "1px solid #ddd",
-        borderRadius: "8px",
-        padding: "12px",
-        marginBottom: "12px",
-        cursor: "pointer",
-        background: "white",
-      }}
-    >
-      <strong>{task.title}</strong>
-
-      <p
-        style={{
-          fontSize: "14px",
-          color: "#666",
-          marginTop: "8px",
-        }}
-      >
-        {task.description || "No description"}
-      </p>
-    </div>
+    <TaskCard
+    key={task._id}
+    task={task}
+    onClick={() => {
+      setSelectedTask(task);
+      setIsDetailsModalOpen(true);
+    }}
+  />
   ))}
 </div>
 </div>
