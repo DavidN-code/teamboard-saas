@@ -10,6 +10,33 @@ import api from "../api/axios";
 import TaskModal from "../components/tasks/TaskModal";
 import TaskDetailsModal from "../components/tasks/TaskDetailsModal";
 import TaskCard from "../components/tasks/TaskCard";
+import {
+  DndContext,
+  closestCenter,
+  useDroppable
+} from "@dnd-kit/core";
+
+import {
+  useSortable,
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy
+} from "@dnd-kit/sortable";
+
+import { CSS } from "@dnd-kit/utilities";
+
+function Column({ id, title, children }) {
+  const { setNodeRef } = useDroppable({
+    id,
+  });
+
+  return (
+    <div ref={setNodeRef}>
+      <h4>{title}</h4>
+      {children}
+    </div>
+  );
+}
 
 
 export default function Dashboard() {
@@ -110,6 +137,34 @@ export default function Dashboard() {
     }
   };
 
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+  
+    if (!over) return;
+  
+    const taskId = active.id;
+    const newStatus = over.id;
+  
+    const task = tasks.find((t) => t._id === taskId);
+  
+    if (!task || task.status === newStatus) return;
+  
+    try {
+      const updated = await api.put(`/tasks/${taskId}`, {
+        ...task,
+        status: newStatus,
+      });
+  
+      setTasks((prev) =>
+        prev.map((t) =>
+          t._id === taskId ? updated.data : t
+        )
+      );
+    } catch (err) {
+      console.error("Drag update failed", err);
+    }
+  };
+
   const todoTasks = tasks.filter(
     (task) => task.status === "todo"
   );
@@ -186,6 +241,10 @@ export default function Dashboard() {
 
           
         </div>
+        <DndContext
+  collisionDetection={closestCenter}
+  onDragEnd={handleDragEnd}
+>
         <div
   style={{
     display: "grid",
@@ -194,51 +253,63 @@ export default function Dashboard() {
     marginTop: "20px",
   }}
 >
-<div>
-  <h4>Todo</h4>
+  
+  
+<Column id="todo" title="Todo">
+  <SortableContext
+    items={todoTasks.map(t => t._id)}
+    strategy={verticalListSortingStrategy}
+  >
+    {todoTasks.map((task) => (
+      <TaskCard
+        key={task._id}
+        task={task}
+        onClick={() => {
+          setSelectedTask(task);
+          setIsDetailsModalOpen(true);
+        }}
+      />
+    ))}
+  </SortableContext>
+</Column>
 
-  {todoTasks.map((task) => (
-    <TaskCard
-    key={task._id}
-    task={task}
-    onClick={() => {
-      setSelectedTask(task);
-      setIsDetailsModalOpen(true);
-    }}
-  />
-  ))}
+<Column id="in-progress" title="In Progress">
+  <SortableContext
+    items={inProgressTasks.map(t => t._id)}
+    strategy={verticalListSortingStrategy}
+  >
+    {inProgressTasks.map((task) => (
+      <TaskCard
+        key={task._id}
+        task={task}
+        onClick={() => {
+          setSelectedTask(task);
+          setIsDetailsModalOpen(true);
+        }}
+      />
+    ))}
+  </SortableContext>
+</Column>
+
+<Column id="done" title="Done">
+  <SortableContext
+    items={doneTasks.map(t => t._id)}
+    strategy={verticalListSortingStrategy}
+  >
+    {doneTasks.map((task) => (
+      <TaskCard
+        key={task._id}
+        task={task}
+        onClick={() => {
+          setSelectedTask(task);
+          setIsDetailsModalOpen(true);
+        }}
+      />
+    ))}
+  </SortableContext>
+</Column>
 </div>
-
-<div>
-  <h4>In Progress</h4>
-
-  {inProgressTasks.map((task) => (
-    <TaskCard
-    key={task._id}
-    task={task}
-    onClick={() => {
-      setSelectedTask(task);
-      setIsDetailsModalOpen(true);
-    }}
-  />
-  ))}
-</div>
-
-<div>
-  <h4>Done</h4>
-
-  {doneTasks.map((task) => (
-    <TaskCard
-    key={task._id}
-    task={task}
-    onClick={() => {
-      setSelectedTask(task);
-      setIsDetailsModalOpen(true);
-    }}
-  />
-  ))}
-</div>
-</div>
+</DndContext>
 
       </div>
       <TaskModal
