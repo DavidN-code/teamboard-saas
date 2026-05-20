@@ -19,23 +19,25 @@ export default function TaskCard({ task, onClick }) {
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const handleClick = (e) => {
+    if (isDragging) return;
+    onClick(e);
+  };
+
   return (
     <div ref={setNodeRef} style={style}>
       
-      {/* Drag handle (ONLY drag here) */}
+      {/* Drag handle ONLY */}
       <div
         {...attributes}
         {...listeners}
-        style={{
-          cursor: "grab",
-          paddingBottom: "6px",
-        }}
+        style={{ cursor: "grab", paddingBottom: "6px" }}
       >
         ☰
       </div>
 
-      {/* Clickable content (ONLY click here) */}
-      <div onClick={onClick}>
+      {/* Click area */}
+      <div onClick={handleClick}>
         <strong>{task.title}</strong>
 
         <p style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>
