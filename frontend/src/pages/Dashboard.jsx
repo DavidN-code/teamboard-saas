@@ -12,6 +12,7 @@ import TaskDetailsModal from "../components/tasks/TaskDetailsModal";
 import TaskCard from "../components/tasks/TaskCard";
 import {
   DndContext,
+  closestCenter,
   rectIntersection,
   useDroppable,
   DragOverlay,
@@ -140,10 +141,7 @@ export default function Dashboard() {
   };
 
   const handleDragStart = (event) => {
-    const taskId = event.active.id;
-  
-    const task = tasks.find((t) => t._id === taskId);
-  
+    const task = tasks.find(t => t._id === event.active.id);
     setActiveTask(task);
   };
 
@@ -155,25 +153,19 @@ export default function Dashboard() {
     const taskId = active.id;
     const newStatus = over.id;
   
-    const task = tasks.find((t) => t._id === taskId);
-  
-    if (!task || task.status === newStatus) return;
+    setTasks((prev) =>
+      prev.map((t) =>
+        t._id === taskId ? { ...t, status: newStatus } : t
+      )
+    );
   
     try {
-      const updated = await api.put(`/tasks/${taskId}`, {
-        ...task,
+      await api.put(`/tasks/${taskId}`, {
         status: newStatus,
       });
-  
-      setTasks((prev) =>
-        prev.map((t) =>
-          t._id === taskId ? updated.data : t
-        )
-      );
     } catch (err) {
       console.error("Drag update failed", err);
     }
-    setActiveTask(null);
   };
 
   const todoTasks = tasks.filter(
@@ -253,7 +245,7 @@ export default function Dashboard() {
           
         </div>
         <DndContext
-  collisionDetection={rectIntersection}
+  collisionDetection={closestCenter}
   onDragStart={handleDragStart}
   onDragEnd={handleDragEnd}
 >
@@ -269,7 +261,7 @@ export default function Dashboard() {
   
 <Column id="todo" title="Todo">
   <SortableContext
-    items={todoTasks.map(t => t._id)}
+    items={todoTasks.map((task) => task._id)}
     strategy={verticalListSortingStrategy}
   >
     {todoTasks.map((task) => (
@@ -287,7 +279,7 @@ export default function Dashboard() {
 
 <Column id="in-progress" title="In Progress">
   <SortableContext
-    items={inProgressTasks.map(t => t._id)}
+    items={inProgressTasks.map((task) => task._id)}
     strategy={verticalListSortingStrategy}
   >
     {inProgressTasks.map((task) => (
@@ -305,7 +297,7 @@ export default function Dashboard() {
 
 <Column id="done" title="Done">
   <SortableContext
-    items={doneTasks.map(t => t._id)}
+    items={doneTasks.map((task) => task._id)}
     strategy={verticalListSortingStrategy}
   >
     {doneTasks.map((task) => (
@@ -323,10 +315,16 @@ export default function Dashboard() {
 </div>
 <DragOverlay>
   {activeTask ? (
-    <TaskCard
-      task={activeTask}
-      onClick={() => {}}
-    />
+    <div style={{
+      padding: "12px",
+      background: "white",
+      border: "1px solid #ddd",
+      borderRadius: "8px",
+      boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
+    }}>
+      <strong>{activeTask.title}</strong>
+      <p>{activeTask.description}</p>
+    </div>
   ) : null}
 </DragOverlay>
 </DndContext>

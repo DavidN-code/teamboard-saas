@@ -8,40 +8,40 @@ export default function TaskCard({ task, onClick }) {
     setNodeRef,
     transform,
     transition,
+    isDragging,
   } = useSortable({
-    id: task._id, // 🔥 THIS is what connects drag system to this card
+    id: task._id,
   });
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
-    border: "1px solid #ddd",
-    borderRadius: "8px",
-    padding: "12px",
-    marginBottom: "12px",
-    background: "white",
-    cursor: "grab",
+    transition: transition || "transform 200ms ease",
+    opacity: isDragging ? 0.5 : 1,
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      onClick={onClick}
-    >
-      <strong>{task.title}</strong>
-
-      <p
+    <div ref={setNodeRef} style={style}>
+      
+      {/* Drag handle (ONLY drag here) */}
+      <div
+        {...attributes}
+        {...listeners}
         style={{
-          fontSize: "14px",
-          color: "#666",
-          marginTop: "8px",
+          cursor: "grab",
+          paddingBottom: "6px",
         }}
       >
-        {task.description || "No description"}
-      </p>
+        ☰
+      </div>
+
+      {/* Clickable content (ONLY click here) */}
+      <div onClick={onClick}>
+        <strong>{task.title}</strong>
+
+        <p style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>
+          {task.description || "No description"}
+        </p>
+      </div>
     </div>
   );
 }
