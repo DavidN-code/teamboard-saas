@@ -12,13 +12,7 @@ export default function Sidebar() {
   // Fetch boards
   const fetchBoards = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await api.get("/boards", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await api.get("/boards");
       setBoards(res.data);
 
       // Auto-select first board if none selected

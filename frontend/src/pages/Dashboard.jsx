@@ -128,6 +128,7 @@ export default function Dashboard() {
   };
 
   const handleDragEnd = async (event) => {
+    console.log(localStorage.getItem("token"));
     const { active, over } = event;
 
     setActiveTask(null);
