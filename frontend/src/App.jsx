@@ -4,6 +4,7 @@ import LoginPage from "./pages/Login.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { useAuth } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard.jsx";
+import AuditLogs from "./pages/AuditLogs.jsx";
 
 
 function App() {
@@ -22,6 +23,15 @@ function App() {
           </ProtectedRoute>
         }
         />
+
+      <Route
+        path="/audit-logs"
+        element={
+          <ProtectedRoute allowedRoles={["owner", "admin"]}>
+            <AuditLogs />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
