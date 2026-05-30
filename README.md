@@ -1,8 +1,8 @@
-# 🚀 TeamBoard – Secure Multi-Tenant SaaS Platform
+# 🚀 TeamBoard – Secure Multi-Tenant SaaS Platform (Full-Stack Kanban System)
 
-TeamBoard is a production-style, full-stack SaaS application designed to demonstrate secure backend architecture, multi-tenant data isolation, role-based access control (RBAC), and audit logging.
+TeamBoard is a production-style, full-stack SaaS application designed to demonstrate secure backend architecture, multi-tenant data isolation, role-based access control (RBAC), and real-time-like drag-and-drop task management.
 
-This project focuses on building real-world backend systems that reflect how modern SaaS platforms are structured and secured.
+This project simulates a modern Kanban-style SaaS product similar to Trello, with authentication, boards, tasks, and interactive drag-and-drop workflows.
 
 ---
 
@@ -10,12 +10,13 @@ This project focuses on building real-world backend systems that reflect how mod
 
 TeamBoard allows users to:
 
-- Create and manage organizations
-- Collaborate using boards and tasks
-- Enforce role-based permissions
-- Track system activity through audit logs
+- Create and manage boards (projects)
+- Create, edit, delete, and organize tasks
+- Drag and drop tasks between workflow columns
+- Persist authentication using JWT
+- Secure all API routes with middleware-based authentication
 
-The goal is to simulate a **full-stack SaaS platform**, not just a simple CRUD app.
+The goal is to demonstrate a **real-world SaaS architecture with interactive UI behavior and secure backend integration**, not just CRUD endpoints.
 
 ---
 
@@ -29,11 +30,12 @@ The goal is to simulate a **full-stack SaaS platform**, not just a simple CRUD a
 - JSON Web Tokens (JWT)
 - bcrypt
 
-### Frontend (planned)
-- React
+### Frontend
+- React (Vite)
 - React Router
-- Axios
-- Vite
+- Axios (with interceptors)
+- @dnd-kit/core
+- @dnd-kit/sortable
 
 ### Deployment (planned)
 - Backend → Render
@@ -44,76 +46,82 @@ The goal is to simulate a **full-stack SaaS platform**, not just a simple CRUD a
 
 ## 🔐 Core Features
 
-### Authentication & Security
-- User registration and login with JWT authentication
-- Password hashing using bcrypt
-- Protected API routes
-- Multi-tenant data isolation via `organizationId`
-- frontend authentication UI
-- protected frontend routes
-- persistent login sessions
-- dashboard interface
+### 🔑 Authentication & Security
+- User registration and login using JWT
+- Password hashing with bcrypt
+- Protected API routes using middleware
+- Persistent login using localStorage
+- Axios interceptor automatically attaches JWT token
+- Automatic redirect to login on 401 unauthorized responses
 
 ---
 
-### 🛡 Role-Based Access Control (RBAC)
-- Roles: **Owner, Admin, Member**
-- Middleware-based authorization
-- Fine-grained access control on:
-  - Boards
-  - Tasks
-  - Audit logs
+### 🛡 Role-Based Access Control (RBAC – foundation)
+- Architecture supports roles (Owner, Admin, Member)
+- Backend structure ready for permission expansion
 
 ---
 
-### 🏢 Multi-Tenant Architecture
-- Users belong to organizations
-- All data is scoped by `organizationId`
-- Prevents cross-organization data access
+### 🏢 Multi-Tenant Architecture (foundation)
+- Boards scoped to active user context
+- Backend designed for organization-level isolation (expandable)
 
 ---
 
-### 📋 Boards & Tasks
+### 📋 Boards & Tasks (Kanban System)
 
 #### Boards
-- Create, read, update, delete boards
-- Organization-scoped access
+- Create boards dynamically
+- Sidebar loads all boards for user
+- Active board selection system
+- Instant switching between boards
 
 #### Tasks
-- Full CRUD operations
-- Assigned users
-- Status tracking (todo, in-progress, etc.)
-- Organization-scoped access
+- Full CRUD (Create, Read, Update, Delete)
+- Status tracking:
+  - todo
+  - in-progress
+  - done
+- Board-based task filtering
+- Real-time UI updates after API changes
 
 ---
 
-### 📜 Audit Logging System (Advanced Feature)
-- Automatic logging of:
-  - Task actions (create, update, delete)
-  - Board actions (create, update, delete)
-- Stores:
-  - userId
-  - organizationId
-  - resourceId
-  - timestamps
+### 🖱 Drag & Drop Kanban System (Major Feature)
+
+- Built using @dnd-kit
+- Drag tasks between columns:
+  - Todo → In Progress → Done
+- Column-based drop zones
+- Drag preview overlay for UX clarity
+- Optimistic UI updates before backend confirmation
+- Backend sync via PUT /tasks/:id
 
 ---
 
-### 🔎 Audit Logs API
-- Secure endpoint: `GET /api/audit-logs`
-- RBAC protected (Owner/Admin only)
-- Organization-based filtering
-- Query support:
-  - `action`
-  - `resourceType`
-  - `limit` (performance control)
-- Sorted by newest activity
+### ⚡ Axios API Architecture
+
+- Centralized API client (api/axios.js)
+- JWT automatically injected into headers
+- Global 401 interceptor:
+  - Clears invalid token
+  - Redirects user to login page
+- Consistent API structure across frontend
+
+---
+
+### 📜 Task Interaction System
+
+- Click task to open detail modal
+- Edit title, description, and status
+- Delete task with confirmation
+- Modal updates sync across global state
 
 ---
 
 ## 📂 Project Structure
 
-~~~
+```
 backend/
   src/
     controllers/
@@ -123,19 +131,19 @@ backend/
     utils/
     app.js
     server.js
+
 frontend/
   src/
     api/
     assets/
     components/
+      layout/
+      tasks/
     context/
-    hooks/
     pages/
-    services/
-    utils/
     App.jsx
     main.jsx
-~~~
+```
 
 ---
 
@@ -143,52 +151,55 @@ frontend/
 
 ### 1. Clone the repository
 
-~~~bash
+```bash
 git clone https://github.com/DavidN-code/teamboard-saas.git
 cd teamboard-saas/backend
-~~~
+```
 
 ### 2. Install dependencies
 
-~~~bash
+```bash
 npm install
-~~~
+```
 
 ### 3. Create environment variables
 
-Create a `.env` file:
-
-~~~
+```
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
 PORT=5050
-~~~
+```
 
-### 4. Run the server
+### 4. Run backend
 
-~~~bash
+```bash
 npm start
-~~~
+```
 
 Server runs at:
-
-~~~
+```
 http://localhost:5050
-~~~
+```
+
+### 5. Run frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
 ---
 
-## 🔐 API Usage
+## 🔐 API Endpoints
 
 ### Authentication
-
 - POST /api/auth/register
 - POST /api/auth/login
 
 ---
 
 ### Boards (Protected)
-
 - GET /api/boards
 - POST /api/boards
 - GET /api/boards/:id
@@ -198,54 +209,38 @@ http://localhost:5050
 ---
 
 ### Tasks (Protected)
-
-- GET /api/tasks
+- GET /api/tasks/board/:boardId
 - POST /api/tasks
-- GET /api/tasks/:id
 - PUT /api/tasks/:id
 - DELETE /api/tasks/:id
 
 ---
 
-### Audit Logs (Protected – Owner/Admin only)
-
-- GET /api/audit-logs
-
-Optional query params:
-- action=CREATE_TASK
-- resourceType=Board
-- limit=10
+### Audit Logs (Future Feature)
+- GET /api/audit-logs (Owner/Admin only)
 
 ---
 
-## 🧪 Example Request
+## 🧪 Key Engineering Patterns Demonstrated
 
-~~~bash
-curl http://localhost:5050/api/audit-logs \
--H "Authorization: Bearer YOUR_TOKEN"
-~~~
-
----
-
-## 🎯 Learning Objectives
-
-This project demonstrates:
-
-- Production-level backend architecture
-- Secure multi-tenant SaaS design
-- Role-based authorization patterns
-- Audit logging systems
-- REST API best practices
+- JWT authentication system
+- Axios interceptor architecture
+- Kanban drag-and-drop UI system
+- Optimistic UI updates
+- React Context API state management
+- Component-based modal system
+- Separation of API, UI, and state layers
 
 ---
 
 ## 🚧 Future Improvements
 
-- Refresh token implementation
-- Rate limiting & enhanced security
-- Input validation middleware (Joi/Zod)
-- Frontend UI (React)
-- Full deployment (Render + Vercel)
+- Refine drag-and-drop UX polish
+- Add WebSocket real-time collaboration
+- Add refresh token authentication
+- Add full RBAC enforcement
+- Add audit log frontend UI
+- Add backend validation layer (Zod/Joi)
 
 ---
 

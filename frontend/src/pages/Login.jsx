@@ -25,10 +25,9 @@ const Login = () => {
     try {
       const res = await api.post("/auth/login", form);
 
-      const token = res.data.token;
+      const { token, user } = res.data;
 
-      // ✅ USE CONTEXT INSTEAD OF localStorage DIRECTLY
-      login(token);
+      login(token, user);
       navigate("/dashboard");
 
       setMessage("Login successful!");

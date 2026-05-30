@@ -17,7 +17,7 @@ The goal of this project is to simulate real-world full-stack engineering and Sa
 - Express
 - MongoDB (Atlas)
 - Mongoose
-- JWT (Access Tokens currently implemented, Refresh Tokens planned)
+- JWT (implemented with interceptor-based frontend integration)
 - bcrypt
 - express-rate-limit (planned)
 - helmet (planned)
@@ -25,8 +25,10 @@ The goal of this project is to simulate real-world full-stack engineering and Sa
 #### Frontend
 - React
 - React Router
-- Axios
+- Axios (with interceptors)
 - Vite
+- @dnd-kit/core
+- @dnd-kit/sortable
 
 #### Deployment
 - Backend → Render (planned)
@@ -38,17 +40,21 @@ The goal of this project is to simulate real-world full-stack engineering and Sa
 ## 🔐 Security & System Design
 
 ### Implemented
-- Multi-tenant data isolation via organizationId
-- Role-Based Access Control (Owner, Admin, Member)
-- JWT authentication
+- Multi-tenant data isolation via organizationId (backend architecture ready)
+- Role-Based Access Control (Owner, Admin, Member) (foundation implemented)
+- JWT authentication system
 - Password hashing using bcrypt
 - Protected backend routes
 - Centralized error handling
+- Axios interceptor-based authentication flow
+- Automatic token injection into API requests
+- Automatic 401 handling with redirect to login
+- Persistent login using localStorage
 - Audit logging system (backend)
 
 ### Planned Hardening
 - Refresh token authentication system
-- Rate limiting (auth + API protection)
+- Rate limiting (express-rate-limit)
 - Helmet security headers
 - Input validation middleware (Zod or Joi)
 - Account lockout after failed login attempts
@@ -66,7 +72,7 @@ Ensures complete data isolation between organizations.
 
 ---
 
-### RBAC Flow
+### RBAC Flow (Foundation)
 1. User authenticates via JWT
 2. Middleware extracts user role
 3. Authorization middleware validates permissions
@@ -102,67 +108,85 @@ Stored data includes:
 
 ## 🗂 Backend Folder Structure
 
+```
 backend/
-src/
-controllers/
-middleware/
-models/
-routes/
-services/
-utils/
-config/
-app.js
-server.js
+  src/
+    controllers/
+    middleware/
+    models/
+    routes/
+    services/
+    utils/
+    config/
+    app.js
+    server.js
+```
 
 ---
 
-## 🎯 Frontend Status (CURRENT PHASE)
+## 🎯 Frontend Status (CURRENT STATE)
 
 ### Implemented
 - React app initialized (Vite)
-- Authentication UI (login/register)
-- JWT-based authentication
-- Protected routes
+- Authentication system implemented (JWT + interceptor-based flow)
+- Protected routes system
 - Persistent login state
 - Logout flow
-- Dashboard layout
-- API integration via Axios
+- Dashboard layout shell
+- Sidebar-based board navigation system
+- ActiveBoardContext global state system
+- Board switching functionality
+- Task system fully integrated with backend API
+- Kanban-style task organization UI
+- Drag-and-drop task movement (@dnd-kit)
+- Task modals (create, edit, delete)
+- Optimistic UI updates for task movement
 
 ### Current Behavior
 - Users can register and log in
 - Authentication persists across refresh
-- Dashboard is protected
-- API requests are authenticated
-- Boards and tasks are fetched from backend
+- API requests are automatically authenticated
+- Boards are loaded dynamically
+- Tasks are loaded per active board
+- Tasks can be created, edited, deleted
+- Tasks can be dragged between columns
+- UI updates instantly with backend sync
 
 ---
 
-## 🧭 Frontend Roadmap (CURRENT PRIORITY)
+## 🧭 Frontend Roadmap
 
-### Phase 1 — SaaS Layout Foundation (IN PROGRESS)
-- Build sidebar-based board navigation system
-- Implement ActiveBoardContext (global state)
-- Refactor dashboard into layout shell
-- Board switching functionality
-- Fetch boards in sidebar UI
-
----
-
-### Phase 2 — Core Product UI Layer
-- Create board modal (UI)
-- Board list + selection system
-- Task filtering by active board
-- Task creation UI
-- Task list rendering improvements
+### Phase 1 — Foundation & Layout (COMPLETED)
+- Sidebar navigation system
+- ActiveBoardContext global state
+- Dashboard layout shell
+- Board switching system
+- API integration setup
 
 ---
 
-### Phase 3 — SaaS Experience Layer
-- Kanban board layout (columns)
-- Task cards UI system
-- Drag and drop task movement
+### Phase 2 — Task System Core (COMPLETED)
+- Task CRUD operations (create, update, delete)
+- Task modal system (UI + interaction)
+- Task filtering by board
+- Backend API integration for tasks
+
+---
+
+### Phase 3 — Kanban Interaction Layer (COMPLETED)
+- Drag and drop system using @dnd-kit
+- Column-based workflow (todo / in-progress / done)
+- Optimistic UI updates
+- Drag preview overlay
+- Task status synchronization with backend
+
+---
+
+### Phase 4 — SaaS Experience Layer (NEXT PRIORITY)
 - Role-based UI differences (Owner/Admin/Member)
 - Audit log frontend dashboard
+- UX polish (animations, smoother drag interactions)
+- Better visual hierarchy and spacing improvements
 
 ---
 
@@ -174,7 +198,7 @@ server.js
 - Input validation (Zod/Joi)
 - Account lockout system
 - Pagination & query optimization
-- Deployment to production
+- Production deployment (Render + Vercel)
 
 ---
 
