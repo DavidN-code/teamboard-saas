@@ -58,7 +58,9 @@ The goal is to demonstrate a **real-world SaaS architecture with interactive UI 
 
 ### 🛡 Role-Based Access Control (RBAC – foundation)
 - Architecture supports roles (Owner, Admin, Member)
-- Backend structure ready for permission expansion
+- Backend role architecture implemented
+- Frontend role-aware route protection implemented
+- Owner/Admin restricted routes supported
 
 ---
 
