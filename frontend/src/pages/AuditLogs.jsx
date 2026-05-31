@@ -1,6 +1,19 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 
+const formatAction = (action) => {
+  const actionMap = {
+    CREATE_TASK: "Created Task",
+    UPDATE_TASK: "Updated Task",
+    DELETE_TASK: "Deleted Task",
+    CREATE_BOARD: "Created Board",
+    UPDATE_BOARD: "Updated Board",
+    DELETE_BOARD: "Deleted Board",
+  };
+
+  return actionMap[action] || action;
+};
+
 const AuditLogs = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,7 +56,7 @@ const AuditLogs = () => {
             {logs.map((log) => (
               <tr key={log._id}>
                 <td>{log.userId?.name || "Unknown"}</td>
-                <td>{log.action}</td>
+                <td>{formatAction(log.action)}</td>
                 <td>{log.resourceType}</td>
                 <td>{new Date(log.createdAt).toLocaleString()}</td>
               </tr>
