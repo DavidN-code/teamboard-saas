@@ -44,7 +44,7 @@ const AuditLogs = () => {
       try {
 
         setLoading(true);
-        
+
         const res = await api.get("/audit-logs", {
           params: {
             action: actionFilter || undefined,
@@ -62,7 +62,7 @@ const AuditLogs = () => {
     fetchLogs();
   }, [actionFilter, resourceFilter]);
 
-  if (loading) return <p>Loading audit logs...</p>;
+  {loading && <p style={{ marginBottom: "10px" }}>Loading...</p>}
 
   return (
     <div className="audit-page">
