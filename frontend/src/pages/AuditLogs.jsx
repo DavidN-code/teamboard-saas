@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 import "./AuditLogs.css";
 
+
 const formatAction = (action) => {
   const actionMap = {
     CREATE_TASK: "Created Task",
@@ -35,10 +36,18 @@ const AuditLogs = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [actionFilter, setActionFilter] = useState("");
+  const [resourceFilter, setResourceFilter] = useState("");
+
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const res = await api.get("/audit-logs");
+        const res = await api.get("/audit-logs", {
+          params: {
+            action: actionFilter || undefined,
+            resourceType: resourceFilter || undefined,
+          },
+        });
         setLogs(res.data);
       } catch (err) {
         console.error("Failed to load audit logs:", err);
@@ -48,7 +57,7 @@ const AuditLogs = () => {
     };
 
     fetchLogs();
-  }, []);
+  }, [actionFilter, resourceFilter]);
 
   if (loading) return <p>Loading audit logs...</p>;
 
@@ -57,6 +66,27 @@ const AuditLogs = () => {
       <div className="audit-header">
   <h1>Audit Logs</h1>
   <p>Track activity across your organization.</p>
+</div>
+
+<div className="filter-bar">
+  <select
+    value={actionFilter}
+    onChange={(e) => setActionFilter(e.target.value)}
+  >
+    <option value="">All Actions</option>
+    <option value="CREATE_TASK">Created Task</option>
+    <option value="UPDATE_TASK">Updated Task</option>
+    <option value="DELETE_TASK">Deleted Task</option>
+  </select>
+
+  <select
+    value={resourceFilter}
+    onChange={(e) => setResourceFilter(e.target.value)}
+  >
+    <option value="">All Resources</option>
+    <option value="Task">Task</option>
+    <option value="Board">Board</option>
+  </select>
 </div>
 
       {logs.length === 0 ? (
