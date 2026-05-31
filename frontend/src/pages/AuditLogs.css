@@ -36,3 +36,39 @@
     background-color: #fee2e2;
     color: #991b1b;
   }
+
+  .audit-header {
+    margin-bottom: 24px;
+  }
+  
+  .audit-header h1 {
+    margin: 0;
+    font-size: 2rem;
+  }
+  
+  .audit-header p {
+    margin-top: 8px;
+    color: #666;
+  }
+
+  .audit-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  .audit-table th {
+    background: #f8fafc;
+    font-weight: 600;
+  }
+  
+  .audit-table tbody tr:hover {
+    background: #f8fafc;
+  }
+
+  .timestamp {
+    color: #666;
+    font-size: 0.9rem;
+  }

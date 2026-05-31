@@ -54,7 +54,10 @@ const AuditLogs = () => {
 
   return (
     <div className="audit-page">
-      <h1>Audit Logs</h1>
+      <div className="audit-header">
+  <h1>Audit Logs</h1>
+  <p>Track activity across your organization.</p>
+</div>
 
       {logs.length === 0 ? (
         <p>No activity yet.</p>
@@ -81,7 +84,9 @@ const AuditLogs = () => {
             </span>
           </td>
                 <td>{log.resourceType}</td>
-                <td>{new Date(log.createdAt).toLocaleString()}</td>
+                <td className="timestamp">
+                  {new Date(log.createdAt).toLocaleString()}
+                </td>
               </tr>
             ))}
           </tbody>
