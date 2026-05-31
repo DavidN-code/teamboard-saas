@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 import "./AuditLogs.css";
 
-
 const formatAction = (action) => {
   const actionMap = {
     CREATE_TASK: "Created Task",
@@ -17,18 +16,9 @@ const formatAction = (action) => {
 };
 
 const getActionClass = (action) => {
-  if (action.startsWith("CREATE")) {
-    return "action-create";
-  }
-
-  if (action.startsWith("UPDATE")) {
-    return "action-update";
-  }
-
-  if (action.startsWith("DELETE")) {
-    return "action-delete";
-  }
-
+  if (action.startsWith("CREATE")) return "action-create";
+  if (action.startsWith("UPDATE")) return "action-update";
+  if (action.startsWith("DELETE")) return "action-delete";
   return "";
 };
 
@@ -39,19 +29,32 @@ const AuditLogs = () => {
   const [actionFilter, setActionFilter] = useState("");
   const [resourceFilter, setResourceFilter] = useState("");
 
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [actionFilter, resourceFilter]);
+
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-
         setLoading(true);
 
         const res = await api.get("/audit-logs", {
           params: {
             action: actionFilter || undefined,
             resourceType: resourceFilter || undefined,
+            page,
+            limit,
           },
         });
-        setLogs(res.data);
+
+        setLogs(res.data.logs);
+        setTotalPages(res.data.totalPages);
       } catch (err) {
         console.error("Failed to load audit logs:", err);
       } finally {
@@ -60,37 +63,38 @@ const AuditLogs = () => {
     };
 
     fetchLogs();
-  }, [actionFilter, resourceFilter]);
-
-  {loading && <p style={{ marginBottom: "10px" }}>Loading...</p>}
+  }, [actionFilter, resourceFilter, page]);
 
   return (
     <div className="audit-page">
+
+      {loading && <p style={{ marginBottom: "10px" }}>Loading...</p>}
+
       <div className="audit-header">
-  <h1>Audit Logs</h1>
-  <p>Track activity across your organization.</p>
-</div>
+        <h1>Audit Logs</h1>
+        <p>Track activity across your organization.</p>
+      </div>
 
-<div className="filter-bar">
-  <select
-    value={actionFilter}
-    onChange={(e) => setActionFilter(e.target.value)}
-  >
-    <option value="">All Actions</option>
-    <option value="CREATE_TASK">Created Task</option>
-    <option value="UPDATE_TASK">Updated Task</option>
-    <option value="DELETE_TASK">Deleted Task</option>
-  </select>
+      <div className="filter-bar">
+        <select
+          value={actionFilter}
+          onChange={(e) => setActionFilter(e.target.value)}
+        >
+          <option value="">All Actions</option>
+          <option value="CREATE_TASK">Created Task</option>
+          <option value="UPDATE_TASK">Updated Task</option>
+          <option value="DELETE_TASK">Deleted Task</option>
+        </select>
 
-  <select
-    value={resourceFilter}
-    onChange={(e) => setResourceFilter(e.target.value)}
-  >
-    <option value="">All Resources</option>
-    <option value="Task">Task</option>
-    <option value="Board">Board</option>
-  </select>
-</div>
+        <select
+          value={resourceFilter}
+          onChange={(e) => setResourceFilter(e.target.value)}
+        >
+          <option value="">All Resources</option>
+          <option value="Task">Task</option>
+          <option value="Board">Board</option>
+        </select>
+      </div>
 
       {logs.length === 0 ? (
         <p>No activity yet.</p>
@@ -109,14 +113,17 @@ const AuditLogs = () => {
             {logs.map((log) => (
               <tr key={log._id}>
                 <td>{log.userId?.name || "Unknown"}</td>
+
                 <td>
-            <span
-              className={`action-badge ${getActionClass(log.action)}`}
-            >
-              {formatAction(log.action)}
-            </span>
-          </td>
+                  <span
+                    className={`action-badge ${getActionClass(log.action)}`}
+                  >
+                    {formatAction(log.action)}
+                  </span>
+                </td>
+
                 <td>{log.resourceType}</td>
+
                 <td className="timestamp">
                   {new Date(log.createdAt).toLocaleString()}
                 </td>
@@ -125,6 +132,26 @@ const AuditLogs = () => {
           </tbody>
         </table>
       )}
+
+      <div className="pagination">
+        <button
+          disabled={page === 1}
+          onClick={() => setPage((p) => p - 1)}
+        >
+          Previous
+        </button>
+
+        <span>
+          Page {page} of {totalPages}
+        </span>
+
+        <button
+          disabled={page === totalPages}
+          onClick={() => setPage((p) => p + 1)}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

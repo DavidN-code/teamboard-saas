@@ -5,7 +5,9 @@ exports.getAuditLogs = async (req, res, next) => {
   try {
     const { action, resourceType } = req.query;
 
-    const limit = parseInt(req.query.limit) || 100;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
     const query = {
       organizationId: req.user.organizationId,
@@ -20,11 +22,19 @@ exports.getAuditLogs = async (req, res, next) => {
     }
 
     const logs = await AuditLog.find(query)
-      .populate("userId", "name email") // 👈 THIS IS THE FIX
-      .sort({ createdAt: -1 })
-      .limit(limit);
+  .populate("userId", "name email")
+  .sort({ createdAt: -1 })
+  .skip(skip)
+  .limit(limit);
 
-    res.json(logs);
+  const total = await AuditLog.countDocuments(query);
+
+  res.json({
+    logs,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  });
 
   } catch (error) {
     next(error);
