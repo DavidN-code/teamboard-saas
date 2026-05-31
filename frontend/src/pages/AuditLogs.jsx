@@ -42,6 +42,9 @@ const AuditLogs = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
+
+        setLoading(true);
+        
         const res = await api.get("/audit-logs", {
           params: {
             action: actionFilter || undefined,
