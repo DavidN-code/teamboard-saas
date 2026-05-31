@@ -1,0 +1,38 @@
+.audit-page {
+    padding: 20px;
+  }
+  
+  .audit-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .audit-table th,
+  .audit-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  .action-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  
+  .action-create {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  
+  .action-update {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+  
+  .action-delete {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }

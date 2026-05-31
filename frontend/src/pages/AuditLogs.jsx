@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import "./AuditLogs.css";
 
 const formatAction = (action) => {
   const actionMap = {
@@ -12,6 +13,22 @@ const formatAction = (action) => {
   };
 
   return actionMap[action] || action;
+};
+
+const getActionClass = (action) => {
+  if (action.startsWith("CREATE")) {
+    return "action-create";
+  }
+
+  if (action.startsWith("UPDATE")) {
+    return "action-update";
+  }
+
+  if (action.startsWith("DELETE")) {
+    return "action-delete";
+  }
+
+  return "";
 };
 
 const AuditLogs = () => {
@@ -36,13 +53,13 @@ const AuditLogs = () => {
   if (loading) return <p>Loading audit logs...</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="audit-page">
       <h1>Audit Logs</h1>
 
       {logs.length === 0 ? (
         <p>No activity yet.</p>
       ) : (
-        <table border="1" cellPadding="10">
+        <table className="audit-table">
           <thead>
             <tr>
               <th>User</th>
@@ -56,7 +73,13 @@ const AuditLogs = () => {
             {logs.map((log) => (
               <tr key={log._id}>
                 <td>{log.userId?.name || "Unknown"}</td>
-                <td>{formatAction(log.action)}</td>
+                <td>
+            <span
+              className={`action-badge ${getActionClass(log.action)}`}
+            >
+              {formatAction(log.action)}
+            </span>
+          </td>
                 <td>{log.resourceType}</td>
                 <td>{new Date(log.createdAt).toLocaleString()}</td>
               </tr>
