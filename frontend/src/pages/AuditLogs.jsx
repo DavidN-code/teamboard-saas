@@ -22,6 +22,15 @@ const getActionClass = (action) => {
   return "";
 };
 
+const SkeletonRow = () => (
+  <tr className="skeleton-row">
+    <td><div className="skeleton skeleton-text"></div></td>
+    <td><div className="skeleton skeleton-text"></div></td>
+    <td><div className="skeleton skeleton-text"></div></td>
+    <td><div className="skeleton skeleton-text"></div></td>
+  </tr>
+);
+
 const AuditLogs = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,17 +73,21 @@ const AuditLogs = () => {
 
     fetchLogs();
   }, [actionFilter, resourceFilter, page]);
+  console.log("loading:", loading);
+console.log("logs length:", logs.length);
 
   return (
     <div className="audit-page">
-
-      {loading && <p style={{ marginBottom: "10px" }}>Loading...</p>}
-
+  
+      {loading && logs.length === 0 && (
+        <p style={{ marginBottom: "10px" }}>Loading...</p>
+      )}
+  
       <div className="audit-header">
         <h1>Audit Logs</h1>
         <p>Track activity across your organization.</p>
       </div>
-
+  
       <div className="filter-bar">
         <select
           value={actionFilter}
@@ -85,7 +98,7 @@ const AuditLogs = () => {
           <option value="UPDATE_TASK">Updated Task</option>
           <option value="DELETE_TASK">Deleted Task</option>
         </select>
-
+  
         <select
           value={resourceFilter}
           onChange={(e) => setResourceFilter(e.target.value)}
@@ -95,44 +108,51 @@ const AuditLogs = () => {
           <option value="Board">Board</option>
         </select>
       </div>
-
-      {logs.length === 0 ? (
+  
+      {/* EMPTY STATE */}
+      {!loading && logs.length === 0 ? (
         <p>No activity yet.</p>
       ) : (
-        <table className="audit-table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Action</th>
-              <th>Resource</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {logs.map((log) => (
-              <tr key={log._id}>
-                <td>{log.userId?.name || "Unknown"}</td>
-
-                <td>
-                  <span
-                    className={`action-badge ${getActionClass(log.action)}`}
-                  >
-                    {formatAction(log.action)}
-                  </span>
-                </td>
-
-                <td>{log.resourceType}</td>
-
-                <td className="timestamp">
-                  {new Date(log.createdAt).toLocaleString()}
-                </td>
+        <>
+          <table className="audit-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Action</th>
+                <th>Resource</th>
+                <th>Timestamp</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+  
+            <tbody>
+              {loading ? (
+                [...Array(6)].map((_, i) => (
+                  <SkeletonRow key={i} />
+                ))
+              ) : (
+                logs.map((log) => (
+                  <tr key={log._id}>
+                    <td>{log.userId?.name || "Unknown"}</td>
+  
+                    <td>
+                      <span className={`action-badge ${getActionClass(log.action)}`}>
+                        {formatAction(log.action)}
+                      </span>
+                    </td>
+  
+                    <td>{log.resourceType}</td>
+  
+                    <td className="timestamp">
+                      {new Date(log.createdAt).toLocaleString()}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </>
       )}
-
+  
       <div className="pagination">
         <button
           disabled={page === 1}
@@ -140,11 +160,11 @@ const AuditLogs = () => {
         >
           Previous
         </button>
-
+  
         <span>
           Page {page} of {totalPages}
         </span>
-
+  
         <button
           disabled={page === totalPages}
           onClick={() => setPage((p) => p + 1)}

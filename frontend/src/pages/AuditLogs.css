@@ -114,3 +114,30 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      #e2e8f0 25%,
+      #f8fafc 50%,
+      #e2e8f0 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+    border-radius: 6px;
+  }
+  
+  .skeleton-text {
+    height: 14px;
+    width: 100%;
+    min-width: 80px;
+  }
+  
+  .skeleton-row td {
+    padding: 14px;
+  }
+  
+  .skeleton-row td div {
+    min-height: 14px;
+    display: block;
+  }
