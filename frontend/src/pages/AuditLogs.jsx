@@ -45,14 +45,14 @@ const AuditLogs = () => {
 
   // Reset page when filters change
   useEffect(() => {
-    setPage(1);
-  }, [actionFilter, resourceFilter]);
-
-  useEffect(() => {
-    const fetchLogs = async () => {
+    const fetchData = async () => {  
       try {
         setLoading(true);
-
+  
+        // 1. TEST USERS FIRST (debug auth)
+        const usersRes = await api.get("/users");
+  
+        // 2. FETCH AUDIT LOGS
         const res = await api.get("/audit-logs", {
           params: {
             action: actionFilter || undefined,
@@ -61,18 +61,20 @@ const AuditLogs = () => {
             limit,
           },
         });
-
+  
         setLogs(res.data.logs);
         setTotalPages(res.data.totalPages);
+  
       } catch (err) {
-        console.error("Failed to load audit logs:", err);
+        console.error("API ERROR:", err.response?.data || err);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchLogs();
+  
+    fetchData();
   }, [actionFilter, resourceFilter, page]);
+
   console.log("loading:", loading);
 console.log("logs length:", logs.length);
 

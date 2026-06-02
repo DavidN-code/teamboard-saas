@@ -21,17 +21,19 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const res = await api.post("/auth/login", form);
-
+  
       const { token, user } = res.data;
-
+  
+      localStorage.setItem("token", token);
+  
       login(token, user);
       navigate("/dashboard");
-
+  
       setMessage("Login successful!");
-
+  
       console.log("TOKEN:", token);
     } catch (err) {
       console.error(err);

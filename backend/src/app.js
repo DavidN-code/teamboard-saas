@@ -7,7 +7,7 @@ const boardRoutes = require("./routes/boardRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const errorMiddleware = require("./middleware/errorMiddleware");
 const auditLogRoutes = require("./routes/auditLogRoutes");
-
+const userRoutes = require("./routes/userRoutes");
 
 // Middleware
 app.use(express.json());
@@ -22,13 +22,13 @@ app.use(cors({
   credentials: true // optional if you want cookies later
 }));
 
-app.use("/api/audit-logs", auditLogRoutes);
-
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use("/api/boards", boardRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/audit-logs", auditLogRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
