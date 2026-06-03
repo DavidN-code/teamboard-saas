@@ -5,7 +5,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { useAuth } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard.jsx";
 import AuditLogs from "./pages/AuditLogs.jsx";
-
+import OrganizationMembers from "./pages/OrganizationMembers.jsx";
 
 function App() {
   return (
@@ -13,6 +13,7 @@ function App() {
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/members" element={<OrganizationMembers />} />
 
       {/* 🔐 Protected Route */}
       <Route
