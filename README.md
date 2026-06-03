@@ -1,252 +1,330 @@
-# 🚀 TeamBoard – Secure Multi-Tenant SaaS Platform (Full-Stack Kanban System)
+# 🚀 TeamBoard – Multi-Tenant Project Management SaaS
 
-TeamBoard is a production-style, full-stack SaaS application designed to demonstrate secure backend architecture, multi-tenant data isolation, role-based access control (RBAC), and real-time-like drag-and-drop task management.
+TeamBoard is a full-stack SaaS application designed to demonstrate modern software engineering practices, including secure authentication, role-based access control (RBAC), audit logging, multi-tenant architecture, and Kanban-style project management.
 
-This project simulates a modern Kanban-style SaaS product similar to Trello, with authentication, boards, tasks, and interactive drag-and-drop workflows.
-
----
-
-## 🧠 Overview
-
-TeamBoard allows users to:
-
-- Create and manage boards (projects)
-- Create, edit, delete, and organize tasks
-- Drag and drop tasks between workflow columns
-- Persist authentication using JWT
-- Secure all API routes with middleware-based authentication
-
-The goal is to demonstrate a **real-world SaaS architecture with interactive UI behavior and secure backend integration**, not just CRUD endpoints.
+The project is being built as a portfolio-quality application to showcase skills commonly required of full-stack software developers.
 
 ---
 
-## 🧱 Tech Stack
+# 🎯 Project Goals
+
+TeamBoard is designed to demonstrate:
+
+* Full-stack application development
+* JWT authentication and authorization
+* Multi-tenant SaaS architecture
+* Role-based access control (RBAC)
+* Audit logging systems
+* React frontend architecture
+* RESTful API design
+* MongoDB data modeling
+* Secure backend development practices
+
+---
+
+# 🧱 Tech Stack
+
+## Backend
+
+* Node.js
+* Express.js
+* MongoDB Atlas
+* Mongoose
+* JSON Web Tokens (JWT)
+* bcrypt
+
+## Frontend
+
+* React
+* React Router
+* Axios
+* Vite
+* @dnd-kit/core
+* @dnd-kit/sortable
+
+## Planned Deployment
+
+* Backend → Render
+* Frontend → Vercel
+* Database → MongoDB Atlas
+
+---
+
+# 🔐 Authentication & Security
+
+## Implemented
+
+* User registration
+* User login
+* JWT authentication
+* Password hashing with bcrypt
+* Protected API routes
+* Axios interceptor authentication flow
+* Persistent login using localStorage
+* Automatic unauthorized-session handling
+* Centralized error handling
+
+## Planned
+
+* Refresh token authentication
+* Rate limiting
+* Helmet security headers
+* Input validation layer (Zod or Joi)
+
+---
+
+# 🏢 Multi-Tenant Architecture
+
+TeamBoard uses organization-based isolation.
+
+Each user belongs to an organization and application resources are scoped to that organization.
+
+## Implemented
+
+* Organization model
+* Organization ownership
+* User-to-organization relationships
+* Organization-scoped user access
+* Organization-scoped boards
+* Organization-scoped tasks
+
+This architecture helps ensure data isolation between organizations.
+
+---
+
+# 🛡 Role-Based Access Control (RBAC)
+
+TeamBoard supports multiple permission levels.
+
+## Roles
+
+### Owner
+
+* Full access
+* Manage organization members
+* Change user roles
+* Remove users
+
+### Admin
+
+* Manage project resources
+* Limited user management
+
+### Member
+
+* Standard workspace access
+
+## Implemented
+
+* Role field on users
+* Authorization middleware
+* Protected role-based endpoints
+* Owner/Admin route restrictions
+
+---
+
+# 📋 Boards & Tasks
+
+## Boards
+
+Implemented:
+
+* Create boards
+* View boards
+* Switch active boards
+* Organization-scoped board access
+
+## Tasks
+
+Implemented:
+
+* Create tasks
+* Update tasks
+* Delete tasks
+* Status management
+* Board filtering
+* Optimistic UI updates
+
+---
+
+# 🖱 Kanban Workflow System
+
+Built using @dnd-kit.
+
+Features:
+
+* Drag-and-drop tasks
+* Todo column
+* In Progress column
+* Done column
+* Backend synchronization
+* Drag preview overlay
+* Optimistic updates
+
+---
+
+# 📜 Audit Logging
+
+TeamBoard includes a working audit logging system.
+
+## Implemented
+
+* Audit log model
+* Audit log API
+* Audit log frontend page
+* Pagination
+* Filtering
+* User population
+
+Tracked actions include:
+
+* Board creation
+* Board updates
+* Board deletion
+* Task creation
+* Task updates
+* Task deletion
+
+---
+
+# 👥 Organization Members
+
+TeamBoard includes organization member management foundations.
+
+## Implemented
 
 ### Backend
-- Node.js
-- Express.js
-- MongoDB (Atlas)
-- Mongoose
-- JSON Web Tokens (JWT)
-- bcrypt
+
+* User management API
+* Organization user retrieval endpoint
+* Role-restricted user routes
 
 ### Frontend
-- React (Vite)
-- React Router
-- Axios (with interceptors)
-- @dnd-kit/core
-- @dnd-kit/sortable
 
-### Deployment (planned)
-- Backend → Render
-- Frontend → Vercel
-- Database → MongoDB Atlas
+* Organization Members page
+* Member listing table
+* User name display
+* User email display
+* User role display
 
 ---
 
-## 🔐 Core Features
+# ⚡ API Architecture
 
-### 🔑 Authentication & Security
-- User registration and login using JWT
-- Password hashing with bcrypt
-- Protected API routes using middleware
-- Persistent login using localStorage
-- Axios interceptor automatically attaches JWT token
-- Automatic redirect to login on 401 unauthorized responses
+## Axios Client
 
----
+Centralized API architecture:
 
-### 🛡 Role-Based Access Control (RBAC – foundation)
-- Architecture supports roles (Owner, Admin, Member)
-- Backend role architecture implemented
-- Frontend role-aware route protection implemented
-- Owner/Admin restricted routes supported
+* Shared Axios instance
+* Automatic JWT injection
+* Global authentication handling
+* Consistent API requests
 
----
+## REST API
 
-### 🏢 Multi-Tenant Architecture (foundation)
-- Boards scoped to active user context
-- Backend designed for organization-level isolation (expandable)
+Authentication:
 
----
+* POST /api/auth/register
+* POST /api/auth/login
 
-### 📋 Boards & Tasks (Kanban System)
+Boards:
 
-#### Boards
-- Create boards dynamically
-- Sidebar loads all boards for user
-- Active board selection system
-- Instant switching between boards
+* GET /api/boards
+* POST /api/boards
+* PUT /api/boards/:id
+* DELETE /api/boards/:id
 
-#### Tasks
-- Full CRUD (Create, Read, Update, Delete)
-- Status tracking:
-  - todo
-  - in-progress
-  - done
-- Board-based task filtering
-- Real-time UI updates after API changes
+Tasks:
 
----
+* GET /api/tasks/board/:boardId
+* POST /api/tasks
+* PUT /api/tasks/:id
+* DELETE /api/tasks/:id
 
-### 🖱 Drag & Drop Kanban System (Major Feature)
+Audit Logs:
 
-- Built using @dnd-kit
-- Drag tasks between columns:
-  - Todo → In Progress → Done
-- Column-based drop zones
-- Drag preview overlay for UX clarity
-- Optimistic UI updates before backend confirmation
-- Backend sync via PUT /tasks/:id
+* GET /api/audit-logs
+
+Users:
+
+* GET /api/users
+* PUT /api/users/:id/role
+* DELETE /api/users/:id
 
 ---
 
-### ⚡ Axios API Architecture
+# 📂 Project Structure
 
-- Centralized API client (api/axios.js)
-- JWT automatically injected into headers
-- Global 401 interceptor:
-  - Clears invalid token
-  - Redirects user to login page
-- Consistent API structure across frontend
-
----
-
-### 📜 Task Interaction System
-
-- Click task to open detail modal
-- Edit title, description, and status
-- Delete task with confirmation
-- Modal updates sync across global state
-
----
-
-## 📂 Project Structure
-
-```
 backend/
-  src/
-    controllers/
-    middleware/
-    models/
-    routes/
-    utils/
-    app.js
-    server.js
+src/
+controllers/
+middleware/
+models/
+routes/
+utils/
+app.js
+server.js
 
 frontend/
-  src/
-    api/
-    assets/
-    components/
-      layout/
-      tasks/
-    context/
-    pages/
-    App.jsx
-    main.jsx
-```
+src/
+api/
+components/
+context/
+pages/
+App.jsx
+main.jsx
 
 ---
 
-## ⚙️ Getting Started
+# 🚧 Current Development Priorities
 
-### 1. Clone the repository
+## Priority 1 – Organization & Access Management
 
-```bash
-git clone https://github.com/DavidN-code/teamboard-saas.git
-cd teamboard-saas/backend
-```
+* Role badges
+* Role management UI
+* Frontend permission enforcement
+* User removal workflow
 
-### 2. Install dependencies
+## Priority 2 – Dashboard Enhancements
 
-```bash
-npm install
-```
+* User metrics
+* Board metrics
+* Task metrics
+* Activity summaries
 
-### 3. Create environment variables
+## Priority 3 – Team Collaboration
 
-```
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
-PORT=5050
-```
+* User invitations
+* Team onboarding workflows
 
-### 4. Run backend
+## Priority 4 – Production Readiness
 
-```bash
-npm start
-```
-
-Server runs at:
-```
-http://localhost:5050
-```
-
-### 5. Run frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
+* Deployment
+* Validation layer
+* Security hardening
+* Testing
 
 ---
 
-## 🔐 API Endpoints
+# 🧪 Engineering Concepts Demonstrated
 
-### Authentication
-- POST /api/auth/register
-- POST /api/auth/login
-
----
-
-### Boards (Protected)
-- GET /api/boards
-- POST /api/boards
-- GET /api/boards/:id
-- PUT /api/boards/:id
-- DELETE /api/boards/:id
-
----
-
-### Tasks (Protected)
-- GET /api/tasks/board/:boardId
-- POST /api/tasks
-- PUT /api/tasks/:id
-- DELETE /api/tasks/:id
+* JWT authentication
+* Authorization middleware
+* RBAC
+* Multi-tenant architecture
+* Audit logging
+* React Context API
+* Axios interceptors
+* Optimistic UI updates
+* Drag-and-drop interfaces
+* REST API design
+* MongoDB data modeling
 
 ---
 
-### Audit Logs (Future Feature)
-- GET /api/audit-logs (Owner/Admin only)
+# 👨‍💻 Author
 
----
+David Neagoy
 
-## 🧪 Key Engineering Patterns Demonstrated
-
-- JWT authentication system
-- Axios interceptor architecture
-- Kanban drag-and-drop UI system
-- Optimistic UI updates
-- React Context API state management
-- Component-based modal system
-- Separation of API, UI, and state layers
-
----
-
-## 🚧 Future Improvements
-
-- Refine drag-and-drop UX polish
-- Add WebSocket real-time collaboration
-- Add refresh token authentication
-- Add full RBAC enforcement
-- Add audit log frontend UI
-- Add backend validation layer (Zod/Joi)
-
----
-
-## 👨‍💻 Author
-
-David Neagoy  
+GitHub:
 https://github.com/DavidN-code

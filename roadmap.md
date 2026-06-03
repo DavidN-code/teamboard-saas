@@ -2,232 +2,289 @@
 
 ## 🚀 Overview
 
-TeamBoard is a production-style multi-tenant task management platform designed to demonstrate secure SaaS architecture, role-based access control (RBAC), and audit logging.
+TeamBoard is a production-style multi-tenant project management SaaS application designed to demonstrate modern full-stack development practices, secure authentication, role-based access control (RBAC), audit logging, and organization-scoped data management.
 
-The goal of this project is to simulate real-world full-stack engineering and SaaS system design rather than build a simple CRUD application.
-
----
-
-## 🧱 Architecture Overview
-
-### Tech Stack
-
-#### Backend
-- Node.js
-- Express
-- MongoDB (Atlas)
-- Mongoose
-- JWT (implemented with interceptor-based frontend integration)
-- bcrypt
-- express-rate-limit (planned)
-- helmet (planned)
-
-#### Frontend
-- React
-- React Router
-- Axios (with interceptors)
-- Vite
-- @dnd-kit/core
-- @dnd-kit/sortable
-
-#### Deployment
-- Backend → Render (planned)
-- Frontend → Vercel (planned)
-- Database → MongoDB Atlas
+The goal of this project is to showcase real-world SaaS architecture and engineering patterns rather than simply implementing CRUD functionality.
 
 ---
 
-## 🔐 Security & System Design
+## 🧱 Tech Stack
 
-### Implemented
-- Multi-tenant data isolation via organizationId (backend architecture ready)
-- Role-Based Access Control (Owner, Admin, Member) (foundation implemented)
-- JWT authentication system
-- Password hashing using bcrypt
-- Protected backend routes
-- Centralized error handling
-- Axios interceptor-based authentication flow
-- Automatic token injection into API requests
-- Automatic 401 handling with redirect to login
-- Persistent login using localStorage
-- Audit logging system (backend)
+### Backend
 
-### Planned Hardening
-- Refresh token authentication system
-- Rate limiting (express-rate-limit)
-- Helmet security headers
-- Input validation middleware (Zod or Joi)
-- Account lockout after failed login attempts
-- Pagination for large datasets
+* Node.js
+* Express
+* MongoDB Atlas
+* Mongoose
+* JWT Authentication
+* bcrypt
 
----
+### Frontend
 
-## 🧠 Core System Architecture
+* React
+* React Router
+* Axios
+* Vite
+* @dnd-kit/core
+* @dnd-kit/sortable
 
-### Multi-Tenant Model
-All resources are scoped by:
-- organizationId
+### Planned Deployment
 
-Ensures complete data isolation between organizations.
+* Backend → Render
+* Frontend → Vercel
+* Database → MongoDB Atlas
 
 ---
 
-### RBAC Flow (Foundation)
-1. User authenticates via JWT
-2. Middleware extracts user role
-3. Authorization middleware validates permissions
-4. Access granted or denied based on role hierarchy:
-   - Owner → full access
-   - Admin → management access
-   - Member → limited access
+## 🔐 Security & Authentication
+
+### Completed
+
+* JWT authentication
+* Password hashing with bcrypt
+* Protected API routes
+* Axios interceptor authentication flow
+* Persistent login using localStorage
+* Automatic unauthorized-session handling
+* Centralized error handling
+
+### Planned
+
+* Refresh token authentication
+* Rate limiting
+* Helmet security headers
+* Input validation (Zod/Joi)
+* Account lockout protection
 
 ---
 
-### Audit Logging System
-Every important mutation (create/update/delete) triggers an audit log entry.
+## 🏢 Multi-Tenant Architecture
 
-Stored data includes:
-- userId
-- organizationId
-- action type
-- resource type
-- resourceId
-- timestamp
+### Completed
 
----
+* Organization model
+* User-to-organization relationships
+* Organization ownership
+* Organization-scoped data access
+* Organization-scoped user management
 
-## 🏗 Core Data Models
+### Goal
 
-- User
-- Organization
-- Board
-- Task
-- AuditLog
+Ensure complete data isolation between organizations.
 
 ---
 
-## 🗂 Backend Folder Structure
+## 🛡 Role-Based Access Control (RBAC)
 
-```
-backend/
-  src/
-    controllers/
-    middleware/
-    models/
-    routes/
-    services/
-    utils/
-    config/
-    app.js
-    server.js
-```
+### Completed
 
----
+* Owner role
+* Admin role
+* Member role
+* Backend authorization middleware
+* Role-restricted API endpoints
 
-## 🎯 Frontend Status (CURRENT STATE)
+### In Progress
 
-### Implemented
-- React app initialized (Vite)
-- Authentication system implemented (JWT + interceptor-based flow)
-- Protected routes system
-- Persistent login state
-- Logout flow
-- Dashboard layout shell
-- Sidebar-based board navigation system
-- ActiveBoardContext global state system
-- Board switching functionality
-- Task system fully integrated with backend API
-- Kanban-style task organization UI
-- Drag-and-drop task movement (@dnd-kit)
-- Task modals (create, edit, delete)
-- Optimistic UI updates for task movement
-
-### Current Behavior
-- Users can register and log in
-- Authentication persists across refresh
-- API requests are automatically authenticated
-- Boards are loaded dynamically
-- Tasks are loaded per active board
-- Tasks can be created, edited, deleted
-- Tasks can be dragged between columns
-- UI updates instantly with backend sync
+* Frontend role-aware UI controls
+* Role management interface
 
 ---
 
-## 🧭 Frontend Roadmap
+## 📋 Core Features
 
-### Phase 1 — Foundation & Layout (COMPLETED)
-- Sidebar navigation system
-- ActiveBoardContext global state
-- Dashboard layout shell
-- Board switching system
-- API integration setup
+### Boards
 
----
+* Create boards
+* View boards
+* Board switching
+* Organization-scoped access
 
-### Phase 2 — Task System Core (COMPLETED)
-- Task CRUD operations (create, update, delete)
-- Task modal system (UI + interaction)
-- Task filtering by board
-- Backend API integration for tasks
+### Tasks
 
----
+* Create tasks
+* Edit tasks
+* Delete tasks
+* Status tracking
+* Board filtering
+* Optimistic UI updates
 
-### Phase 3 — Kanban Interaction Layer (COMPLETED)
-- Drag and drop system using @dnd-kit
-- Column-based workflow (todo / in-progress / done)
-- Optimistic UI updates
-- Drag preview overlay
-- Task status synchronization with backend
+### Kanban System
 
----
-
-### Phase 4 — SaaS Experience Layer (NEXT PRIORITY)
-- Role-based UI differences (Owner/Admin/Member)
-- Audit log frontend dashboard
-- UX polish (animations, smoother drag interactions)
-- Better visual hierarchy and spacing improvements
+* Drag-and-drop workflow
+* Todo / In Progress / Done columns
+* Backend synchronization
+* Drag preview overlay
 
 ---
 
-## 🚧 Backend Enhancement Roadmap (Post-UI)
+## 📜 Audit Logging
 
-- JWT refresh token system
-- Rate limiting (express-rate-limit)
-- Helmet security headers
-- Input validation (Zod/Joi)
-- Account lockout system
-- Pagination & query optimization
-- Production deployment (Render + Vercel)
+### Completed
+
+* Audit log model
+* Audit log API
+* Activity tracking
+* Pagination
+* Filtering
+* User population
+* Audit log frontend page
+
+Tracked events:
+
+* Board creation
+* Board updates
+* Board deletion
+* Task creation
+* Task updates
+* Task deletion
 
 ---
 
-## 🚀 Deployment Phase
+## 👥 Organization Members
 
-- Backend deployment on Render
-- Frontend deployment on Vercel
-- MongoDB Atlas production configuration
-- Environment variable separation
-- Production security review
+### Completed
+
+* User management API
+* Organization members endpoint
+* Organization Members page
+* Member listing table
+* Name, email, and role display
+
+### Next Steps
+
+* Role editing UI
+* Role badges
+* Permission-based controls
+* User removal workflow
 
 ---
 
-## 🎯 Learning Objectives
+# 🗺 Development Roadmap
+
+## Phase 1 — Authentication & Foundations ✅
+
+* Registration
+* Login
+* JWT authentication
+* Protected routes
+* Axios interceptors
+* Persistent sessions
+
+---
+
+## Phase 2 — Boards & Tasks ✅
+
+* Board CRUD
+* Task CRUD
+* Board/task relationships
+* Active board state management
+
+---
+
+## Phase 3 — Kanban Workflow ✅
+
+* Drag-and-drop system
+* Workflow columns
+* Optimistic UI updates
+* Task status synchronization
+
+---
+
+## Phase 4 — Organization & Access Management 🚧 CURRENT PRIORITY
+
+### Role Management
+
+* Role badges
+* Change user role
+* Frontend role controls
+
+### Permission Enforcement
+
+* Owner-only actions
+* Admin-only actions
+* Hidden UI controls based on permissions
+
+### User Management
+
+* Remove users
+* Permission validation
+* Improved member administration
+
+---
+
+## Phase 5 — Dashboard & SaaS Experience
+
+### Dashboard Enhancements
+
+* Organization metrics
+* User counts
+* Board counts
+* Task counts
+* Recent activity widgets
+
+### UX Improvements
+
+* Loading states
+* Empty states
+* Responsive design
+* UI polish
+
+---
+
+## Phase 6 — Team Collaboration
+
+### Invitations
+
+* Invite users by email
+* Join organization workflow
+* Team onboarding experience
+
+---
+
+## Phase 7 — Production Readiness
+
+### Deployment
+
+* Render backend deployment
+* Vercel frontend deployment
+* Environment configuration
+
+### Security
+
+* Refresh tokens
+* Validation layer
+* Rate limiting
+* Helmet
+
+### Testing
+
+* Backend API testing
+* Frontend component testing
+* Integration testing
+
+---
+
+## 🎯 Portfolio Objectives
 
 This project demonstrates:
 
-- Production-level backend architecture
-- Secure multi-tenant SaaS design
-- Role-based authorization patterns
-- Audit logging systems
-- Full-stack integration patterns
-- Scalable frontend architecture
-- Real-world SaaS development workflow
-- Deployment-ready application structure
+* Full-stack application development
+* JWT authentication
+* Multi-tenant SaaS architecture
+* Role-based access control
+* Audit logging systems
+* React state management
+* REST API design
+* MongoDB data modeling
+* Secure backend architecture
+* Modern frontend engineering practices
 
 ---
 
 ## 👨‍💻 Author
 
 David Neagoy
-GitHub: https://github.com/DavidN-code
+
+GitHub:
+https://github.com/DavidN-code
