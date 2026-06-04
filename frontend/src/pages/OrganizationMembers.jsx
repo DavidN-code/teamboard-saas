@@ -17,10 +17,21 @@ const OrganizationMembers = () => {
     fetchUsers();
   }, []);
 
+  const getRoleBadgeClass = (role) => {
+    switch (role) {
+      case "owner":
+        return "bg-purple-100 text-purple-800";
+      case "admin":
+        return "bg-blue-100 text-blue-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   return (
     <div>
       <h1>Organization Members</h1>
-
+      
       <table>
         <thead>
           <tr>
@@ -35,7 +46,15 @@ const OrganizationMembers = () => {
             <tr key={u._id}>
               <td>{u.name}</td>
               <td>{u.email}</td>
-              <td>{u.role}</td>
+              <td>
+              <span
+  className={`px-2 py-1 rounded text-xs font-medium ${getRoleBadgeClass(
+    u.role
+  )}`}
+>
+  {u.role.toUpperCase()}
+</span>
+            </td>
             </tr>
           ))}
         </tbody>
