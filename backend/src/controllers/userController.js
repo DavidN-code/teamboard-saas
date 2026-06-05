@@ -20,6 +20,14 @@ exports.updateUserRole = async (req, res, next) => {
   try {
     const { role } = req.body;
 
+    const validRoles = ["owner", "admin", "member"];
+
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({
+        message: "Invalid role",
+      });
+    }
+
     const user = await User.findOne({
       _id: req.params.id,
       organizationId: req.user.organizationId,

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
 const OrganizationMembers = () => {
   const [users, setUsers] = useState([]);
@@ -16,7 +17,9 @@ const OrganizationMembers = () => {
 
     fetchUsers();
   }, []);
+  const { user } = useAuth();
 
+  console.log("Current User:", user);
   const getRoleBadgeClass = (role) => {
     switch (role) {
       case "owner":
@@ -25,6 +28,22 @@ const OrganizationMembers = () => {
         return "bg-blue-100 text-blue-800";
       default:
         return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const handleRoleChange = async (userId, newRole) => {
+    try {
+      const res = await api.put(`/users/${userId}/role`, {
+        role: newRole,
+      });
+  
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === userId ? res.data : user
+        )
+      );
+    } catch (err) {
+      console.error("Failed to update role:", err);
     }
   };
 
@@ -47,14 +66,27 @@ const OrganizationMembers = () => {
               <td>{u.name}</td>
               <td>{u.email}</td>
               <td>
-              <span
-  className={`px-2 py-1 rounded text-xs font-medium ${getRoleBadgeClass(
-    u.role
-  )}`}
->
-  {u.role.toUpperCase()}
-</span>
-            </td>
+  {user?.role === "owner" ? (
+    <select
+    value={u.role}
+    onChange={(e) =>
+      handleRoleChange(u._id, e.target.value)
+    }
+  >
+      <option value="owner">Owner</option>
+      <option value="admin">Admin</option>
+      <option value="member">Member</option>
+    </select>
+  ) : (
+    <span
+      className={`px-2 py-1 rounded text-xs font-medium ${getRoleBadgeClass(
+        u.role
+      )}`}
+    >
+      {u.role.toUpperCase()}
+    </span>
+  )}
+</td>
             </tr>
           ))}
         </tbody>
