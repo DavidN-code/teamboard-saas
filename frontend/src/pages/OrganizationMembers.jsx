@@ -47,6 +47,16 @@ const OrganizationMembers = () => {
     }
   };
 
+  const handleDeleteUser = async (userId) => {
+    try {
+      await api.delete(`/users/${userId}`);
+  
+      setUsers((prev) => prev.filter((u) => u._id !== userId));
+    } catch (err) {
+      console.error("Failed to delete user:", err);
+    }
+  };
+
   return (
     <div>
       <h1>Organization Members</h1>
@@ -57,6 +67,7 @@ const OrganizationMembers = () => {
             <th>Name</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Actions</th>
           </tr>
         </thead>
 
@@ -85,6 +96,16 @@ const OrganizationMembers = () => {
     >
       {u.role.toUpperCase()}
     </span>
+  )}
+</td>
+<td>
+  {user?.role === "owner" && user._id !== u._id && (
+    <button
+      onClick={() => handleDeleteUser(u._id)}
+      className="bg-red-500 text-white px-2 py-1 rounded text-xs"
+    >
+      Remove
+    </button>
   )}
 </td>
             </tr>
