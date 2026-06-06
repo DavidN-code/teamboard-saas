@@ -43,7 +43,7 @@ const OrganizationMembers = () => {
         )
       );
     } catch (err) {
-      console.error("Failed to update role:", err);
+      console.error(err.response?.data?.message || "Failed to update role");
     }
   };
 

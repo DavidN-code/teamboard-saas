@@ -39,6 +39,19 @@ exports.updateUserRole = async (req, res, next) => {
       });
     }
 
+    if (user.role === "owner" && role !== "owner") {
+      const ownerCount = await User.countDocuments({
+        organizationId: req.user.organizationId,
+        role: "owner",
+      });
+    
+      if (ownerCount <= 1) {
+        return res.status(400).json({
+          message: "Cannot change the role of the last owner",
+        });
+      }
+    }
+
     user.role = role;
 
     await user.save();
