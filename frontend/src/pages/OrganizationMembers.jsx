@@ -53,7 +53,7 @@ const OrganizationMembers = () => {
   
       setUsers((prev) => prev.filter((u) => u._id !== userId));
     } catch (err) {
-      console.error("Failed to delete user:", err);
+      console.error(err.response?.data?.message || "Failed to delete user");
     }
   };
 

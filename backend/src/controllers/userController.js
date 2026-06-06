@@ -63,6 +63,25 @@ exports.deleteUser = async (req, res, next) => {
       });
     }
 
+    if (user._id.toString() === req.user.userId) {
+      return res.status(400).json({
+        message: "You cannot delete your own account",
+      });
+    }
+
+    if (user.role === "owner") {
+      const ownerCount = await User.countDocuments({
+        organizationId: req.user.organizationId,
+        role: "owner",
+      });
+    
+      if (ownerCount <= 1) {
+        return res.status(400).json({
+          message: "Cannot delete the last owner",
+        });
+      }
+    }
+
     await user.deleteOne();
 
     res.json({
