@@ -49,6 +49,7 @@ export default function Dashboard() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const [activeTask, setActiveTask] = useState(null);
+  const [metrics, setMetrics] = useState(null);
 
   /* ---------------- LOAD TASKS ---------------- */
   useEffect(() => {
@@ -71,6 +72,19 @@ export default function Dashboard() {
 
     fetchTasks();
   }, [activeBoard]);
+
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        const res = await api.get("/metrics/dashboard");
+        setMetrics(res.data);
+      } catch (err) {
+        console.error("Failed to load metrics", err);
+      }
+    };
+  
+    fetchMetrics();
+  }, []);
 
   /* ---------------- CRUD ---------------- */
   const handleCreateTask = async (taskData) => {
@@ -168,7 +182,44 @@ export default function Dashboard() {
 
       <div style={{ flex: 1, padding: "20px" }}>
         {/* HEADER */}
+
+        {metrics && (
+  <div style={{ display: "flex", gap: "15px", marginTop: "20px" }}>
+    
+    <div style={{ padding: "15px", border: "1px solid #ddd" }}>
+      <h4>Users</h4>
+      <p>{metrics.users}</p>
+    </div>
+
+    <div style={{ padding: "15px", border: "1px solid #ddd" }}>
+      <h4>Boards</h4>
+      <p>{metrics.boards}</p>
+    </div>
+
+    <div style={{ padding: "15px", border: "1px solid #ddd" }}>
+      <h4>Tasks</h4>
+      <p>{metrics.tasks}</p>
+    </div>
+
+    <div style={{ padding: "15px", border: "1px solid #ddd" }}>
+      <h4>Todo</h4>
+      <p>{metrics.todo}</p>
+    </div>
+
+    <div style={{ padding: "15px", border: "1px solid #ddd" }}>
+      <h4>In Progress</h4>
+      <p>{metrics.inProgress}</p>
+    </div>
+
+    <div style={{ padding: "15px", border: "1px solid #ddd" }}>
+      <h4>Done</h4>
+      <p>{metrics.done}</p>
+    </div>
+
+  </div>
+)}
         <div style={{ display: "flex", justifyContent: "space-between" }}>
+          
           <h2>
             {activeBoard ? activeBoard.name : "Select a Board"}
           </h2>
@@ -185,7 +236,9 @@ export default function Dashboard() {
 
         {/* TASK CONTROLS */}
         <div style={{ marginTop: "20px" }}>
+        
           <h3>Tasks</h3>
+          
 
           {activeBoard && (
             <button onClick={() => setIsTaskModalOpen(true)}>
