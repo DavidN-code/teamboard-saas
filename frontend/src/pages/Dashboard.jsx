@@ -51,6 +51,14 @@ export default function Dashboard() {
   const [activeTask, setActiveTask] = useState(null);
   const [metrics, setMetrics] = useState(null);
 
+  const metricCardStyle = {
+    background: "#fff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "12px",
+    padding: "16px",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+  };
+
   /* ---------------- LOAD TASKS ---------------- */
   useEffect(() => {
     const fetchTasks = async () => {
@@ -183,35 +191,67 @@ export default function Dashboard() {
       <div style={{ flex: 1, padding: "20px" }}>
         {/* HEADER */}
 
+        <h1
+  style={{
+    marginBottom: "20px",
+  }}
+>
+  Dashboard Overview
+</h1>
+
         {metrics && (
-  <div style={{ display: "flex", gap: "15px", marginTop: "20px" }}>
+  <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+    gap: "16px",
+    marginBottom: "24px",
+  }}
+>
     
-    <div style={{ padding: "15px", border: "1px solid #ddd" }}>
-      <h4>Users</h4>
-      <p>{metrics.users}</p>
+    <div style={metricCardStyle}>
+    <h4
+  style={{
+    margin: 0,
+    fontSize: "14px",
+    color: "#6b7280",
+  }}
+>
+  Users
+</h4>
+
+<p
+  style={{
+    margin: "8px 0 0",
+    fontSize: "28px",
+    fontWeight: "bold",
+  }}
+>
+  {metrics.users}
+</p>
     </div>
 
-    <div style={{ padding: "15px", border: "1px solid #ddd" }}>
+    <div style={metricCardStyle}>
       <h4>Boards</h4>
       <p>{metrics.boards}</p>
     </div>
 
-    <div style={{ padding: "15px", border: "1px solid #ddd" }}>
+    <div style={metricCardStyle}>
       <h4>Tasks</h4>
       <p>{metrics.tasks}</p>
     </div>
 
-    <div style={{ padding: "15px", border: "1px solid #ddd" }}>
+    <div style={metricCardStyle}>
       <h4>Todo</h4>
       <p>{metrics.todo}</p>
     </div>
 
-    <div style={{ padding: "15px", border: "1px solid #ddd" }}>
+    <div style={metricCardStyle}>
       <h4>In Progress</h4>
       <p>{metrics.inProgress}</p>
     </div>
 
-    <div style={{ padding: "15px", border: "1px solid #ddd" }}>
+    <div style={metricCardStyle}>
       <h4>Done</h4>
       <p>{metrics.done}</p>
     </div>
@@ -220,9 +260,14 @@ export default function Dashboard() {
 )}
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           
-          <h2>
-            {activeBoard ? activeBoard.name : "Select a Board"}
-          </h2>
+        <h2
+  style={{
+    marginTop: "10px",
+    marginBottom: "20px",
+  }}
+>
+  {activeBoard ? activeBoard.name : "Select a Board"}
+</h2>
 
           <button
             onClick={() => {
