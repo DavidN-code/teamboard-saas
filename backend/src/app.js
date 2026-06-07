@@ -9,7 +9,7 @@ const errorMiddleware = require("./middleware/errorMiddleware");
 const auditLogRoutes = require("./routes/auditLogRoutes");
 const userRoutes = require("./routes/userRoutes");
 const metricsRoutes = require("./routes/metricsRoutes");
-console.log("APP.JS LOADED");
+const invitationRoutes = require("./routes/invitationRoutes");
 // Middleware
 app.use(express.json());
 
@@ -31,6 +31,7 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/audit-logs", auditLogRoutes);
 app.use("/api/metrics/dashboard", metricsRoutes);
+app.use("/api/invitations", invitationRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

@@ -4,6 +4,9 @@ import { useAuth } from "../context/AuthContext";
 
 const OrganizationMembers = () => {
   const [users, setUsers] = useState([]);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteMessage, setInviteMessage] = useState("");
+const [inviteError, setInviteError] = useState("");
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -47,6 +50,27 @@ const OrganizationMembers = () => {
     }
   };
 
+  const handleInviteUser = async () => {
+    try {
+      setInviteError("");
+    setInviteMessage("");
+
+      await api.post("/invitations", {
+        email: inviteEmail,
+      });
+  
+      setInviteMessage("Invitation created successfully");
+      setInviteEmail("");
+
+    } catch (err) {
+      setInviteMessage("");
+
+    setInviteError(
+      err.response?.data?.message || "Failed to send invitation"
+      );
+    }
+  };
+
   const handleDeleteUser = async (userId) => {
     try {
       await api.delete(`/users/${userId}`);
@@ -61,6 +85,36 @@ const OrganizationMembers = () => {
     <div>
       <h1>Organization Members</h1>
       
+      <div style={{ marginBottom: "20px" }}>
+  <h3>Invite User</h3>
+
+  {inviteMessage && (
+  <p style={{ color: "green" }}>{inviteMessage}</p>
+)}
+
+{inviteError && (
+  <p style={{ color: "red" }}>{inviteError}</p>
+)}
+
+<form
+  onSubmit={(e) => {
+    e.preventDefault();
+    handleInviteUser();
+  }}
+>
+  <input
+    type="email"
+    placeholder="email@example.com"
+    value={inviteEmail}
+    onChange={(e) => setInviteEmail(e.target.value)}
+  />
+
+  <button type="submit">
+    Send Invite
+  </button>
+</form>
+</div>
+
       <table>
         <thead>
           <tr>
