@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const Organization = require('../models/Organization');
+const Invitation = require("../models/Invitation");
 
 const register = async (req, res, next) => {
     try {
@@ -21,23 +22,44 @@ const register = async (req, res, next) => {
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-      // 4. Create organization
-      const organization = await Organization.create({
-        name: organizationName
-      });
-  
-      // 5. Create user (owner)
-     const user = await User.create({
+// 4. Check if there is a pending invitation for this email
+const invitation = await Invitation.findOne({
+  email,
+  status: "pending",
+});
+
+let organization;
+let role = "owner";
+
+// CASE 1: invited user exists
+if (invitation) {
+  organization = await Organization.findById(invitation.organizationId);
+  role = "member";
+
+  invitation.status = "accepted";
+  await invitation.save();
+} 
+// CASE 2: normal signup
+else {
+  organization = await Organization.create({
+    name: organizationName,
+  });
+}
+
+// 5. Create user
+const user = await User.create({
   name,
   email,
   password: hashedPassword,
-  role: 'owner',
-  organizationId: organization._id
+  role,
+  organizationId: organization._id,
 });
-  
-      // 6. Link owner to organization
-      organization.ownerId = user._id;
-      await organization.save();
+
+// 6. Only set owner if NOT invited user
+if (!invitation) {
+  organization.ownerId = user._id;
+  await organization.save();
+}
   
       // 7. Return success (no JWT yet)
       res.status(201).json({
