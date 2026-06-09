@@ -1,5 +1,6 @@
 const Invitation = require("../models/Invitation");
 const crypto = require("crypto");
+const sendInvitationEmail = require("../utils/sendInvitationEmail");
 
 exports.createInvitation = async (req, res, next) => {
   try {
@@ -26,7 +27,8 @@ exports.createInvitation = async (req, res, next) => {
 
     const inviteLink =
   `http://localhost:5173/register?token=${token}`;
-  console.log("INVITE LINK:", inviteLink);
+  await sendInvitationEmail(email, inviteLink);
+  
 res.status(201).json({
   message: "Invitation created successfully",
   inviteLink,
@@ -50,6 +52,45 @@ exports.getInvitationByToken = async (req, res, next) => {
       }
   
       res.json(invitation);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  exports.getPendingInvitations = async (req, res, next) => {
+    try {    
+      const invitations = await Invitation.find({
+        organizationId: req.user.organizationId,
+        status: "pending",
+      })
+        .populate("invitedBy", "name email")
+        .sort({ createdAt: -1 });
+  
+      res.json(invitations);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  exports.revokeInvitation = async (req, res, next) => {
+    try {
+      const invitation = await Invitation.findOne({
+        _id: req.params.id,
+        organizationId: req.user.organizationId,
+        status: "pending",
+      });
+  
+      if (!invitation) {
+        return res.status(404).json({
+          message: "Invitation not found",
+        });
+      }
+  
+      await invitation.deleteOne();
+  
+      res.json({
+        message: "Invitation revoked successfully",
+      });
     } catch (error) {
       next(error);
     }

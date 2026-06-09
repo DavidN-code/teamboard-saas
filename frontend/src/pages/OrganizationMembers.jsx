@@ -7,6 +7,7 @@ const OrganizationMembers = () => {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteMessage, setInviteMessage] = useState("");
 const [inviteError, setInviteError] = useState("");
+const [invitations, setInvitations] = useState([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -18,8 +19,19 @@ const [inviteError, setInviteError] = useState("");
       }
     };
 
+    const fetchInvitations = async () => {
+      try {
+        const res = await api.get("/invitations");
+        setInvitations(res.data);
+      } catch (err) {
+        console.error("Failed to load invitations:", err);
+      }
+    };
+
     fetchUsers();
+    fetchInvitations();
   }, []);
+
   const { user } = useAuth();
 
   console.log("Current User:", user);
@@ -59,7 +71,7 @@ const [inviteError, setInviteError] = useState("");
         email: inviteEmail,
       });
       
-      setInviteMessage("Invitation created successfully");
+      setInviteMessage("Invitation sent");
       setInviteEmail("");
 
     } catch (err) {
@@ -78,6 +90,21 @@ const [inviteError, setInviteError] = useState("");
       setUsers((prev) => prev.filter((u) => u._id !== userId));
     } catch (err) {
       console.error(err.response?.data?.message || "Failed to delete user");
+    }
+  };
+
+  const handleRevokeInvitation = async (invitationId) => {
+    try {
+      await api.delete(`/invitations/${invitationId}`);
+  
+      setInvitations((prev) =>
+        prev.filter((invite) => invite._id !== invitationId)
+      );
+    } catch (err) {
+      console.error(
+        err.response?.data?.message ||
+        "Failed to revoke invitation"
+      );
     }
   };
 
@@ -153,7 +180,7 @@ const [inviteError, setInviteError] = useState("");
   )}
 </td>
 <td>
-  {user?.role === "owner" && user._id !== u._id && (
+  {user?.role === "owner" && (user?.id || user?._id) !== u._id && (
     <button
       onClick={() => handleDeleteUser(u._id)}
       className="bg-red-500 text-white px-2 py-1 rounded text-xs"
@@ -166,6 +193,42 @@ const [inviteError, setInviteError] = useState("");
           ))}
         </tbody>
       </table>
+      <h3>Pending Invitations</h3>
+      <table>
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Invited By</th>
+      <th>Created</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {invitations.map((invite) => (
+      <tr key={invite._id}>
+        <td>{invite.email}</td>
+
+        <td>
+          {invite.invitedBy?.name || invite.invitedBy?.email || "Unknown"}
+        </td>
+
+        <td>
+          {new Date(invite.createdAt).toLocaleDateString()}
+        </td>
+
+        <td>
+          <button
+            onClick={() => handleRevokeInvitation(invite._id)}
+            className="bg-red-500 text-white px-2 py-1 rounded text-xs"
+          >
+            Revoke
+          </button>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
     </div>
   );
 };

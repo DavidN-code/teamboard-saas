@@ -1,5 +1,9 @@
-require('dotenv').config();
-
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+console.log("🔥 SERVER STARTED");
+console.log("EMAIL_USER (server):", process.env.EMAIL_USER);
+console.log("EMAIL_PASS exists (server):", !!process.env.EMAIL_PASS);
+console.log("CWD:", process.cwd());
 const mongoose = require('mongoose');
 const app = require('./app');
 
