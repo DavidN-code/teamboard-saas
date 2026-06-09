@@ -6,8 +6,9 @@ const authMiddleware = require("../middleware/authMiddleware");
 const allowRoles = require("../middleware/roleMiddleware");
 
 const {
-  createInvitation,
-} = require("../controllers/invitationController");
+    createInvitation,
+    getInvitationByToken,
+  } = require("../controllers/invitationController");
 
 router.post(
   "/",
@@ -15,5 +16,7 @@ router.post(
   allowRoles("owner", "admin"),
   createInvitation
 );
+
+router.get("/token/:token", getInvitationByToken);
 
 module.exports = router;

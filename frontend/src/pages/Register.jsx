@@ -1,7 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
 const Register = () => {
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
+  const [invitation, setInvitation] = useState(null);
+  const [loadingInvite, setLoadingInvite] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -9,6 +15,28 @@ const Register = () => {
     organizationName: ""
   });
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const validateInvitation = async () => {
+      if (!token) return;
+  
+      try {
+        setLoadingInvite(true);
+  
+        const res = await axios.get(
+          `http://localhost:5050/api/invitations/token/${token}`
+        );
+  
+        setInvitation(res.data);
+      } catch (err) {
+        console.error("Invalid invitation");
+      } finally {
+        setLoadingInvite(false);
+      }
+    };
+  
+    validateInvitation();
+  }, [token]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -28,9 +56,21 @@ const Register = () => {
   return (
     <div>
       <h1>Register</h1>
+      {loadingInvite && <p>Validating invitation...</p>}
+
+{invitation && (
+  <div>
+    <p>
+      Invitation detected for:
+      <strong> {invitation.email}</strong>
+    </p>
+  </div>
+)}
       <form onSubmit={handleSubmit}>
         <input name="name" placeholder="Full Name" onChange={handleChange} />
-        <input name="email" placeholder="Email" onChange={handleChange} />
+        <input name="email" placeholder="Email" value={invitation ? invitation.email : form.email}
+  onChange={handleChange}
+  disabled={!!invitation} />
         <input name="password" type="password" placeholder="Password" onChange={handleChange} />
         <input name="organizationName" placeholder="Organization Name" onChange={handleChange} />
         <button type="submit">Register</button>

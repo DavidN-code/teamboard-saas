@@ -36,3 +36,21 @@ res.status(201).json({
   }
 };
 
+exports.getInvitationByToken = async (req, res, next) => {
+    try {
+      const invitation = await Invitation.findOne({
+        token: req.params.token,
+        status: "pending",
+      });
+  
+      if (!invitation) {
+        return res.status(404).json({
+          message: "Invitation not found or expired",
+        });
+      }
+  
+      res.json(invitation);
+    } catch (error) {
+      next(error);
+    }
+  };
