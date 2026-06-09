@@ -58,7 +58,7 @@ const [inviteError, setInviteError] = useState("");
       await api.post("/invitations", {
         email: inviteEmail,
       });
-  
+      
       setInviteMessage("Invitation created successfully");
       setInviteEmail("");
 
