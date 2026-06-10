@@ -1,28 +1,30 @@
 # 🚀 TeamBoard – Multi-Tenant Project Management SaaS
 
-TeamBoard is a full-stack SaaS application designed to demonstrate modern software engineering practices, including secure authentication, role-based access control (RBAC), audit logging, multi-tenant architecture, and Kanban-style project management.
+TeamBoard is a full-stack SaaS application built to demonstrate production-style software engineering practices including secure authentication, multi-tenant architecture, role-based access control (RBAC), audit logging, team onboarding workflows, and Kanban project management.
 
-The project is being built as a portfolio-quality application to showcase skills commonly required of full-stack software developers.
+The project is being developed as a portfolio-quality application that showcases the skills commonly expected of modern full-stack software developers.
 
 ---
 
-# 🎯 Project Goals
+# 🎯 Project Objectives
 
-TeamBoard is designed to demonstrate:
+TeamBoard demonstrates the ability to design and build:
 
-* Full-stack application development
-* JWT authentication and authorization
+* Full-stack web applications
 * Multi-tenant SaaS architecture
-* Role-based access control (RBAC)
-* Audit logging systems
-* React frontend architecture
-* RESTful API design
+* Secure authentication systems
+* Role-based authorization
+* Team onboarding workflows
+* RESTful APIs
+* Modern React applications
 * MongoDB data modeling
-* Secure backend development practices
+* Email integrations
+* Audit logging systems
+* Production-oriented backend architecture
 
 ---
 
-# 🧱 Tech Stack
+# 🧱 Technology Stack
 
 ## Backend
 
@@ -32,6 +34,7 @@ TeamBoard is designed to demonstrate:
 * Mongoose
 * JSON Web Tokens (JWT)
 * bcrypt
+* Nodemailer
 
 ## Frontend
 
@@ -42,11 +45,12 @@ TeamBoard is designed to demonstrate:
 * @dnd-kit/core
 * @dnd-kit/sortable
 
-## Planned Deployment
+## Planned Production Infrastructure
 
-* Backend → Render
-* Frontend → Vercel
-* Database → MongoDB Atlas
+* Frontend: Vercel
+* Backend: Render
+* Database: MongoDB Atlas
+* Email Service: Resend or SendGrid
 
 ---
 
@@ -54,61 +58,74 @@ TeamBoard is designed to demonstrate:
 
 ## Implemented
 
+### User Authentication
+
 * User registration
 * User login
 * JWT authentication
 * Password hashing with bcrypt
 * Protected API routes
-* Axios interceptor authentication flow
-* Persistent login using localStorage
+* Persistent login sessions
 * Automatic unauthorized-session handling
+
+### Security Architecture
+
+* Authorization middleware
+* Role-restricted endpoints
+* Organization-level data isolation
 * Centralized error handling
+* Secure invitation token generation
+* Environment variable configuration
 
 ## Planned
 
-* Refresh token authentication
+* Refresh token rotation
 * Rate limiting
 * Helmet security headers
-* Input validation layer (Zod or Joi)
+* Input validation (Zod or Joi)
+* Account recovery workflows
 
 ---
 
-# 🏢 Multi-Tenant Architecture
+# 🏢 Multi-Tenant SaaS Architecture
 
-TeamBoard uses organization-based isolation.
+TeamBoard uses organization-based tenancy.
 
-Each user belongs to an organization and application resources are scoped to that organization.
+Every user belongs to a single organization and all resources are scoped to that organization.
+
+This prevents cross-organization data access and mirrors the architecture commonly used by SaaS platforms such as Slack, Asana, and Notion.
 
 ## Implemented
 
 * Organization model
 * Organization ownership
 * User-to-organization relationships
-* Organization-scoped user access
 * Organization-scoped boards
 * Organization-scoped tasks
-
-This architecture helps ensure data isolation between organizations.
+* Organization-scoped member management
+* Invitation-based organization onboarding
 
 ---
 
 # 🛡 Role-Based Access Control (RBAC)
 
-TeamBoard supports multiple permission levels.
+TeamBoard implements multiple permission levels.
 
 ## Roles
 
 ### Owner
 
-* Full access
-* Manage organization members
+* Full organization access
+* Manage users
 * Change user roles
 * Remove users
+* Create invitations
 
 ### Admin
 
 * Manage project resources
-* Limited user management
+* Create invitations
+* Limited organization management
 
 ### Member
 
@@ -116,10 +133,79 @@ TeamBoard supports multiple permission levels.
 
 ## Implemented
 
-* Role field on users
+* User role model
 * Authorization middleware
-* Protected role-based endpoints
-* Owner/Admin route restrictions
+* Role-protected routes
+* Owner-only user management
+* Owner-only role changes
+* Role-aware frontend rendering
+
+---
+
+# 👥 Organization Management & Team Onboarding
+
+TeamBoard includes a complete invitation-based onboarding system.
+
+## Member Management
+
+### Implemented
+
+* Organization member directory
+* Role management interface
+* User removal workflow
+* Role update API
+* Permission-based controls
+
+## Invitation System
+
+### Implemented
+
+* Invitation creation
+* Secure invitation tokens
+* Invitation validation endpoint
+* Pending invitation tracking
+* Invitation status management
+* Invitation revocation
+* Email invitation delivery
+* Invitation-aware registration flow
+
+### Invitation Workflow
+
+1. Owner/Admin creates invitation
+2. Secure token generated
+3. Invitation stored in MongoDB
+4. Email invitation delivered
+5. User opens invitation link
+6. Registration form validates invitation
+7. Email auto-filled and locked
+8. User joins organization automatically
+9. Invitation marked accepted
+
+### Invitation Status Tracking
+
+* Pending
+* Accepted
+
+---
+
+# 📧 Email Integration
+
+TeamBoard includes transactional email delivery for organization invitations.
+
+## Implemented
+
+* Nodemailer integration
+* Gmail SMTP configuration
+* Environment-based credentials
+* HTML email templates
+* Invitation acceptance links
+
+## Planned
+
+* Production email provider migration
+* Resend invitation workflow
+* Invitation expiration system
+* Email branding improvements
 
 ---
 
@@ -127,21 +213,23 @@ TeamBoard supports multiple permission levels.
 
 ## Boards
 
-Implemented:
+### Implemented
 
 * Create boards
 * View boards
-* Switch active boards
+* Update boards
+* Delete boards
+* Active board switching
 * Organization-scoped board access
 
 ## Tasks
 
-Implemented:
+### Implemented
 
 * Create tasks
-* Update tasks
+* Edit tasks
 * Delete tasks
-* Status management
+* Task status management
 * Board filtering
 * Optimistic UI updates
 
@@ -151,32 +239,34 @@ Implemented:
 
 Built using @dnd-kit.
 
-Features:
+## Implemented
 
-* Drag-and-drop tasks
+* Drag-and-drop task movement
 * Todo column
 * In Progress column
 * Done column
 * Backend synchronization
-* Drag preview overlay
-* Optimistic updates
+* Drag overlays
+* Optimistic state updates
 
 ---
 
-# 📜 Audit Logging
+# 📜 Audit Logging System
 
-TeamBoard includes a working audit logging system.
+TeamBoard includes a centralized audit logging system.
 
 ## Implemented
 
+### Audit Log Features
+
 * Audit log model
 * Audit log API
-* Audit log frontend page
+* Audit log UI
 * Pagination
 * Filtering
 * User population
 
-Tracked actions include:
+### Tracked Actions
 
 * Board creation
 * Board updates
@@ -185,140 +275,131 @@ Tracked actions include:
 * Task updates
 * Task deletion
 
----
-
-# 👥 Organization Members
-
-TeamBoard includes organization member management foundations.
-
-## Implemented
-
-### Backend
-
-* User management API
-* Organization user retrieval endpoint
-* Role-restricted user routes
-
-### Frontend
-
-* Organization Members page
-* Member listing table
-* User name display
-* User email display
-* User role display
+This provides visibility into organizational activity and demonstrates event-tracking architecture.
 
 ---
 
 # ⚡ API Architecture
 
-## Axios Client
+## Centralized Axios Client
 
-Centralized API architecture:
-
-* Shared Axios instance
+* Shared API client
 * Automatic JWT injection
-* Global authentication handling
-* Consistent API requests
+* Authentication handling
+* Consistent request patterns
 
 ## REST API
 
-Authentication:
+### Authentication
 
 * POST /api/auth/register
 * POST /api/auth/login
 
-Boards:
+### Boards
 
 * GET /api/boards
 * POST /api/boards
 * PUT /api/boards/:id
 * DELETE /api/boards/:id
 
-Tasks:
+### Tasks
 
 * GET /api/tasks/board/:boardId
 * POST /api/tasks
 * PUT /api/tasks/:id
 * DELETE /api/tasks/:id
 
-Audit Logs:
-
-* GET /api/audit-logs
-
-Users:
+### Users
 
 * GET /api/users
 * PUT /api/users/:id/role
 * DELETE /api/users/:id
+
+### Invitations
+
+* POST /api/invitations
+* GET /api/invitations
+* GET /api/invitations/token/:token
+* DELETE /api/invitations/:id
+
+### Audit Logs
+
+* GET /api/audit-logs
 
 ---
 
 # 📂 Project Structure
 
 backend/
-src/
-controllers/
-middleware/
-models/
-routes/
-utils/
-app.js
-server.js
+├── src/
+│ ├── controllers/
+│ ├── middleware/
+│ ├── models/
+│ ├── routes/
+│ ├── utils/
+│ ├── app.js
+│ └── server.js
 
 frontend/
-src/
-api/
-components/
-context/
-pages/
-App.jsx
-main.jsx
+├── src/
+│ ├── api/
+│ ├── components/
+│ ├── context/
+│ ├── pages/
+│ ├── App.jsx
+│ └── main.jsx
 
 ---
 
-# 🚧 Current Development Priorities
+# 🚧 Current Development Roadmap
 
-## Priority 1 – Organization & Access Management
+## Next Milestone
 
-* Role badges
-* Role management UI
-* Frontend permission enforcement
-* User removal workflow
+### Invitation System Enhancements
 
-## Priority 2 – Dashboard Enhancements
+* Invitation expiration
+* Resend invitation functionality
+* Enhanced email templates
 
-* User metrics
-* Board metrics
-* Task metrics
+### Dashboard Enhancements
+
+* Organization metrics
+* Task analytics
 * Activity summaries
+* Team insights
 
-## Priority 3 – Team Collaboration
+### Collaboration Features
 
-* User invitations
-* Team onboarding workflows
+* Comments
+* Notifications
+* Activity feeds
 
-## Priority 4 – Production Readiness
+### Production Readiness
 
-* Deployment
+* Automated testing
 * Validation layer
 * Security hardening
-* Testing
+* Cloud deployment
 
 ---
 
 # 🧪 Engineering Concepts Demonstrated
 
+* Multi-tenant SaaS architecture
 * JWT authentication
 * Authorization middleware
-* RBAC
-* Multi-tenant architecture
-* Audit logging
+* Role-Based Access Control (RBAC)
+* Secure token generation
+* Email workflow integration
 * React Context API
 * Axios interceptors
+* RESTful API design
+* MongoDB data modeling
+* Audit logging
 * Optimistic UI updates
 * Drag-and-drop interfaces
-* REST API design
-* MongoDB data modeling
+* Environment-based configuration
+* Organization onboarding workflows
 
 ---
 
