@@ -1,0 +1,115 @@
+const Comment = require("../models/Comment");
+const logAction = require("../utils/auditLogger");
+
+// CREATE COMMENT
+exports.createComment = async (req, res, next) => {
+  try {
+    const { content, taskId } = req.body;
+
+    const comment = await Comment.create({
+      content,
+      taskId,
+      organizationId: req.user.organizationId,
+      createdBy: req.user.userId,
+    });
+
+    await logAction({
+      action: "CREATE_COMMENT",
+      resourceType: "Comment",
+      resourceId: comment._id,
+      userId: req.user.userId,
+      organizationId: req.user.organizationId,
+    });
+
+    res.status(201).json(comment);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// GET COMMENTS FOR A TASK
+exports.getCommentsByTask = async (req, res, next) => {
+  try {
+    const comments = await Comment.find({
+      taskId: req.params.taskId,
+      organizationId: req.user.organizationId,
+    })
+      .populate("createdBy", "name email")
+      .sort({ createdAt: 1 });
+
+    res.json(comments);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// UPDATE COMMENT
+exports.updateComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findOne({
+      _id: req.params.id,
+      organizationId: req.user.organizationId,
+    });
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    if (comment.createdBy.toString() !== req.user.userId) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    comment.content = req.body.content;
+    await comment.save();
+
+    await logAction({
+      action: "UPDATE_COMMENT",
+      resourceType: "Comment",
+      resourceId: comment._id,
+      userId: req.user.userId,
+      organizationId: req.user.organizationId,
+    });
+
+    res.json(comment);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// DELETE COMMENT
+exports.deleteComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findOne({
+      _id: req.params.id,
+      organizationId: req.user.organizationId,
+    });
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    const isOwner =
+      comment.createdBy.toString() === req.user.userId;
+
+    const isAdminOrOwner =
+      req.user.role === "admin" || req.user.role === "owner";
+
+    if (!isOwner && !isAdminOrOwner) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    await comment.deleteOne();
+
+    await logAction({
+      action: "DELETE_COMMENT",
+      resourceType: "Comment",
+      resourceId: comment._id,
+      userId: req.user.userId,
+      organizationId: req.user.organizationId,
+    });
+
+    res.json({ message: "Comment deleted successfully" });
+  } catch (err) {
+    next(err);
+  }
+};

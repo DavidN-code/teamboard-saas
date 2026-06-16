@@ -10,6 +10,7 @@ const auditLogRoutes = require("./routes/auditLogRoutes");
 const userRoutes = require("./routes/userRoutes");
 const metricsRoutes = require("./routes/metricsRoutes");
 const invitationRoutes = require("./routes/invitationRoutes");
+const commentRoutes = require("./routes/commentRoutes");
 // Middleware
 app.use(express.json());
 
@@ -28,6 +29,7 @@ app.use(cors({
 app.use('/api/auth', authRoutes);
 app.use("/api/boards", boardRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/comments", commentRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/audit-logs", auditLogRoutes);
 app.use("/api/metrics/dashboard", metricsRoutes);

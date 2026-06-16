@@ -1,4 +1,12 @@
 import { useEffect, useState } from "react";
+import CommentList from "../comments/CommentList";
+import CommentForm from "../comments/CommentForm";
+import {
+  getComments,
+  createComment,
+  updateComment,
+  deleteComment,
+} from "../../api/comments";
 
 export default function TaskDetailsModal({
   task,
@@ -11,6 +19,7 @@ export default function TaskDetailsModal({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("todo");
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     if (task) {
@@ -18,10 +27,52 @@ export default function TaskDetailsModal({
       setDescription(task.description || "");
       setStatus(task.status || "todo");
     }
+    const loadComments = async () => {
+      if (task) {
+        const res = await getComments(task._id);
+        setComments(res.data);
+      }
+    };
+    loadComments();
   }, [task]);
 
   // ✅ safe render check AFTER hooks
   if (!isOpen || !task) return null;
+
+  const handleCreateComment = async (content) => {
+    const res = await createComment({
+      taskId: task._id,
+      content,
+    });
+  
+    setComments([...comments, res.data]);
+  };
+  
+  
+  const handleUpdateComment = async (id, content) => {
+    const res = await updateComment(id, {
+      content,
+    });
+  
+    setComments(
+      comments.map((comment) =>
+        comment._id === id
+          ? res.data
+          : comment
+      )
+    );
+  };
+  
+  
+  const handleDeleteComment = async (id) => {
+    await deleteComment(id);
+  
+    setComments(
+      comments.filter(
+        (comment) => comment._id !== id
+      )
+    );
+  };
 
   return (
     <div
@@ -88,6 +139,21 @@ export default function TaskDetailsModal({
             style={{ width: "100%", padding: "10px", marginTop: "6px" }}
           />
         </div>
+
+        {/* COMMENTS */}
+<div style={{ marginBottom: "16px" }}>
+  <strong>Comments</strong>
+
+  <CommentList
+    comments={comments}
+    onDelete={handleDeleteComment}
+    onUpdate={handleUpdateComment}
+  />
+
+  <CommentForm
+    onCreate={handleCreateComment}
+  />
+</div>
 
         {/* ACTIONS */}
         <div style={{ display: "flex", justifyContent: "space-between" }}>

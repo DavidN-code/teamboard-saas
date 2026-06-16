@@ -58,20 +58,6 @@ exports.getTasksByBoard = async (req, res, next) => {
   }
 };
 
-exports.getTasksByBoard = async (req, res, next) => {
-  try {
-    const tasks = await Task.find({
-      board: req.params.boardId,
-      organizationId: req.user.organizationId,
-    });
-
-    res.json(tasks);
-
-  } catch (err) {
-    next(err);
-  }
-};
-
 // GET a single task by ID
 exports.getTaskById = async (req, res, next) => {
   try {
