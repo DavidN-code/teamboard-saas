@@ -10,6 +10,8 @@ import TaskModal from "../components/tasks/TaskModal";
 import TaskDetailsModal from "../components/tasks/TaskDetailsModal";
 import TaskCard from "../components/tasks/TaskCard";
 
+import ActivityFeed from "../components/ActivityFeed";
+
 import {
   DndContext,
   closestCenter,
@@ -258,6 +260,7 @@ export default function Dashboard() {
 
   </div>
 )}
+
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           
         <h2
@@ -374,6 +377,8 @@ export default function Dashboard() {
             ) : null}
           </DragOverlay>
         </DndContext>
+
+        <ActivityFeed />
 
         {/* MODALS */}
         <TaskModal
