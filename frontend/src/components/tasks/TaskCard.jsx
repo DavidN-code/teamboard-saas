@@ -41,8 +41,20 @@ export default function TaskCard({ task, onClick }) {
         <strong>{task.title}</strong>
 
         <p style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>
-          {task.description || "No description"}
-        </p>
+  {task.description || "No description"}
+</p>
+
+{task.assignedTo && (
+  <p
+    style={{
+      fontSize: "13px",
+      marginTop: "8px",
+      color: "#444",
+    }}
+  >
+    Assigned: <strong>{task.assignedTo.name}</strong>
+  </p>
+)}
       </div>
     </div>
   );

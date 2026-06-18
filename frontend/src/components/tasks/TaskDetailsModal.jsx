@@ -7,6 +7,7 @@ import {
   updateComment,
   deleteComment,
 } from "../../api/comments";
+import { getUsers } from "../../api/users";
 
 export default function TaskDetailsModal({
   task,
@@ -20,13 +21,28 @@ export default function TaskDetailsModal({
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("todo");
   const [comments, setComments] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [assignedTo, setAssignedTo] = useState("");
 
   useEffect(() => {
     if (task) {
+      setAssignedTo(task.assignedTo?._id || "");
       setTitle(task.title || "");
       setDescription(task.description || "");
       setStatus(task.status || "todo");
     }
+
+    const loadUsers = async () => {
+      try {
+        const res = await getUsers();
+        setUsers(res.data);
+      } catch (err) {
+        console.error("Failed to load users", err);
+      }
+    };
+  
+    loadUsers();
+
     const loadComments = async () => {
       if (task) {
         const res = await getComments(task._id);
@@ -129,6 +145,31 @@ export default function TaskDetailsModal({
           </select>
         </div>
 
+        <div style={{ marginBottom: "16px" }}>
+  <strong>Assigned To</strong>
+
+  <select
+    value={assignedTo}
+    onChange={(e) => setAssignedTo(e.target.value)}
+    style={{
+      width: "100%",
+      padding: "10px",
+      marginTop: "6px",
+    }}
+  >
+    <option value="">Unassigned</option>
+
+    {users.map((user) => (
+      <option
+        key={user._id}
+        value={user._id}
+      >
+        {user.name}
+      </option>
+    ))}
+  </select>
+</div>
+
         {/* DESCRIPTION */}
         <div style={{ marginBottom: "16px" }}>
           <strong>Description</strong>
@@ -167,6 +208,7 @@ export default function TaskDetailsModal({
                 title,
                 description,
                 status,
+                assignedTo,
               })
             }
           >
