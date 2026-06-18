@@ -19,6 +19,9 @@ exports.createComment = async (req, res, next) => {
       resourceId: comment._id,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
+      details: {
+        commentPreview: comment.content.substring(0, 50),
+      },
     });
 
     res.status(201).json(comment);
@@ -68,6 +71,9 @@ exports.updateComment = async (req, res, next) => {
       resourceId: comment._id,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
+      details: {
+        commentPreview: comment.content.substring(0, 50),
+      },
     });
 
     res.json(comment);
@@ -106,6 +112,9 @@ exports.deleteComment = async (req, res, next) => {
       resourceId: comment._id,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
+      details: {
+        commentPreview: comment.content.substring(0, 50),
+      },
     });
 
     res.json({ message: "Comment deleted successfully" });

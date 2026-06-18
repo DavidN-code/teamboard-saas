@@ -71,6 +71,18 @@ export default function ActivityFeed() {
   </>
 )}
 
+{activity.details?.commentPreview && (
+  <div
+    style={{
+      marginTop: "6px",
+      fontStyle: "italic",
+      color: "#666",
+    }}
+  >
+    "{activity.details.commentPreview}"
+  </div>
+)}
+
             <div>
               <small>
                 {new Date(
