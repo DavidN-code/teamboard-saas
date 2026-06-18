@@ -23,6 +23,9 @@ exports.createTask = async (req, res, next) => {
       resourceId: task._id,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
+      details: {
+        taskTitle: task.title,
+      },
     });
 
     res.status(201).json(task);
@@ -92,6 +95,9 @@ exports.updateTask = async (req, res, next) => {
       resourceId: task._id,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
+      details: {
+        taskTitle: task.title,
+      },
     });
 
     res.json(task);
@@ -120,6 +126,9 @@ exports.deleteTask = async (req, res, next) => {
       resourceId: task._id,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
+      details: {
+        taskTitle: task.title,
+      },
     });
 
     res.json({ message: 'Task deleted successfully' });

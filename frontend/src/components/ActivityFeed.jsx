@@ -64,6 +64,13 @@ export default function ActivityFeed() {
 </strong>{" "}
 {formatAction(activity.action)}
 
+{activity.details?.taskTitle && (
+  <>
+    {" "}
+    <strong>"{activity.details.taskTitle}"</strong>
+  </>
+)}
+
             <div>
               <small>
                 {new Date(
