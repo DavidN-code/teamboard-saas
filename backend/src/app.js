@@ -12,6 +12,7 @@ const metricsRoutes = require("./routes/metricsRoutes");
 const invitationRoutes = require("./routes/invitationRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 const activityFeedRoutes = require("./routes/activityFeedRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 // Middleware
 app.use(express.json());
 
@@ -36,6 +37,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/audit-logs", auditLogRoutes);
 app.use("/api/metrics/dashboard", metricsRoutes);
 app.use("/api/invitations", invitationRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

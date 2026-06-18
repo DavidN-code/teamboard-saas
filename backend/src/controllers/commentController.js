@@ -1,5 +1,8 @@
 const Comment = require("../models/Comment");
 const logAction = require("../utils/auditLogger");
+const Task = require("../models/Task");
+const createNotification = require("../utils/notificationService");
+const User = require("../models/User");
 
 // CREATE COMMENT
 exports.createComment = async (req, res, next) => {
@@ -23,6 +26,22 @@ exports.createComment = async (req, res, next) => {
         commentPreview: comment.content.substring(0, 50),
       },
     });
+
+    const task = await Task.findById(comment.taskId);
+
+    if (
+      task &&
+      task.createdBy.toString() !== req.user.userId
+    ) {
+      const user = await User.findById(req.user.userId);
+
+  await createNotification({
+    userId: task.createdBy,
+    organizationId: req.user.organizationId,
+    type: "TASK_COMMENT",
+    message: `${user.name} commented on your task "${task.title}"`,
+  });
+}
 
     res.status(201).json(comment);
   } catch (err) {

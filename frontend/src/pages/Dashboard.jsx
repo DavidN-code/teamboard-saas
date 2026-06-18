@@ -12,6 +12,8 @@ import TaskCard from "../components/tasks/TaskCard";
 
 import ActivityFeed from "../components/ActivityFeed";
 
+import NotificationBell from "../components/notifications/NotificationBell";
+
 import {
   DndContext,
   closestCenter,
@@ -193,13 +195,41 @@ export default function Dashboard() {
       <div style={{ flex: 1, padding: "20px" }}>
         {/* HEADER */}
 
-        <h1
+        <div
   style={{
-    marginBottom: "20px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "24px",
   }}
 >
-  Dashboard Overview
-</h1>
+  <h1
+    style={{
+      margin: 0,
+    }}
+  >
+    Dashboard Overview
+  </h1>
+
+  <div
+    style={{
+      display: "flex",
+      gap: "12px",
+      alignItems: "center",
+    }}
+  >
+    <NotificationBell />
+
+    <button
+      onClick={() => {
+        logout();
+        navigate("/login");
+      }}
+    >
+      Logout
+    </button>
+  </div>
+</div>
 
         {metrics && (
   <div
@@ -261,26 +291,6 @@ export default function Dashboard() {
   </div>
 )}
 
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          
-        <h2
-  style={{
-    marginTop: "10px",
-    marginBottom: "20px",
-  }}
->
-  {activeBoard ? activeBoard.name : "Select a Board"}
-</h2>
-
-          <button
-            onClick={() => {
-              logout();
-              navigate("/login");
-            }}
-          >
-            Logout
-          </button>
-        </div>
 
         {/* TASK CONTROLS */}
         <div style={{ marginTop: "20px" }}>
