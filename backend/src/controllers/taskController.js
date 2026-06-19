@@ -1,5 +1,7 @@
 const Task = require('../models/Task');
 const logAction = require("../utils/auditLogger");
+const createNotification = require("../utils/notificationService");
+const User = require("../models/User");
 
 // CREATE a new Task
 exports.createTask = async (req, res, next) => {
@@ -90,6 +92,27 @@ exports.updateTask = async (req, res, next) => {
 
     if (!task) return res.status(404).json({ message: 'Task not found' });
     task = await task.populate("assignedTo", "name email");
+
+    console.log("updates.assignedTo:", updates.assignedTo);
+console.log("task.assignedTo:", task.assignedTo);
+console.log("req.user.userId:", req.user.userId);
+
+if (
+  updates.assignedTo &&
+  task.assignedTo &&
+  task.assignedTo._id.toString() !== req.user.userId
+) {
+
+  const assigningUser = await User.findById(req.user.userId);
+
+  const notification = await createNotification({
+    userId: task.assignedTo._id,
+    organizationId: req.user.organizationId,
+    type: "TASK_ASSIGNED",
+    message: `${assigningUser.name} assigned you task "${task.title}"`,
+  });
+
+}
 
     // ✅ MOVE HERE
     await logAction({
