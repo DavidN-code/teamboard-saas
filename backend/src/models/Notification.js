@@ -19,6 +19,11 @@ const notificationSchema = new mongoose.Schema(
       required: true,
     },
 
+    resourceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: false,
+    },
+
     message: {
       type: String,
       required: true,

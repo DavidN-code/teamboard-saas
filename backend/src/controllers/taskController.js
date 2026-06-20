@@ -109,6 +109,7 @@ if (
     userId: task.assignedTo._id,
     organizationId: req.user.organizationId,
     type: "TASK_ASSIGNED",
+    resourceId: task._id,
     message: `${assigningUser.name} assigned you task "${task.title}"`,
   });
 

@@ -147,6 +147,18 @@ export default function Dashboard() {
     }
   };
 
+  const handleOpenNotificationTask = async (taskId) => {
+    try {
+      const res = await api.get(`/tasks/${taskId}`);
+  
+      setSelectedTask(res.data);
+      setIsDetailsModalOpen(true);
+  
+    } catch (err) {
+      console.error("Failed to open task from notification", err);
+    }
+  };
+
   /* ---------------- DRAG ---------------- */
   const handleDragStart = (event) => {
     const task = tasks.find((t) => t._id === event.active.id);
@@ -218,7 +230,7 @@ export default function Dashboard() {
       alignItems: "center",
     }}
   >
-    <NotificationBell />
+    <NotificationBell onOpenTask={handleOpenNotificationTask} />
 
     <button
       onClick={() => {

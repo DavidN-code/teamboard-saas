@@ -4,8 +4,8 @@ import {
   markNotificationRead,
 } from "../../api/notifications";
 
-export default function NotificationBell() {
-  const [notifications, setNotifications] = useState([]);
+export default function NotificationBell({ onOpenTask }) {
+    const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function NotificationBell() {
   const handleNotificationClick = async (notification) => {
     try {
       await markNotificationRead(notification._id);
-
+  
       setNotifications((prev) =>
         prev.map((n) =>
           n._id === notification._id
@@ -36,6 +36,12 @@ export default function NotificationBell() {
             : n
         )
       );
+  
+      if (notification.resourceId) {
+        onOpenTask(notification.resourceId);
+        setOpen(false);
+      }
+  
     } catch (err) {
       console.error(err);
     }
