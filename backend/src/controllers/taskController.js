@@ -116,16 +116,30 @@ if (
 }
 
     // ✅ MOVE HERE
-    await logAction({
-      action: "UPDATE_TASK",
-      resourceType: "Task",
-      resourceId: task._id,
-      userId: req.user.userId,
-      organizationId: req.user.organizationId,
-      details: {
-        taskTitle: task.title,
-      },
-    });
+    if (updates.assignedTo) {
+      await logAction({
+        action: "ASSIGN_TASK",
+        resourceType: "Task",
+        resourceId: task._id,
+        userId: req.user.userId,
+        organizationId: req.user.organizationId,
+        details: {
+          taskTitle: task.title,
+          assignedTo: task.assignedTo.name,
+        },
+      });
+    } else {
+      await logAction({
+        action: "UPDATE_TASK",
+        resourceType: "Task",
+        resourceId: task._id,
+        userId: req.user.userId,
+        organizationId: req.user.organizationId,
+        details: {
+          taskTitle: task.title,
+        },
+      });
+    }
 
     res.json(task);
 

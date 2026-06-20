@@ -3,9 +3,11 @@ import { getActivityFeed } from "../api/activityFeed";
 
 function formatAction(action) {
     const actionMap = {
-      CREATE_TASK: "created a task",
-      UPDATE_TASK: "updated a task",
-      DELETE_TASK: "deleted a task",
+      CREATE_TASK: "created",
+      UPDATE_TASK: "updated",
+      DELETE_TASK: "deleted",
+
+      ASSIGN_TASK: "assigned",
   
       CREATE_BOARD: "created a board",
       UPDATE_BOARD: "updated a board",
@@ -68,6 +70,11 @@ export default function ActivityFeed() {
   <>
     {" "}
     <strong>"{activity.details.taskTitle}"</strong>
+
+    {activity.action === "ASSIGN_TASK" &&
+      activity.details?.assignedTo && (
+        <> to <strong>{activity.details.assignedTo}</strong></>
+      )}
   </>
 )}
 
