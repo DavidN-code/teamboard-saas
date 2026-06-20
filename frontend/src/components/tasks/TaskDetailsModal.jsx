@@ -56,12 +56,14 @@ export default function TaskDetailsModal({
   if (!isOpen || !task) return null;
 
   const handleCreateComment = async (content) => {
-    const res = await createComment({
+    await createComment({
       taskId: task._id,
       content,
     });
   
-    setComments([...comments, res.data]);
+    const updated = await getComments(task._id);
+  
+    setComments(updated.data);
   };
   
   
@@ -98,17 +100,20 @@ export default function TaskDetailsModal({
         background: "rgba(0,0,0,0.5)",
         display: "flex",
         justifyContent: "center",
-        alignItems: "center",
+        alignItems: "flex-start",
+        paddingTop: "40px",
       }}
     >
       <div
-        style={{
-          background: "white",
-          padding: "24px",
-          borderRadius: "8px",
-          width: "500px",
-        }}
-      >
+  style={{
+    background: "white",
+    padding: "24px",
+    borderRadius: "8px",
+    width: "500px",
+    maxHeight: "80vh",
+    overflowY: "auto",
+  }}
+>
         <div
           style={{
             display: "flex",
@@ -117,6 +122,18 @@ export default function TaskDetailsModal({
           }}
         >
           <h2>{task.title}</h2>
+
+          <div style={{ fontSize: "14px", color: "#666" }}>
+  <div>
+    Created by:{" "}
+    {task.createdBy?.name || "Unknown"}
+  </div>
+
+  <div>
+    Assigned to:{" "}
+    {task.assignedTo?.name || "Unassigned"}
+  </div>
+</div>
 
           <button onClick={onClose}>X</button>
         </div>
