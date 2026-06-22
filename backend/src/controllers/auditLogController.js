@@ -40,3 +40,19 @@ exports.getAuditLogs = async (req, res, next) => {
     next(error);
   }
 };
+
+// GET activity for a specific task
+exports.getTaskActivity = async (req, res, next) => {
+  try {
+    const logs = await AuditLog.find({
+      organizationId: req.user.organizationId,
+      resourceId: req.params.taskId,
+    })
+      .populate("userId", "name email")
+      .sort({ createdAt: -1 });
+
+    res.json(logs);
+  } catch (error) {
+    next(error);
+  }
+};

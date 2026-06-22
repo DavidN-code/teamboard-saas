@@ -18,8 +18,8 @@ exports.createComment = async (req, res, next) => {
 
     await logAction({
       action: "CREATE_COMMENT",
-      resourceType: "Comment",
-      resourceId: comment._id,
+      resourceType: "Task",
+      resourceId: comment.taskId,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
       details: {
@@ -86,8 +86,8 @@ exports.updateComment = async (req, res, next) => {
 
     await logAction({
       action: "UPDATE_COMMENT",
-      resourceType: "Comment",
-      resourceId: comment._id,
+      resourceType: "Task",
+      resourceId: comment.taskId,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
       details: {
@@ -127,8 +127,8 @@ exports.deleteComment = async (req, res, next) => {
 
     await logAction({
       action: "DELETE_COMMENT",
-      resourceType: "Comment",
-      resourceId: comment._id,
+      resourceType: "Task",
+      resourceId: comment.taskId,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
       details: {
