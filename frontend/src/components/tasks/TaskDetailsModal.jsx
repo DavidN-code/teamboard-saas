@@ -8,6 +8,65 @@ import {
   deleteComment,
 } from "../../api/comments";
 import { getUsers } from "../../api/users";
+import { getTaskActivity } from "../../api/auditLogs";
+
+function formatActivity(item) {
+  const name = item.userId?.name || "Unknown User";
+
+  switch (item.action) {
+    case "CREATE_TASK":
+      return `${name} created task "${item.details.taskTitle}"`;
+
+    case "ASSIGN_TASK":
+      return `${name} assigned task "${item.details.taskTitle}" to ${item.details.assignedTo}`;
+
+    case "UPDATE_TASK":
+      return `${name} updated task "${item.details.taskTitle}"`;
+
+    case "CREATE_COMMENT":
+      return `${name} commented: "${item.details.commentPreview}"`;
+
+    case "UPDATE_COMMENT":
+      return `${name} updated a comment: "${item.details.commentPreview}"`;
+
+    case "DELETE_COMMENT":
+      return `${name} deleted a comment`;
+
+    case "DELETE_TASK":
+      return `${name} deleted task "${item.details.taskTitle}"`;
+
+    default:
+      return `${name} performed ${item.action}`;
+  }
+}
+
+function getActivityIcon(action) {
+  switch (action) {
+    case "CREATE_TASK":
+      return "📝";
+
+    case "ASSIGN_TASK":
+      return "👤";
+
+    case "UPDATE_TASK":
+      return "✏️";
+
+    case "DELETE_TASK":
+      return "🗑️";
+
+    case "CREATE_COMMENT":
+      return "💬";
+
+    case "UPDATE_COMMENT":
+      return "🛠️";
+
+    case "DELETE_COMMENT":
+      return "❌";
+
+    default:
+      return "📌";
+  }
+}
 
 export default function TaskDetailsModal({
   task,
@@ -23,6 +82,7 @@ export default function TaskDetailsModal({
   const [comments, setComments] = useState([]);
   const [users, setUsers] = useState([]);
   const [assignedTo, setAssignedTo] = useState("");
+  const [activity, setActivity] = useState([]);
 
   useEffect(() => {
     if (task) {
@@ -50,6 +110,15 @@ export default function TaskDetailsModal({
       }
     };
     loadComments();
+
+    const loadActivity = async () => {
+      if (task) {
+        const res = await getTaskActivity(task._id);
+        setActivity(res.data);
+      }
+    };
+    
+    loadActivity();
   }, [task]);
 
   // ✅ safe render check AFTER hooks
@@ -211,6 +280,47 @@ export default function TaskDetailsModal({
   <CommentForm
     onCreate={handleCreateComment}
   />
+</div>
+
+{/* ACTIVITY TIMELINE */}
+<div style={{ marginBottom: "16px" }}>
+  <strong>Activity Timeline</strong>
+
+  {activity.length === 0 ? (
+    <p>No activity yet.</p>
+  ) : (
+    activity.map((item) => (
+      <div
+        key={item._id}
+        style={{
+          padding: "8px 0",
+          borderBottom: "1px solid #eee",
+        }}
+      >
+        <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  }}
+>
+  <span style={{ fontSize: "20px" }}>
+    {getActivityIcon(item.action)}
+  </span>
+
+  <span>
+    {formatActivity(item)}
+  </span>
+</div>
+
+        <small>
+          {new Date(
+            item.createdAt
+          ).toLocaleString()}
+        </small>
+      </div>
+    ))
+  )}
 </div>
 
         {/* ACTIONS */}
