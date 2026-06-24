@@ -66,6 +66,7 @@ export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState("");
 const [statusFilter, setStatusFilter] = useState("");
 const [priorityFilter, setPriorityFilter] = useState("");
+const [sortBy, setSortBy] = useState("");
 
   /* ---------------- LOAD TASKS ---------------- */
   useEffect(() => {
@@ -102,24 +103,49 @@ const [priorityFilter, setPriorityFilter] = useState("");
     fetchMetrics();
   }, []);
 
-  const filteredTasks = tasks.filter((task) => {
+  const filteredTasks = tasks
+  .filter((task) => {
     const matchesSearch =
       task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (task.description || "")
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
-  
+
     const matchesStatus =
       !statusFilter || task.status === statusFilter;
-  
+
     const matchesPriority =
       !priorityFilter || task.priority === priorityFilter;
-  
+
     return (
       matchesSearch &&
       matchesStatus &&
       matchesPriority
     );
+  })
+  .sort((a, b) => {
+    if (sortBy === "dueDate") {
+      return new Date(a.dueDate || 0) - new Date(b.dueDate || 0);
+    }
+
+    if (sortBy === "createdAt") {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    }
+
+    if (sortBy === "priority") {
+      const priorities = {
+        high: 3,
+        medium: 2,
+        low: 1,
+      };
+
+      return (
+        priorities[b.priority] -
+        priorities[a.priority]
+      );
+    }
+
+    return 0;
   });
 
   /* ---------------- CRUD ---------------- */
@@ -390,6 +416,16 @@ const doneTasks = filteredTasks.filter(
     <option value="low">Low</option>
   </select>
 </div>
+
+<select
+  value={sortBy}
+  onChange={(e) => setSortBy(e.target.value)}
+>
+  <option value="">No Sorting</option>
+  <option value="priority">Priority</option>
+  <option value="dueDate">Due Date</option>
+  <option value="createdAt">Newest Created</option>
+</select>
 
         {/* DND */}
         <DndContext

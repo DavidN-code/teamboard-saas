@@ -486,6 +486,13 @@ Completed:
 
 ✅ Task priorities
 ✅ Task due dates
+### Task Features
+
+✅ Priorities
+✅ Due Dates
+✅ Search
+✅ Filtering
+✅ Sorting
 
 ---
 
