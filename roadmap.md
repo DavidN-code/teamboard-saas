@@ -480,6 +480,13 @@ This project is designed to demonstrate proficiency in:
 * Filtering
 * Sorting
 
+Phase 8 — Advanced Task Management 🚧
+
+Completed:
+
+✅ Task priorities
+✅ Task due dates
+
 ---
 
 ## Phase 9 — Production Readiness

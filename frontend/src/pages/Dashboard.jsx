@@ -63,6 +63,10 @@ export default function Dashboard() {
     boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
   };
 
+  const [searchTerm, setSearchTerm] = useState("");
+const [statusFilter, setStatusFilter] = useState("");
+const [priorityFilter, setPriorityFilter] = useState("");
+
   /* ---------------- LOAD TASKS ---------------- */
   useEffect(() => {
     const fetchTasks = async () => {
@@ -97,6 +101,26 @@ export default function Dashboard() {
   
     fetchMetrics();
   }, []);
+
+  const filteredTasks = tasks.filter((task) => {
+    const matchesSearch =
+      task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (task.description || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+  
+    const matchesStatus =
+      !statusFilter || task.status === statusFilter;
+  
+    const matchesPriority =
+      !priorityFilter || task.priority === priorityFilter;
+  
+    return (
+      matchesSearch &&
+      matchesStatus &&
+      matchesPriority
+    );
+  });
 
   /* ---------------- CRUD ---------------- */
   const handleCreateTask = async (taskData) => {
@@ -195,10 +219,18 @@ export default function Dashboard() {
     }
   };
 
-  /* ---------------- FILTERS ---------------- */
-  const todoTasks = tasks.filter((t) => t.status === "todo");
-  const inProgressTasks = tasks.filter((t) => t.status === "in-progress");
-  const doneTasks = tasks.filter((t) => t.status === "done");
+ /* ---------------- FILTERED KANBAN COLUMNS ---------------- */
+const todoTasks = filteredTasks.filter(
+  (t) => t.status === "todo"
+);
+
+const inProgressTasks = filteredTasks.filter(
+  (t) => t.status === "in-progress"
+);
+
+const doneTasks = filteredTasks.filter(
+  (t) => t.status === "done"
+);
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
@@ -320,6 +352,45 @@ export default function Dashboard() {
           {taskError && <p style={{ color: "red" }}>{taskError}</p>}
         </div>
 
+        <div
+  style={{
+    display: "flex",
+    gap: "10px",
+    marginBottom: "20px",
+  }}
+>
+  <input
+    type="text"
+    placeholder="Search tasks..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    style={{
+      padding: "10px",
+      flex: 1,
+    }}
+  />
+
+  <select
+    value={statusFilter}
+    onChange={(e) => setStatusFilter(e.target.value)}
+  >
+    <option value="">All Statuses</option>
+    <option value="todo">Todo</option>
+    <option value="in-progress">In Progress</option>
+    <option value="done">Done</option>
+  </select>
+
+  <select
+    value={priorityFilter}
+    onChange={(e) => setPriorityFilter(e.target.value)}
+  >
+    <option value="">All Priorities</option>
+    <option value="high">High</option>
+    <option value="medium">Medium</option>
+    <option value="low">Low</option>
+  </select>
+</div>
+
         {/* DND */}
         <DndContext
           collisionDetection={closestCenter}
@@ -328,9 +399,9 @@ export default function Dashboard() {
         >
           {/* SINGLE SORTABLE CONTEXT (IMPORTANT FIX) */}
           <SortableContext
-            items={tasks.map((t) => t._id)}
-            strategy={verticalListSortingStrategy}
-          >
+  items={filteredTasks.map((t) => t._id)}
+  strategy={verticalListSortingStrategy}
+>
             <div
               style={{
                 display: "grid",
