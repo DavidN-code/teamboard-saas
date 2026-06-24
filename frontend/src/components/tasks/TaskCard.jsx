@@ -38,7 +38,21 @@ export default function TaskCard({ task, onClick }) {
 
       {/* Click area */}
       <div onClick={handleClick}>
-        <strong>{task.title}</strong>
+
+  <div
+    style={{
+      marginBottom: "6px",
+      fontSize: "12px",
+      fontWeight: "bold",
+    }}
+  >
+    {task.priority === "high" && "🔴 High"}
+    {task.priority === "medium" && "🟡 Medium"}
+    {task.priority === "low" && "🟢 Low"}
+    {!task.priority && "🟡 Medium"}
+  </div>
+
+  <strong>{task.title}</strong>
 
         <p style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>
   {task.description || "No description"}

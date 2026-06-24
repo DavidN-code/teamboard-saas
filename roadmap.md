@@ -4,7 +4,7 @@
 
 TeamBoard is a production-oriented multi-tenant SaaS application designed to demonstrate the architecture, security practices, and engineering patterns commonly found in modern software products.
 
-The project focuses on solving real-world business problems such as organization management, team onboarding, access control, auditability, and collaborative project tracking while showcasing full-stack development skills.
+The project focuses on solving real-world business problems such as organization management, team onboarding, access control, auditability, notifications, collaboration, and project tracking while showcasing full-stack development skills.
 
 ---
 
@@ -19,6 +19,8 @@ This project is designed to demonstrate proficiency in:
 * Team onboarding workflows
 * Transactional email systems
 * Audit logging and activity tracking
+* Notification systems
+* Collaboration systems
 * REST API design
 * MongoDB data modeling
 * Modern React application architecture
@@ -102,16 +104,15 @@ This project is designed to demonstrate proficiency in:
 * Organization-scoped tasks
 * Organization-scoped users
 * Organization-scoped invitations
+* Organization-scoped comments
+* Organization-scoped notifications
+* Organization-scoped audit logs
 
 ### Data Isolation
 
 * Organization-level access control
 * Resource ownership enforcement
 * Multi-tenant authorization architecture
-
-## Goal
-
-Provide complete isolation between organizations while maintaining a scalable SaaS architecture.
 
 ---
 
@@ -214,6 +215,11 @@ Provide complete isolation between organizations while maintaining a scalable Sa
 * Status tracking
 * Board filtering
 * Optimistic updates
+* Task assignment
+* Task creator tracking
+* Task Details Modal
+* Task activity timeline
+* Task comments
 
 ---
 
@@ -243,21 +249,109 @@ Provide complete isolation between organizations while maintaining a scalable Sa
 * Pagination
 * Filtering
 * User population
+* Task activity endpoint
 
 ### Tracked Activity
 
-* Board creation
-* Board updates
-* Board deletion
-* Task creation
-* Task updates
-* Task deletion
+#### Boards
+
+* CREATE_BOARD
+* UPDATE_BOARD
+* DELETE_BOARD
+
+#### Tasks
+
+* CREATE_TASK
+* UPDATE_TASK
+* DELETE_TASK
+* ASSIGN_TASK
+
+#### Comments
+
+* CREATE_COMMENT
+* UPDATE_COMMENT
+* DELETE_COMMENT
 
 ## Planned
 
 * Invitation activity logging
 * User management logging
 * Organization administration logging
+
+---
+
+# 🔔 Notifications
+
+## Completed
+
+### Notification System
+
+* Notification model
+* Notification API
+* Notification Bell UI
+* Unread counts
+* Mark as read
+* Notification persistence
+* Click-to-open task navigation
+
+### Notification Types
+
+* TASK_ASSIGNED
+* TASK_COMMENT
+
+---
+
+# 💬 Collaboration Features
+
+## Completed
+
+### Comments
+
+* Create comments
+* Edit comments
+* Delete comments
+* Comment history
+* User attribution
+* Comment notifications
+
+### Activity Feed
+
+* Organization-wide activity feed
+* Human-readable activity messages
+* Assignment tracking
+* Comment tracking
+
+### Task Activity Timeline
+
+* Task-specific audit history
+* Activity icons
+* User attribution
+* Assignment history
+* Comment history
+
+---
+
+# 📊 Dashboard Metrics
+
+## Completed
+
+### Metrics Endpoint
+
+* User count
+* Board count
+* Total task count
+* Todo count
+* In Progress count
+* Done count
+
+### Dashboard Cards
+
+* Users
+* Boards
+* Tasks
+* Todo
+* In Progress
+* Done
 
 ---
 
@@ -277,9 +371,12 @@ Provide complete isolation between organizations while maintaining a scalable Sa
 * Authentication
 * Boards
 * Tasks
+* Comments
+* Notifications
 * Users
 * Invitations
 * Audit Logs
+* Dashboard Metrics
 
 ---
 
@@ -332,7 +429,31 @@ Provide complete isolation between organizations while maintaining a scalable Sa
 
 ---
 
-## Phase 5 — Invitation System Enhancements 🚧 Current Focus
+## Phase 5 — Collaboration Systems ✅ Complete
+
+### Collaboration
+
+* Comments
+* Notifications
+* Activity Feed
+* Task Assignment Tracking
+* Task Activity Timeline
+
+---
+
+## Phase 6 — Dashboard Analytics ✅ Complete
+
+### Dashboard
+
+* Organization metrics
+* User counts
+* Board counts
+* Task counts
+* Workflow status metrics
+
+---
+
+## Phase 7 — Invitation System Enhancements 🚧 Current Focus
 
 ### Invitation Improvements
 
@@ -349,36 +470,19 @@ Provide complete isolation between organizations while maintaining a scalable Sa
 
 ---
 
-## Phase 6 — Dashboard & Analytics
+## Phase 8 — Advanced Task Management
 
-### Dashboard Enhancements
+### Task Features
 
-* Organization metrics
-* User counts
-* Board counts
-* Task counts
-* Recent activity widgets
-
-### Reporting
-
-* Productivity metrics
-* Activity summaries
-* Usage insights
+* Task priorities
+* Due dates
+* Search
+* Filtering
+* Sorting
 
 ---
 
-## Phase 7 — Collaboration Features
-
-### Team Collaboration
-
-* Comments
-* Activity feeds
-* Notifications
-* Mentions
-
----
-
-## Phase 8 — Production Readiness
+## Phase 9 — Production Readiness
 
 ### Deployment
 
@@ -412,6 +516,8 @@ TeamBoard demonstrates experience with:
 * Secure onboarding workflows
 * Email integrations
 * Audit logging systems
+* Notification systems
+* Collaboration systems
 * React state management
 * RESTful API design
 * MongoDB data modeling

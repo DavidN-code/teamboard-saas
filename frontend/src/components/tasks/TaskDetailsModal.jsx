@@ -79,6 +79,7 @@ export default function TaskDetailsModal({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("todo");
+  const [priority, setPriority] = useState("medium");
   const [comments, setComments] = useState([]);
   const [users, setUsers] = useState([]);
   const [assignedTo, setAssignedTo] = useState("");
@@ -90,6 +91,7 @@ export default function TaskDetailsModal({
       setTitle(task.title || "");
       setDescription(task.description || "");
       setStatus(task.status || "todo");
+      setPriority(task.priority || "medium");
     }
 
     const loadUsers = async () => {
@@ -256,6 +258,25 @@ export default function TaskDetailsModal({
   </select>
 </div>
 
+{/* PRIORITY */}
+<div style={{ marginBottom: "16px" }}>
+  <strong>Priority</strong>
+
+  <select
+    value={priority}
+    onChange={(e) => setPriority(e.target.value)}
+    style={{
+      width: "100%",
+      padding: "10px",
+      marginTop: "6px",
+    }}
+  >
+    <option value="low">Low</option>
+    <option value="medium">Medium</option>
+    <option value="high">High</option>
+  </select>
+</div>
+
         {/* DESCRIPTION */}
         <div style={{ marginBottom: "16px" }}>
           <strong>Description</strong>
@@ -335,6 +356,7 @@ export default function TaskDetailsModal({
                 title,
                 description,
                 status,
+                priority,
                 assignedTo,
               })
             }

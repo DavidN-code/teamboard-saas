@@ -1,8 +1,10 @@
 # 🚀 TeamBoard – Multi-Tenant Project Management SaaS
 
-TeamBoard is a full-stack SaaS application built to demonstrate production-style software engineering practices including secure authentication, multi-tenant architecture, role-based access control (RBAC), audit logging, team onboarding workflows, and Kanban project management.
+TeamBoard is a full-stack SaaS application built to demonstrate production-style software engineering practices including secure authentication, multi-tenant architecture, role-based access control (RBAC), audit logging, team onboarding workflows, notifications, comments, activity tracking, and Kanban project management.
 
 The project is being developed as a portfolio-quality application that showcases the skills commonly expected of modern full-stack software developers.
+
+Current development focus is on building a realistic multi-tenant collaboration platform similar to Asana, Jira, ClickUp, Trello, and Monday.com.
 
 ---
 
@@ -20,6 +22,9 @@ TeamBoard demonstrates the ability to design and build:
 * MongoDB data modeling
 * Email integrations
 * Audit logging systems
+* Notification systems
+* Activity tracking systems
+* Collaboration features
 * Production-oriented backend architecture
 
 ---
@@ -67,6 +72,8 @@ TeamBoard demonstrates the ability to design and build:
 * Protected API routes
 * Persistent login sessions
 * Automatic unauthorized-session handling
+* Axios token injection
+* Global authentication state
 
 ### Security Architecture
 
@@ -93,7 +100,7 @@ TeamBoard uses organization-based tenancy.
 
 Every user belongs to a single organization and all resources are scoped to that organization.
 
-This prevents cross-organization data access and mirrors the architecture commonly used by SaaS platforms such as Slack, Asana, and Notion.
+This prevents cross-organization data access and mirrors the architecture commonly used by SaaS platforms such as Slack, Asana, Notion, and ClickUp.
 
 ## Implemented
 
@@ -102,6 +109,9 @@ This prevents cross-organization data access and mirrors the architecture common
 * User-to-organization relationships
 * Organization-scoped boards
 * Organization-scoped tasks
+* Organization-scoped comments
+* Organization-scoped notifications
+* Organization-scoped audit logs
 * Organization-scoped member management
 * Invitation-based organization onboarding
 
@@ -120,16 +130,21 @@ TeamBoard implements multiple permission levels.
 * Change user roles
 * Remove users
 * Create invitations
+* Access audit logs
 
 ### Admin
 
 * Manage project resources
 * Create invitations
 * Limited organization management
+* Access audit logs
 
 ### Member
 
 * Standard workspace access
+* Task collaboration
+* Commenting
+* Notification access
 
 ## Implemented
 
@@ -232,6 +247,109 @@ TeamBoard includes transactional email delivery for organization invitations.
 * Task status management
 * Board filtering
 * Optimistic UI updates
+* Task Details Modal
+* Task creator tracking
+* Task assignment system
+* Task activity history
+* Task comments
+* Notification integration
+
+### Task Details Modal
+
+Implemented features:
+
+* Edit task title
+* Edit task description
+* Edit task status
+* Assign users
+* Delete task
+* View creator
+* View assignee
+* View comments
+* Create comments
+* Edit comments
+* Delete comments
+* View task activity timeline
+
+---
+
+# 👤 Task Assignment System
+
+## Implemented
+
+* Assign tasks to organization members
+* Reassign tasks
+* Unassign tasks
+* Assignment dropdown UI
+* Assignment notifications
+* Assignment audit logging
+* Assignment activity tracking
+
+### Assignment Audit Events
+
+* ASSIGN_TASK
+
+### Assignment Notifications
+
+When a task is assigned:
+
+1. Notification created
+2. Notification appears in Notification Bell
+3. User receives unread count update
+4. User can click notification
+5. Task opens directly from notification
+
+---
+
+# 💬 Comments System
+
+## Implemented
+
+* Create comments
+* Edit comments
+* Delete comments
+* Comment history
+* User attribution
+* Task-specific comment threads
+* Comment notifications
+* Comment audit logging
+
+### Comment Audit Events
+
+* CREATE_COMMENT
+* UPDATE_COMMENT
+* DELETE_COMMENT
+
+### Comment Notifications
+
+Task owners receive notifications when another user comments on their task.
+
+---
+
+# 🔔 Notification System
+
+## Implemented
+
+* Notification model
+* Notification API
+* Notification Bell UI
+* Unread notification count
+* Mark notification as read
+* Clickable notifications
+* Task navigation from notifications
+
+### Notification Types
+
+* TASK_ASSIGNED
+* TASK_COMMENT
+
+### Notification Features
+
+* Unread badge count
+* Read/unread state
+* Notification history
+* Direct task opening
+* Notification persistence
 
 ---
 
@@ -265,17 +383,132 @@ TeamBoard includes a centralized audit logging system.
 * Pagination
 * Filtering
 * User population
+* Organization scoping
+* Task-specific history endpoint
 
 ### Tracked Actions
 
-* Board creation
-* Board updates
-* Board deletion
+#### Boards
+
+* CREATE_BOARD
+* UPDATE_BOARD
+* DELETE_BOARD
+
+#### Tasks
+
+* CREATE_TASK
+* UPDATE_TASK
+* DELETE_TASK
+* ASSIGN_TASK
+
+#### Comments
+
+* CREATE_COMMENT
+* UPDATE_COMMENT
+* DELETE_COMMENT
+
+#### Organization Events
+
+* CREATE_INVITATION
+* ACCEPT_INVITATION
+* UPDATE_USER_ROLE
+* REMOVE_USER
+
+---
+
+# 📈 Activity Feed System
+
+## Implemented
+
+Organization-wide activity feed.
+
+### Features
+
+* User attribution
+* Human-readable actions
+* Task names
+* Comment previews
+* Assignment details
+* Activity timestamps
+
+Example:
+
+Recovered Owner assigned task "Task Seven" to New Invite User
+
+---
+
+# 📊 Task Activity Timeline
+
+Each task contains its own activity history.
+
+## Implemented
+
+### Timeline Events
+
 * Task creation
 * Task updates
+* Task assignment
+* Comment creation
+* Comment updates
+* Comment deletion
 * Task deletion
 
-This provides visibility into organizational activity and demonstrates event-tracking architecture.
+### Timeline Features
+
+* Reverse chronological ordering
+* User attribution
+* Activity icons
+* Comment previews
+* Assignment details
+
+### Icons
+
+* 📝 Create Task
+* 👤 Assign Task
+* ✏️ Update Task
+* 💬 Create Comment
+* 🛠️ Update Comment
+* ❌ Delete Comment
+* 🗑️ Delete Task
+
+---
+
+# 📊 Dashboard Metrics
+
+## Implemented
+
+### Metrics Endpoint
+
+GET /api/metrics/dashboard
+
+### Metrics Returned
+
+* User count
+* Board count
+* Total task count
+* Todo task count
+* In Progress task count
+* Completed task count
+
+### Dashboard Cards
+
+* Users
+* Boards
+* Tasks
+* Todo
+* In Progress
+* Done
+
+Example Response:
+
+{
+users: 2,
+boards: 2,
+tasks: 9,
+todo: 7,
+inProgress: 1,
+done: 1
+}
 
 ---
 
@@ -287,6 +520,7 @@ This provides visibility into organizational activity and demonstrates event-tra
 * Automatic JWT injection
 * Authentication handling
 * Consistent request patterns
+* Global 401 handling
 
 ## REST API
 
@@ -309,6 +543,18 @@ This provides visibility into organizational activity and demonstrates event-tra
 * PUT /api/tasks/:id
 * DELETE /api/tasks/:id
 
+### Comments
+
+* GET /api/comments/task/:taskId
+* POST /api/comments
+* PUT /api/comments/:id
+* DELETE /api/comments/:id
+
+### Notifications
+
+* GET /api/notifications
+* PUT /api/notifications/:id/read
+
 ### Users
 
 * GET /api/users
@@ -325,35 +571,47 @@ This provides visibility into organizational activity and demonstrates event-tra
 ### Audit Logs
 
 * GET /api/audit-logs
+* GET /api/audit-logs/task/:taskId
 
----
+### Metrics
 
-# 📂 Project Structure
-
-backend/
-├── src/
-│ ├── controllers/
-│ ├── middleware/
-│ ├── models/
-│ ├── routes/
-│ ├── utils/
-│ ├── app.js
-│ └── server.js
-
-frontend/
-├── src/
-│ ├── api/
-│ ├── components/
-│ ├── context/
-│ ├── pages/
-│ ├── App.jsx
-│ └── main.jsx
+* GET /api/metrics/dashboard
 
 ---
 
 # 🚧 Current Development Roadmap
 
+## Recently Completed
+
+### Collaboration Features
+
+* Comments system
+* Notifications system
+* Activity feed
+* Task assignment workflow
+* Task activity timeline
+
+### Analytics
+
+* Dashboard metrics endpoint
+* Dashboard metrics cards
+
+### Audit Logging
+
+* Assignment tracking
+* Comment tracking
+* Task activity history
+
+---
+
 ## Next Milestone
+
+### Dashboard Enhancements
+
+* Auto-refresh dashboard metrics
+* Improved metrics card styling
+* Activity summaries
+* Team insights
 
 ### Invitation System Enhancements
 
@@ -361,24 +619,18 @@ frontend/
 * Resend invitation functionality
 * Enhanced email templates
 
-### Dashboard Enhancements
+### Task Management Enhancements
 
-* Organization metrics
-* Task analytics
-* Activity summaries
-* Team insights
-
-### Collaboration Features
-
-* Comments
-* Notifications
-* Activity feeds
+* Task priorities
+* Due dates
+* Search and filtering
 
 ### Production Readiness
 
 * Automated testing
 * Validation layer
-* Security hardening
+* Rate limiting
+* Helmet security headers
 * Cloud deployment
 
 ---
@@ -396,6 +648,9 @@ frontend/
 * RESTful API design
 * MongoDB data modeling
 * Audit logging
+* Activity tracking
+* Notification systems
+* Collaboration workflows
 * Optimistic UI updates
 * Drag-and-drop interfaces
 * Environment-based configuration

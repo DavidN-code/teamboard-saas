@@ -6,12 +6,13 @@ const User = require("../models/User");
 // CREATE a new Task
 exports.createTask = async (req, res, next) => {
   try {
-    const { title, description, status, assignedTo, board } = req.body;
+    const { title, description, status, priority, assignedTo, board } = req.body;
 
     const task = await Task.create({
       title,
       description,
       status,
+      priority,
       assignedTo,
       board,
       organizationId: req.user.organizationId,
@@ -90,6 +91,16 @@ exports.updateTask = async (req, res, next) => {
   try {
     const updates = req.body;
 
+    const existingTask = await Task.findOne({
+      _id: req.params.id,
+      organizationId: req.user.organizationId,
+    });
+
+    const assigneeChanged =
+  updates.assignedTo &&
+  updates.assignedTo.toString() !==
+    (existingTask.assignedTo?.toString() || "");
+
     let task = await Task.findOneAndUpdate(
       { _id: req.params.id, organizationId: req.user.organizationId },
       updates,
@@ -104,7 +115,7 @@ console.log("task.assignedTo:", task.assignedTo);
 console.log("req.user.userId:", req.user.userId);
 
 if (
-  updates.assignedTo &&
+  assigneeChanged &&
   task.assignedTo &&
   task.assignedTo._id.toString() !== req.user.userId
 ) {
@@ -122,7 +133,7 @@ if (
 }
 
     // ✅ MOVE HERE
-    if (updates.assignedTo) {
+    if (assigneeChanged) {
       await logAction({
         action: "ASSIGN_TASK",
         resourceType: "Task",
