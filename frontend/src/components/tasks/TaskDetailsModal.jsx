@@ -80,6 +80,7 @@ export default function TaskDetailsModal({
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("todo");
   const [priority, setPriority] = useState("medium");
+  const [dueDate, setDueDate] = useState("");
   const [comments, setComments] = useState([]);
   const [users, setUsers] = useState([]);
   const [assignedTo, setAssignedTo] = useState("");
@@ -91,6 +92,11 @@ export default function TaskDetailsModal({
       setTitle(task.title || "");
       setDescription(task.description || "");
       setStatus(task.status || "todo");
+      setDueDate(
+        task.dueDate
+          ? task.dueDate.split("T")[0]
+          : ""
+      );
       setPriority(task.priority || "medium");
     }
 
@@ -277,6 +283,21 @@ export default function TaskDetailsModal({
   </select>
 </div>
 
+<div style={{ marginBottom: "16px" }}>
+  <strong>Due Date</strong>
+
+  <input
+    type="date"
+    value={dueDate}
+    onChange={(e) => setDueDate(e.target.value)}
+    style={{
+      width: "100%",
+      padding: "10px",
+      marginTop: "6px",
+    }}
+  />
+</div>
+
         {/* DESCRIPTION */}
         <div style={{ marginBottom: "16px" }}>
           <strong>Description</strong>
@@ -357,6 +378,7 @@ export default function TaskDetailsModal({
                 description,
                 status,
                 priority,
+                dueDate,
                 assignedTo,
               })
             }

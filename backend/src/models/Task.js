@@ -25,6 +25,9 @@ const taskSchema = new mongoose.Schema({
     enum: ["low", "medium", "high"],
     default: "medium",
   },
+  dueDate: {
+    type: Date,
+  },
   organizationId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Organization',

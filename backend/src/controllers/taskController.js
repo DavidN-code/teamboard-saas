@@ -6,13 +6,14 @@ const User = require("../models/User");
 // CREATE a new Task
 exports.createTask = async (req, res, next) => {
   try {
-    const { title, description, status, priority, assignedTo, board } = req.body;
+    const { title, description, status, priority, dueDate, assignedTo, board } = req.body;
 
     const task = await Task.create({
       title,
       description,
       status,
       priority,
+      dueDate,
       assignedTo,
       board,
       organizationId: req.user.organizationId,
@@ -91,6 +92,12 @@ exports.updateTask = async (req, res, next) => {
   try {
     const updates = req.body;
 
+    console.log("UPDATES RECEIVED:", updates);
+
+if (updates.assignedTo === "") {
+      updates.assignedTo = null;
+    }
+    
     const existingTask = await Task.findOne({
       _id: req.params.id,
       organizationId: req.user.organizationId,
@@ -101,6 +108,8 @@ exports.updateTask = async (req, res, next) => {
   updates.assignedTo.toString() !==
     (existingTask.assignedTo?.toString() || "");
 
+    
+    
     let task = await Task.findOneAndUpdate(
       { _id: req.params.id, organizationId: req.user.organizationId },
       updates,
