@@ -2,6 +2,10 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 export default function TaskCard({ task, onClick }) {
+  const isOverdue =
+  task.dueDate &&
+  new Date(task.dueDate) < new Date() &&
+  task.status !== "done";
   const {
     attributes,
     listeners,
@@ -67,6 +71,31 @@ export default function TaskCard({ task, onClick }) {
     }}
   >
     Assigned: <strong>{task.assignedTo.name}</strong>
+  </p>
+)}
+
+{task.dueDate && (
+  <p
+    style={{
+      fontSize: "13px",
+      marginTop: "8px",
+      color: "#444",
+    }}
+  >
+    Due: {new Date(task.dueDate).toLocaleDateString()}
+  </p>
+)}
+
+{isOverdue && (
+  <p
+    style={{
+      color: "red",
+      fontWeight: "bold",
+      marginTop: "6px",
+      fontSize: "13px",
+    }}
+  >
+    ⚠ Overdue
   </p>
 )}
       </div>
