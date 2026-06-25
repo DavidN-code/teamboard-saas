@@ -102,53 +102,110 @@ if (updates.assignedTo === "") {
       _id: req.params.id,
       organizationId: req.user.organizationId,
     });
-
-    const assigneeChanged =
-  updates.assignedTo &&
-  updates.assignedTo.toString() !==
-    (existingTask.assignedTo?.toString() || "");
-
     
+    const assigneeChanged =
+      updates.assignedTo &&
+      updates.assignedTo.toString() !==
+        (existingTask.assignedTo?.toString() || "");
     
     let task = await Task.findOneAndUpdate(
-      { _id: req.params.id, organizationId: req.user.organizationId },
+      {
+        _id: req.params.id,
+        organizationId: req.user.organizationId,
+      },
       updates,
       { new: true }
     );
-
-    if (!task) return res.status(404).json({ message: 'Task not found' });
-    task = await task.populate("assignedTo", "name email");
-
-    console.log("updates.assignedTo:", updates.assignedTo);
-console.log("task.assignedTo:", task.assignedTo);
-console.log("req.user.userId:", req.user.userId);
-
-if (
-  assigneeChanged &&
-  task.assignedTo &&
-  task.assignedTo._id.toString() !== req.user.userId
-) {
-
-  const assigningUser = await User.findById(req.user.userId);
-
-  const notification = await createNotification({
-    userId: task.assignedTo._id,
-    organizationId: req.user.organizationId,
-    type: "TASK_ASSIGNED",
-    resourceId: task._id,
-    message: `${assigningUser.name} assigned you task "${task.title}"`,
-  });
-
-}
-
-    // ✅ MOVE HERE
+    
+    if (!task)
+      return res.status(404).json({
+        message: "Task not found",
+      });
+    
+    task = await task.populate(
+      "assignedTo",
+      "name email"
+    );
+    
+    console.log(
+      "updates.assignedTo:",
+      updates.assignedTo
+    );
+    console.log(
+      "task.assignedTo:",
+      task.assignedTo
+    );
+    console.log(
+      "req.user.userId:",
+      req.user.userId
+    );
+    
+    const changes = [];
+    
+    if (
+      updates.title &&
+      updates.title !== existingTask.title
+    ) {
+      changes.push(
+        `renamed task from "${existingTask.title}" to "${updates.title}"`
+      );
+    }
+    
+    if (
+      updates.status &&
+      updates.status !== existingTask.status
+    ) {
+      changes.push(
+        `moved task from ${existingTask.status} to ${updates.status}`
+      );
+    }
+    
+    if (
+      updates.priority &&
+      updates.priority !== existingTask.priority
+    ) {
+      changes.push(
+        `changed priority from ${existingTask.priority} to ${updates.priority}`
+      );
+    }
+    
+    if (
+      updates.dueDate &&
+      updates.dueDate !==
+        existingTask.dueDate?.toISOString()?.split("T")[0]
+    ) {
+      changes.push(
+        `changed due date to ${updates.dueDate}`
+      );
+    }
+    
+    if (
+      assigneeChanged &&
+      task.assignedTo &&
+      task.assignedTo._id.toString() !==
+        req.user.userId
+    ) {
+      const assigningUser =
+        await User.findById(req.user.userId);
+    
+      await createNotification({
+        userId: task.assignedTo._id,
+        organizationId:
+          req.user.organizationId,
+        type: "TASK_ASSIGNED",
+        resourceId: task._id,
+        message: `${assigningUser.name} assigned you task "${task.title}"`,
+      });
+    }
+    
     if (assigneeChanged) {
       await logAction({
         action: "ASSIGN_TASK",
         resourceType: "Task",
         resourceId: task._id,
         userId: req.user.userId,
-        organizationId: req.user.organizationId,
+        organizationId:
+          req.user.organizationId,
         details: {
           taskTitle: task.title,
           assignedTo: task.assignedTo.name,
@@ -160,9 +217,11 @@ if (
         resourceType: "Task",
         resourceId: task._id,
         userId: req.user.userId,
-        organizationId: req.user.organizationId,
+        organizationId:
+          req.user.organizationId,
         details: {
           taskTitle: task.title,
+          changes,
         },
       });
     }
@@ -173,8 +232,6 @@ if (
     next(err);
   }
 };
-
-
 
 // DELETE a task
 exports.deleteTask = async (req, res, next) => {

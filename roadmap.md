@@ -484,8 +484,6 @@ Phase 8 — Advanced Task Management 🚧
 
 Completed:
 
-✅ Task priorities
-✅ Task due dates
 ### Task Features
 
 ✅ Priorities
@@ -493,6 +491,8 @@ Completed:
 ✅ Search
 ✅ Filtering
 ✅ Sorting
+✅ Sorting
+✅ overdue indicators
 
 ---
 

@@ -1,31 +1,38 @@
 import { useEffect, useState } from "react";
 import { getActivityFeed } from "../api/activityFeed";
 
-function formatAction(action) {
-    const actionMap = {
-      CREATE_TASK: "created",
-      UPDATE_TASK: "updated",
-      DELETE_TASK: "deleted",
+function formatAction(activity) {
+  const name = activity.userId?.name || "Unknown User";
 
-      ASSIGN_TASK: "assigned",
-  
-      CREATE_BOARD: "created a board",
-      UPDATE_BOARD: "updated a board",
-      DELETE_BOARD: "deleted a board",
-  
-      CREATE_COMMENT: "commented on a task",
-      UPDATE_COMMENT: "updated a comment",
-      DELETE_COMMENT: "deleted a comment",
-  
-      CREATE_INVITATION: "invited a team member",
-      ACCEPT_INVITATION: "joined the organization",
-  
-      UPDATE_USER_ROLE: "changed a user role",
-      REMOVE_USER: "removed a user",
-    };
-  
-    return actionMap[action] || action;
+  const changes = activity.details?.changes || [];
+
+  if (activity.action === "UPDATE_TASK" && changes.length > 0) {
+    return `${name} ${changes.join(", ")}`;
   }
+
+  const actionMap = {
+    CREATE_TASK: "created",
+    DELETE_TASK: "deleted",
+
+    ASSIGN_TASK: "assigned",
+
+    CREATE_BOARD: "created a board",
+    UPDATE_BOARD: "updated a board",
+    DELETE_BOARD: "deleted a board",
+
+    CREATE_COMMENT: "commented on a task",
+    UPDATE_COMMENT: "updated a comment",
+    DELETE_COMMENT: "deleted a comment",
+
+    CREATE_INVITATION: "invited a team member",
+    ACCEPT_INVITATION: "joined the organization",
+
+    UPDATE_USER_ROLE: "changed a user role",
+    REMOVE_USER: "removed a user",
+  };
+
+  return `${name} ${actionMap[activity.action] || activity.action}`;
+}
 
 export default function ActivityFeed() {
   const [activities, setActivities] = useState([]);
@@ -64,7 +71,7 @@ export default function ActivityFeed() {
             <strong>
   {activity.userId?.name || "Unknown User"}
 </strong>{" "}
-{formatAction(activity.action)}
+{formatAction(activity)}
 
 {activity.details?.taskTitle && (
   <>
