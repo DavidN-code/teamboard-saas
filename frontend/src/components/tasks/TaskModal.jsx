@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getUsers } from "../../api/users";
 
 export default function TaskModal({
   isOpen,
@@ -9,8 +10,28 @@ export default function TaskModal({
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("medium");
   const [dueDate, setDueDate] = useState("");
+  const [users, setUsers] = useState([]);
+  const [assignedTo, setAssignedTo] = useState("");
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const res = await getUsers();
+        setUsers(res.data);
+      } catch (err) {
+        console.error("Failed to load users", err);
+      }
+    };
+
+    if (isOpen) {
+      loadUsers();
+    }
+
+  }, [isOpen]);
+
 
   if (!isOpen) return null;
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,13 +42,16 @@ export default function TaskModal({
       status: "todo",
       priority,
       dueDate,
+      assignedTo,
     });
 
     setTitle("");
     setDescription("");
     setPriority("medium");
     setDueDate("");
+    setAssignedTo("");
   };
+
 
   return (
     <div
@@ -40,6 +64,7 @@ export default function TaskModal({
         alignItems: "center",
       }}
     >
+
       <div
         style={{
           background: "white",
@@ -48,9 +73,13 @@ export default function TaskModal({
           width: "400px",
         }}
       >
+
         <h2>Create Task</h2>
 
+
         <form onSubmit={handleSubmit}>
+
+
           <div style={{ marginBottom: "12px" }}>
             <input
               type="text"
@@ -65,6 +94,7 @@ export default function TaskModal({
             />
           </div>
 
+
           <div style={{ marginBottom: "12px" }}>
             <textarea
               placeholder="Description"
@@ -77,42 +107,78 @@ export default function TaskModal({
               }}
             />
           </div>
+
+
           <div style={{ marginBottom: "12px" }}>
-  <label>
-    <strong>Priority</strong>
-  </label>
+            <label>
+              <strong>Priority</strong>
+            </label>
 
-  <select
-    value={priority}
-    onChange={(e) => setPriority(e.target.value)}
-    style={{
-      width: "100%",
-      padding: "10px",
-      marginTop: "6px",
-    }}
-  >
-    <option value="low">🟢 Low</option>
-    <option value="medium">🟡 Medium</option>
-    <option value="high">🔴 High</option>
-  </select>
-</div>
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                marginTop: "6px",
+              }}
+            >
+              <option value="low">🟢 Low</option>
+              <option value="medium">🟡 Medium</option>
+              <option value="high">🔴 High</option>
+            </select>
+          </div>
 
-<div style={{ marginBottom: "12px" }}>
-  <label>
-    <strong>Due Date</strong>
-  </label>
 
-  <input
-    type="date"
-    value={dueDate}
-    onChange={(e) => setDueDate(e.target.value)}
-    style={{
-      width: "100%",
-      padding: "10px",
-      marginTop: "6px",
-    }}
-  />
-</div>
+          <div style={{ marginBottom: "12px" }}>
+            <label>
+              <strong>Due Date</strong>
+            </label>
+
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                marginTop: "6px",
+              }}
+            />
+          </div>
+
+
+          <div style={{ marginBottom: "12px" }}>
+            <label>
+              <strong>Assign To</strong>
+            </label>
+
+            <select
+              value={assignedTo}
+              onChange={(e) => setAssignedTo(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                marginTop: "6px",
+              }}
+            >
+
+              <option value="">
+                Unassigned
+              </option>
+
+              {users.map((user) => (
+                <option
+                  key={user._id}
+                  value={user._id}
+                >
+                  {user.name}
+                </option>
+              ))}
+
+            </select>
+          </div>
+
 
           <div
             style={{
@@ -120,16 +186,25 @@ export default function TaskModal({
               justifyContent: "space-between",
             }}
           >
-            <button type="button" onClick={onClose}>
+
+            <button
+              type="button"
+              onClick={onClose}
+            >
               Cancel
             </button>
+
 
             <button type="submit">
               Create Task
             </button>
+
           </div>
+
         </form>
+
       </div>
+
     </div>
   );
 }
