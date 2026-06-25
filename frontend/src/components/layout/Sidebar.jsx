@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import { useActiveBoard } from "../../context/ActiveBoardContext";
+import { Link } from "react-router-dom";
 
 export default function Sidebar() {
   const [boards, setBoards] = useState([]);
@@ -69,6 +70,17 @@ export default function Sidebar() {
       }}
     >
       <h3>Boards</h3>
+
+      <Link
+  to="/my-tasks"
+  style={{
+    display: "block",
+    marginBottom: "20px",
+    textDecoration: "none",
+  }}
+>
+  My Tasks
+</Link>
 
       {/* Create Board Form */}
       <form onSubmit={handleCreateBoard}>

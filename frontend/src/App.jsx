@@ -6,6 +6,7 @@ import { useAuth } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard.jsx";
 import AuditLogs from "./pages/AuditLogs.jsx";
 import OrganizationMembers from "./pages/OrganizationMembers.jsx";
+import MyTasks from "./pages/MyTasks";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<Register />} />
       <Route path="/members" element={<OrganizationMembers />} />
+      <Route path="/my-tasks" element={<MyTasks />} />
 
       {/* 🔐 Protected Route */}
       <Route
