@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const protect = require("../middleware/authMiddleware"); // JWT auth
+const protect = require("../middleware/authMiddleware");
 const allowRoles = require("../middleware/roleMiddleware");
 
 const {
@@ -11,26 +11,31 @@ const {
   getTaskById,
   updateTask,
   deleteTask,
+  getMyTasks, // <-- you need to implement this in controller
 } = require("../controllers/taskController");
 
-// All routes require authentication
+// Apply auth to ALL routes
 router.use(protect);
 
-// GET all tasks for the user's organization
+// My Tasks
+router.get("/my-tasks", getMyTasks);
+
+// Get all tasks
 router.get("/", getTasks);
 
+// Get by board
 router.get("/board/:boardId", getTasksByBoard);
 
-// GET a single task by ID
+// Get single task
 router.get("/:id", getTaskById);
 
-// CREATE a task → only Owner or Admin
+// Create
 router.post("/", allowRoles("owner", "admin"), createTask);
 
-// UPDATE a task → only Owner or Admin (adjust if you want only Owner)
+// Update
 router.put("/:id", allowRoles("owner", "admin"), updateTask);
 
-// DELETE a task → only Owner or Admin
+// Delete
 router.delete("/:id", allowRoles("owner", "admin"), deleteTask);
 
 module.exports = router;

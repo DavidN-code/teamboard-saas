@@ -71,6 +71,24 @@ exports.getTasksByBoard = async (req, res, next) => {
   }
 };
 
+// GET tasks assigned to the current user
+exports.getMyTasks = async (req, res, next) => {
+  try {
+    const tasks = await Task.find({
+      assignedTo: req.user.userId,
+      organizationId: req.user.organizationId,
+    })
+      .populate("assignedTo", "name email")
+      .populate("createdBy", "name email")
+      .populate("board", "name");
+
+    res.json(tasks);
+
+  } catch (err) {
+    next(err);
+  }
+};
+
 // GET a single task by ID
 exports.getTaskById = async (req, res, next) => {
   try {
@@ -94,20 +112,27 @@ exports.updateTask = async (req, res, next) => {
 
     console.log("UPDATES RECEIVED:", updates);
 
-if (updates.assignedTo === "") {
+    // normalize empty assignment
+    if (updates.assignedTo === "") {
       updates.assignedTo = null;
     }
-    
+
+    // fetch existing task FIRST
     const existingTask = await Task.findOne({
       _id: req.params.id,
       organizationId: req.user.organizationId,
     });
-    
+
+    if (!existingTask) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
     const assigneeChanged =
       updates.assignedTo &&
       updates.assignedTo.toString() !==
         (existingTask.assignedTo?.toString() || "");
-    
+
+    // update task
     let task = await Task.findOneAndUpdate(
       {
         _id: req.params.id,
@@ -115,104 +140,80 @@ if (updates.assignedTo === "") {
       },
       updates,
       { new: true }
-    );
-    
-    if (!task)
-      return res.status(404).json({
-        message: "Task not found",
-      });
-    
-    task = await task.populate(
-      "assignedTo",
-      "name email"
-    );
-    
-    console.log(
-      "updates.assignedTo:",
-      updates.assignedTo
-    );
-    console.log(
-      "task.assignedTo:",
-      task.assignedTo
-    );
-    console.log(
-      "req.user.userId:",
-      req.user.userId
-    );
-    
+    ).populate("assignedTo", "name email");
+
+    console.log("updates.assignedTo:", updates.assignedTo);
+    console.log("task.assignedTo:", task.assignedTo);
+    console.log("req.user.userId:", req.user.userId);
+
+    // -------------------------
+    // BUILD CHANGE LIST
+    // -------------------------
     const changes = [];
-    
-    if (
-      updates.title &&
-      updates.title !== existingTask.title
-    ) {
+
+    if (updates.title && updates.title !== existingTask.title) {
       changes.push(
         `renamed task from "${existingTask.title}" to "${updates.title}"`
       );
     }
-    
-    if (
-      updates.status &&
-      updates.status !== existingTask.status
-    ) {
+
+    if (updates.status && updates.status !== existingTask.status) {
       changes.push(
         `moved task from ${existingTask.status} to ${updates.status}`
       );
     }
-    
-    if (
-      updates.priority &&
-      updates.priority !== existingTask.priority
-    ) {
+
+    if (updates.priority && updates.priority !== existingTask.priority) {
       changes.push(
         `changed priority from ${existingTask.priority} to ${updates.priority}`
       );
     }
-    
-    if (
-      updates.dueDate &&
-      updates.dueDate !==
-        existingTask.dueDate?.toISOString()?.split("T")[0]
-    ) {
-      changes.push(
-        `changed due date from ${
-          existingTask.dueDate
-            ? existingTask.dueDate.toISOString().split("T")[0]
-            : "none"
-        } to ${updates.dueDate}`
-      );
+
+    // safer dueDate comparison (fixes silent failures)
+    if (updates.dueDate !== undefined) {
+      const oldDate = existingTask.dueDate
+        ? new Date(existingTask.dueDate).toISOString().split("T")[0]
+        : null;
+
+      if (updates.dueDate !== oldDate) {
+        changes.push(
+          `changed due date from ${oldDate || "none"} to ${updates.dueDate}`
+        );
+      }
     }
-    
+
+    // -------------------------
+    // NOTIFICATION
+    // -------------------------
     if (
       assigneeChanged &&
       task.assignedTo &&
-      task.assignedTo._id.toString() !==
-        req.user.userId
+      task.assignedTo._id.toString() !== req.user.userId
     ) {
-      const assigningUser =
-        await User.findById(req.user.userId);
-    
+      const assigningUser = await User.findById(req.user.userId);
+
       await createNotification({
         userId: task.assignedTo._id,
-        organizationId:
-          req.user.organizationId,
+        organizationId: req.user.organizationId,
         type: "TASK_ASSIGNED",
         resourceId: task._id,
         message: `${assigningUser.name} assigned you task "${task.title}"`,
       });
     }
-    
+
+    // -------------------------
+    // AUDIT LOGGING
+    // -------------------------
     if (assigneeChanged) {
       await logAction({
         action: "ASSIGN_TASK",
         resourceType: "Task",
         resourceId: task._id,
         userId: req.user.userId,
-        organizationId:
-          req.user.organizationId,
+        organizationId: req.user.organizationId,
         details: {
           taskTitle: task.title,
-          assignedTo: task.assignedTo.name,
+          assignedTo: task.assignedTo?.name,
         },
       });
     } else {
@@ -221,17 +222,15 @@ if (updates.assignedTo === "") {
         resourceType: "Task",
         resourceId: task._id,
         userId: req.user.userId,
-        organizationId:
-          req.user.organizationId,
+        organizationId: req.user.organizationId,
         details: {
           taskTitle: task.title,
-          changes,
+          changes: changes.length ? changes : ["updated task"],
         },
       });
     }
 
-    res.json(task);
-
+    return res.json(task);
   } catch (err) {
     next(err);
   }
