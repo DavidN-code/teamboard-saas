@@ -175,7 +175,11 @@ if (updates.assignedTo === "") {
         existingTask.dueDate?.toISOString()?.split("T")[0]
     ) {
       changes.push(
-        `changed due date to ${updates.dueDate}`
+        `changed due date from ${
+          existingTask.dueDate
+            ? existingTask.dueDate.toISOString().split("T")[0]
+            : "none"
+        } to ${updates.dueDate}`
       );
     }
     
