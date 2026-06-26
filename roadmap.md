@@ -493,6 +493,7 @@ Completed:
 ✅ Sorting
 ✅ Sorting
 ✅ overdue indicators
+comments
 
 ---
 

@@ -130,8 +130,12 @@ export default function TaskDetailsModal({
   }, [task]);
 
   // ✅ safe render check AFTER hooks
-  if (!isOpen || !task) return null;
-
+  const refreshActivity = async () => {
+    const res = await getTaskActivity(task._id);
+    setActivity(res.data);
+  };
+  
+  
   const handleCreateComment = async (content) => {
     await createComment({
       taskId: task._id,
@@ -141,33 +145,40 @@ export default function TaskDetailsModal({
     const updated = await getComments(task._id);
   
     setComments(updated.data);
+  
+    await refreshActivity();
   };
   
   
   const handleUpdateComment = async (id, content) => {
-    const res = await updateComment(id, {
+    await updateComment(id, {
       content,
     });
   
-    setComments(
-      comments.map((comment) =>
-        comment._id === id
-          ? res.data
-          : comment
-      )
-    );
+    const updated = await getComments(task._id);
+  
+    setComments(updated.data);
+  
+    await refreshActivity();
   };
   
   
   const handleDeleteComment = async (id) => {
+    if (!window.confirm("Delete this comment?")) return;
+  
     await deleteComment(id);
   
-    setComments(
-      comments.filter(
-        (comment) => comment._id !== id
-      )
-    );
+    const updated = await getComments(task._id);
+  
+    setComments(updated.data);
+  
+    await refreshActivity();
   };
+
+
+  // Prevent rendering if modal is closed or task data is missing
+  if (!isOpen || !task) return null;
+
 
   return (
     <div
