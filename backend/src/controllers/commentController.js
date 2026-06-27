@@ -1,7 +1,7 @@
 const Comment = require("../models/Comment");
-const logAction = require("../utils/auditLogger");
+const createAuditLog = require("../services/auditLogService");
+const createNotification = require("../services/notificationService");
 const Task = require("../models/Task");
-const createNotification = require("../utils/notificationService");
 const User = require("../models/User");
 
 // CREATE COMMENT
@@ -16,7 +16,7 @@ exports.createComment = async (req, res, next) => {
       createdBy: req.user.userId,
     });
 
-    await logAction({
+    await createAuditLog({
       action: "CREATE_COMMENT",
       resourceType: "Task",
       resourceId: comment.taskId,
@@ -84,7 +84,7 @@ exports.updateComment = async (req, res, next) => {
     comment.content = req.body.content;
     await comment.save();
 
-    await logAction({
+    await createAuditLog({
       action: "UPDATE_COMMENT",
       resourceType: "Task",
       resourceId: comment.taskId,
@@ -125,7 +125,7 @@ exports.deleteComment = async (req, res, next) => {
 
     await comment.deleteOne();
 
-    await logAction({
+    await createAuditLog({
       action: "DELETE_COMMENT",
       resourceType: "Task",
       resourceId: comment.taskId,

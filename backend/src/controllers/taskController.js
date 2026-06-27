@@ -1,6 +1,6 @@
 const Task = require('../models/Task');
-const logAction = require("../utils/auditLogger");
-const createNotification = require("../utils/notificationService");
+const createAuditLog = require("../services/auditLogService");
+const createNotification = require("../services/notificationService");
 const User = require("../models/User");
 
 // CREATE a new Task
@@ -21,7 +21,7 @@ exports.createTask = async (req, res, next) => {
     });
 
     // ✅ MOVE HERE
-    await logAction({
+    await createAuditLog({
       action: "CREATE_TASK",
       resourceType: "Task",
       resourceId: task._id,
@@ -205,7 +205,7 @@ exports.updateTask = async (req, res, next) => {
     // AUDIT LOGGING
     // -------------------------
     if (assigneeChanged) {
-      await logAction({
+      await createAuditLog({
         action: "ASSIGN_TASK",
         resourceType: "Task",
         resourceId: task._id,
@@ -217,7 +217,7 @@ exports.updateTask = async (req, res, next) => {
         },
       });
     } else {
-      await logAction({
+      await createAuditLog({
         action: "UPDATE_TASK",
         resourceType: "Task",
         resourceId: task._id,
@@ -247,7 +247,7 @@ exports.deleteTask = async (req, res, next) => {
     if (!task) return res.status(404).json({ message: 'Task not found' });
 
     // ✅ MOVE HERE
-    await logAction({
+    await createAuditLog({
       action: "DELETE_TASK",
       resourceType: "Task",
       resourceId: task._id,

@@ -1,6 +1,6 @@
 const Board = require('../models/Board');
 const mongoose = require('mongoose');
-const logAction = require("../utils/auditLogger");
+const createAuditLog = require("../services/auditLogService");
 
 // GET all boards for the user's organization
 exports.getBoards = async (req, res, next) => {
@@ -44,7 +44,7 @@ exports.createBoard = async (req, res, next) => {
       createdBy: req.user.userId,
     });
     res.status(201).json(board);
-    await logAction({
+    await createAuditLog({
       action: "CREATE_BOARD",
       resourceType: "Board",
       resourceId: board._id,
@@ -70,7 +70,7 @@ exports.updateBoard = async (req, res, next) => {
     if (!board) return res.status(404).json({ message: 'Board not found' });
 
     res.json(board);
-    await logAction({
+    await createAuditLog({
       action: "UPDATE_BOARD",
       resourceType: "Board",
       resourceId: board._id,
@@ -93,7 +93,7 @@ exports.deleteBoard = async (req, res, next) => {
     if (!board) return res.status(404).json({ message: 'Board not found' });
 
     res.json({ message: 'Board deleted successfully' });
-    await logAction({
+    await createAuditLog({
       action: "DELETE_BOARD",
       resourceType: "Board",
       resourceId: board._id,
