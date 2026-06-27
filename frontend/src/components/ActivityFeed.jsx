@@ -7,7 +7,28 @@ function formatAction(activity) {
   const changes = activity.details?.changes || [];
 
   if (activity.action === "UPDATE_TASK" && changes.length > 0) {
-    return `${name} ${changes.join(", ")}`;
+    return (
+      <>
+        {name} updated task{" "}
+        <strong>"{activity.details.taskTitle}"</strong>
+  
+        <ul
+  style={{
+    marginTop: "8px",
+    paddingLeft: "24px",
+    fontSize: "14px",
+    color: "#4b5563",
+    listStyleType: "disc",
+  }}
+>
+          {changes.map((change, index) => (
+            <li key={index}>
+              {change}
+            </li>
+          ))}
+        </ul>
+      </>
+    );
   }
 
   const actionMap = {
@@ -68,21 +89,19 @@ export default function ActivityFeed() {
               padding: "10px 0",
             }}
           >
-            <strong>
-  {activity.userId?.name || "Unknown User"}
-</strong>{" "}
+            
 {formatAction(activity)}
 
-{activity.details?.taskTitle && (
-  <>
-    {" "}
-    <strong>"{activity.details.taskTitle}"</strong>
+{activity.action === "ASSIGN_TASK" &&
+  activity.details?.taskTitle && (
+    <>
+      {" "}
+      <strong>"{activity.details.taskTitle}"</strong>
 
-    {activity.action === "ASSIGN_TASK" &&
-      activity.details?.assignedTo && (
+      {activity.details?.assignedTo && (
         <> to <strong>{activity.details.assignedTo}</strong></>
       )}
-  </>
+    </>
 )}
 
 {activity.details?.commentPreview && (

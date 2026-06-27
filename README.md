@@ -1,666 +1,589 @@
 # 🚀 TeamBoard – Multi-Tenant Project Management SaaS
 
-TeamBoard is a full-stack SaaS application built to demonstrate production-style software engineering practices including secure authentication, multi-tenant architecture, role-based access control (RBAC), audit logging, team onboarding workflows, notifications, comments, activity tracking, and Kanban project management.
+TeamBoard is a full-stack SaaS project management application being built as a portfolio-quality project to demonstrate modern full-stack software engineering skills.
 
-The project is being developed as a portfolio-quality application that showcases the skills commonly expected of modern full-stack software developers.
+The goal is to create a realistic multi-tenant collaboration platform similar to Asana, Jira, ClickUp, Trello, and Monday.com.
 
-Current development focus is on building a realistic multi-tenant collaboration platform similar to Asana, Jira, ClickUp, Trello, and Monday.com.
+The primary purpose of this project is to demonstrate skills needed for a software developer role:
 
----
+- Full-stack application development
+- SaaS architecture
+- Authentication and security
+- Multi-tenant systems
+- RBAC permissions
+- REST APIs
+- React frontend architecture
+- MongoDB data modeling
+- Collaboration workflows
+- Production-style engineering practices
 
-# 🎯 Project Objectives
 
-TeamBoard demonstrates the ability to design and build:
-
-* Full-stack web applications
-* Multi-tenant SaaS architecture
-* Secure authentication systems
-* Role-based authorization
-* Team onboarding workflows
-* RESTful APIs
-* Modern React applications
-* MongoDB data modeling
-* Email integrations
-* Audit logging systems
-* Notification systems
-* Activity tracking systems
-* Collaboration features
-* Production-oriented backend architecture
-
----
-
-# 🧱 Technology Stack
+# 🧱 Tech Stack
 
 ## Backend
 
-* Node.js
-* Express.js
-* MongoDB Atlas
-* Mongoose
-* JSON Web Tokens (JWT)
-* bcrypt
-* Nodemailer
+- Node.js
+- Express.js
+- MongoDB Atlas
+- Mongoose
+- JWT authentication
+- bcrypt password hashing
+- Nodemailer email integration
+
 
 ## Frontend
 
-* React
-* React Router
-* Axios
-* Vite
-* @dnd-kit/core
-* @dnd-kit/sortable
+- React
+- Vite
+- React Router
+- Axios
+- @dnd-kit/core
+- @dnd-kit/sortable
 
-## Planned Production Infrastructure
 
-* Frontend: Vercel
-* Backend: Render
-* Database: MongoDB Atlas
-* Email Service: Resend or SendGrid
-
----
-
-# 🔐 Authentication & Security
-
-## Implemented
-
-### User Authentication
-
-* User registration
-* User login
-* JWT authentication
-* Password hashing with bcrypt
-* Protected API routes
-* Persistent login sessions
-* Automatic unauthorized-session handling
-* Axios token injection
-* Global authentication state
-
-### Security Architecture
-
-* Authorization middleware
-* Role-restricted endpoints
-* Organization-level data isolation
-* Centralized error handling
-* Secure invitation token generation
-* Environment variable configuration
-
-## Planned
-
-* Refresh token rotation
-* Rate limiting
-* Helmet security headers
-* Input validation (Zod or Joi)
-* Account recovery workflows
-
----
-
-# 🏢 Multi-Tenant SaaS Architecture
+# 🏢 Multi-Tenant Architecture
 
 TeamBoard uses organization-based tenancy.
 
-Every user belongs to a single organization and all resources are scoped to that organization.
+Users belong to organizations, and resources are scoped by organizationId to prevent cross-organization data access.
 
-This prevents cross-organization data access and mirrors the architecture commonly used by SaaS platforms such as Slack, Asana, Notion, and ClickUp.
+Implemented:
 
-## Implemented
+- Organization model
+- User organizations
+- Organization-scoped boards
+- Organization-scoped tasks
+- Organization-scoped comments
+- Organization-scoped notifications
+- Organization-scoped audit logs
+- Organization member management
 
-* Organization model
-* Organization ownership
-* User-to-organization relationships
-* Organization-scoped boards
-* Organization-scoped tasks
-* Organization-scoped comments
-* Organization-scoped notifications
-* Organization-scoped audit logs
-* Organization-scoped member management
-* Invitation-based organization onboarding
 
----
+# 🔐 Authentication & Security
+
+Implemented:
+
+- User registration
+- Login
+- JWT authentication
+- bcrypt password hashing
+- Protected backend routes
+- Auth middleware
+- Axios JWT token injection
+- Persistent frontend login
+- Automatic logout on 401 responses
+- Centralized error handling
+
 
 # 🛡 Role-Based Access Control (RBAC)
 
-TeamBoard implements multiple permission levels.
+Roles:
 
-## Roles
+## Owner
 
-### Owner
+- Full organization access
+- Manage members
+- Change roles
+- Create invitations
+- View audit logs
 
-* Full organization access
-* Manage users
-* Change user roles
-* Remove users
-* Create invitations
-* Access audit logs
 
-### Admin
+## Admin
 
-* Manage project resources
-* Create invitations
-* Limited organization management
-* Access audit logs
+- Manage project resources
+- Invite users
+- Limited organization management
 
-### Member
 
-* Standard workspace access
-* Task collaboration
-* Commenting
-* Notification access
+## Member
 
-## Implemented
+- Workspace access
+- Task collaboration
+- Commenting
+- Notifications
 
-* User role model
-* Authorization middleware
-* Role-protected routes
-* Owner-only user management
-* Owner-only role changes
-* Role-aware frontend rendering
 
----
+Implemented:
 
-# 👥 Organization Management & Team Onboarding
+- User roles
+- Backend authorization checks
+- Role-based routes
+- Member management UI
+- Role updates
+- User removal workflow
 
-TeamBoard includes a complete invitation-based onboarding system.
 
-## Member Management
+# 👥 Organization Invitations
 
-### Implemented
+Implemented:
 
-* Organization member directory
-* Role management interface
-* User removal workflow
-* Role update API
-* Permission-based controls
+- Invitation creation
+- Secure invitation tokens
+- Invitation validation
+- Email invitations
+- Invitation registration flow
+- Automatic organization joining
+- Pending/accepted invitation tracking
 
-## Invitation System
-
-### Implemented
-
-* Invitation creation
-* Secure invitation tokens
-* Invitation validation endpoint
-* Pending invitation tracking
-* Invitation status management
-* Invitation revocation
-* Email invitation delivery
-* Invitation-aware registration flow
-
-### Invitation Workflow
-
-1. Owner/Admin creates invitation
-2. Secure token generated
-3. Invitation stored in MongoDB
-4. Email invitation delivered
-5. User opens invitation link
-6. Registration form validates invitation
-7. Email auto-filled and locked
-8. User joins organization automatically
-9. Invitation marked accepted
-
-### Invitation Status Tracking
-
-* Pending
-* Accepted
-
----
 
 # 📧 Email Integration
 
-TeamBoard includes transactional email delivery for organization invitations.
+Implemented:
 
-## Implemented
+- Nodemailer
+- Gmail SMTP configuration
+- HTML invitation emails
+- Invitation acceptance links
 
-* Nodemailer integration
-* Gmail SMTP configuration
-* Environment-based credentials
-* HTML email templates
-* Invitation acceptance links
-
-## Planned
-
-* Production email provider migration
-* Resend invitation workflow
-* Invitation expiration system
-* Email branding improvements
-
----
 
 # 📋 Boards & Tasks
 
 ## Boards
 
-### Implemented
+Implemented:
 
-* Create boards
-* View boards
-* Update boards
-* Delete boards
-* Active board switching
-* Organization-scoped board access
+- Create boards
+- Update boards
+- Delete boards
+- View boards
+- Active board switching
+
 
 ## Tasks
 
-### Implemented
+Implemented:
 
-* Create tasks
-* Edit tasks
-* Delete tasks
-* Task status management
-* Board filtering
-* Optimistic UI updates
-* Task Details Modal
-* Task creator tracking
-* Task assignment system
-* Task activity history
-* Task comments
-* Notification integration
+- Create tasks
+- Edit tasks
+- Delete tasks
+- Task status management
+- Task priority support
+- Due date support
+- Task assignment
+- Task creator attribution (`createdBy`)
+- Task Details Modal
+- Task comments
+- Task activity timeline
 
-### Task Details Modal
-
-Implemented features:
-
-* Edit task title
-* Edit task description
-* Edit task status
-* Assign users
-* Delete task
-* View creator
-* View assignee
-* View comments
-* Create comments
-* Edit comments
-* Delete comments
-* View task activity timeline
-
----
 
 # 👤 Task Assignment System
 
-## Implemented
+Implemented:
 
-* Assign tasks to organization members
-* Reassign tasks
-* Unassign tasks
-* Assignment dropdown UI
-* Assignment notifications
-* Assignment audit logging
-* Assignment activity tracking
+- Assign tasks to organization members
+- Reassign tasks
+- Unassign tasks
+- Assignment dropdown
+- Assignment notifications
+- Assignment audit logging
 
-### Assignment Audit Events
 
-* ASSIGN_TASK
+Assignment event:
 
-### Assignment Notifications
+- ASSIGN_TASK
 
-When a task is assigned:
-
-1. Notification created
-2. Notification appears in Notification Bell
-3. User receives unread count update
-4. User can click notification
-5. Task opens directly from notification
-
----
 
 # 💬 Comments System
 
-## Implemented
+Comments were already partially implemented and were recently connected/refined in the frontend.
 
-* Create comments
-* Edit comments
-* Delete comments
-* Comment history
-* User attribution
-* Task-specific comment threads
-* Comment notifications
-* Comment audit logging
+Implemented:
 
-### Comment Audit Events
+Backend:
 
-* CREATE_COMMENT
-* UPDATE_COMMENT
-* DELETE_COMMENT
+- Comment model
+- Comment controller
+- Comment routes
+- Organization-scoped comments
+- User attribution
+- Comment permissions
 
-### Comment Notifications
 
-Task owners receive notifications when another user comments on their task.
+Frontend:
 
----
+Location:
+
+frontend/src/components/comments/
+
+Files:
+
+- CommentForm.jsx
+- CommentList.jsx
+- CommentItem.jsx
+
+
+Features:
+
+- Create comments
+- Edit comments
+- Delete comments
+- Display commenter
+- Display timestamps
+- Task-specific comment threads
+
+
+Comment audit events:
+
+- CREATE_COMMENT
+- UPDATE_COMMENT
+- DELETE_COMMENT
+
+
+Comment notifications:
+
+Task creators receive notifications when another user comments on their task.
+
+
+Important behavior:
+
+- Adding/editing/deleting comments immediately updates the task activity timeline.
+- The organization-wide dashboard activity feed may still require a page refresh to display new comment activity.
+
 
 # 🔔 Notification System
 
-## Implemented
+Implemented:
 
-* Notification model
-* Notification API
-* Notification Bell UI
-* Unread notification count
-* Mark notification as read
-* Clickable notifications
-* Task navigation from notifications
+- Notification model
+- Notification API
+- Notification bell
+- Unread count
+- Mark notifications as read
+- Click notification → open task
 
-### Notification Types
 
-* TASK_ASSIGNED
-* TASK_COMMENT
+Notification types:
 
-### Notification Features
+- TASK_ASSIGNED
+- TASK_COMMENT
 
-* Unread badge count
-* Read/unread state
-* Notification history
-* Direct task opening
-* Notification persistence
 
----
+# 🖱 Kanban Board
 
-# 🖱 Kanban Workflow System
+Implemented using @dnd-kit.
 
-Built using @dnd-kit.
+Features:
 
-## Implemented
+- Todo column
+- In Progress column
+- Done column
+- Drag and drop
+- Backend synchronization
+- Optimistic updates
 
-* Drag-and-drop task movement
-* Todo column
-* In Progress column
-* Done column
-* Backend synchronization
-* Drag overlays
-* Optimistic state updates
-
----
 
 # 📜 Audit Logging System
 
-TeamBoard includes a centralized audit logging system.
+Implemented:
 
-## Implemented
+- Audit log model
+- Audit log API
+- Audit log dashboard
+- User attribution
+- Organization scoping
+- Task-specific audit history endpoint
 
-### Audit Log Features
 
-* Audit log model
-* Audit log API
-* Audit log UI
-* Pagination
-* Filtering
-* User population
-* Organization scoping
-* Task-specific history endpoint
+Tracked events:
 
-### Tracked Actions
 
-#### Boards
+Boards:
 
-* CREATE_BOARD
-* UPDATE_BOARD
-* DELETE_BOARD
+- CREATE_BOARD
+- UPDATE_BOARD
+- DELETE_BOARD
 
-#### Tasks
 
-* CREATE_TASK
-* UPDATE_TASK
-* DELETE_TASK
-* ASSIGN_TASK
+Tasks:
 
-#### Comments
+- CREATE_TASK
+- UPDATE_TASK
+- DELETE_TASK
+- ASSIGN_TASK
 
-* CREATE_COMMENT
-* UPDATE_COMMENT
-* DELETE_COMMENT
 
-#### Organization Events
+Comments:
 
-* CREATE_INVITATION
-* ACCEPT_INVITATION
-* UPDATE_USER_ROLE
-* REMOVE_USER
+- CREATE_COMMENT
+- UPDATE_COMMENT
+- DELETE_COMMENT
 
----
 
-# 📈 Activity Feed System
+Organization:
 
-## Implemented
+- CREATE_INVITATION
+- ACCEPT_INVITATION
+- UPDATE_USER_ROLE
+- REMOVE_USER
 
-Organization-wide activity feed.
 
-### Features
+# 📈 Activity Systems
 
-* User attribution
-* Human-readable actions
-* Task names
-* Comment previews
-* Assignment details
-* Activity timestamps
+TeamBoard has two activity views.
 
-Example:
 
-Recovered Owner assigned task "Task Seven" to New Invite User
+## Organization Activity Feed
 
----
+Workspace-wide activity feed showing:
 
-# 📊 Task Activity Timeline
+- Task creation
+- Task updates
+- Assignments
+- Comments
+- User actions
 
-Each task contains its own activity history.
 
-## Implemented
+## Task Activity Timeline
 
-### Timeline Events
+Each task has its own history.
 
-* Task creation
-* Task updates
-* Task assignment
-* Comment creation
-* Comment updates
-* Comment deletion
-* Task deletion
+The timeline uses audit log data filtered by task.
 
-### Timeline Features
+Displays:
 
-* Reverse chronological ordering
-* User attribution
-* Activity icons
-* Comment previews
-* Assignment details
+- Task creation
+- Task updates
+- Task assignments
+- Comment creation
+- Comment edits
+- Comment deletion
+- Task deletion
 
-### Icons
+Includes:
 
-* 📝 Create Task
-* 👤 Assign Task
-* ✏️ Update Task
-* 💬 Create Comment
-* 🛠️ Update Comment
-* ❌ Delete Comment
-* 🗑️ Delete Task
+- User names
+- Timestamps
+- Icons
+- Human-readable descriptions
 
----
 
 # 📊 Dashboard Metrics
 
-## Implemented
+Implemented:
 
-### Metrics Endpoint
+Endpoint:
 
 GET /api/metrics/dashboard
 
-### Metrics Returned
 
-* User count
-* Board count
-* Total task count
-* Todo task count
-* In Progress task count
-* Completed task count
+Returns:
 
-### Dashboard Cards
+- User count
+- Board count
+- Task count
+- Todo count
+- In Progress count
+- Completed count
 
-* Users
-* Boards
-* Tasks
-* Todo
-* In Progress
-* Done
 
-Example Response:
+Dashboard displays metric cards.
 
-{
-users: 2,
-boards: 2,
-tasks: 9,
-todo: 7,
-inProgress: 1,
-done: 1
-}
 
----
+# 📌 My Tasks Page
 
-# ⚡ API Architecture
+Recently implemented.
 
-## Centralized Axios Client
+Purpose:
 
-* Shared API client
-* Automatic JWT injection
-* Authentication handling
-* Consistent request patterns
-* Global 401 handling
+Show tasks assigned to the currently logged-in user.
 
-## REST API
+Implemented:
 
-### Authentication
+- Dedicated My Tasks page
+- Fetches assigned tasks
+- Displays user-specific task list
+- Uses existing task assignment system
 
-* POST /api/auth/register
-* POST /api/auth/login
 
-### Boards
+# 🔎 Task Search / Sorting
 
-* GET /api/boards
-* POST /api/boards
-* PUT /api/boards/:id
-* DELETE /api/boards/:id
+Already implemented on dashboard.
 
-### Tasks
+Current functionality includes:
 
-* GET /api/tasks/board/:boardId
-* POST /api/tasks
-* PUT /api/tasks/:id
-* DELETE /api/tasks/:id
+- Task searching
+- Task sorting/filtering
 
-### Comments
+Avoid duplicating this work when adding future features.
 
-* GET /api/comments/task/:taskId
-* POST /api/comments
-* PUT /api/comments/:id
-* DELETE /api/comments/:id
 
-### Notifications
+# ⚡ API Structure
 
-* GET /api/notifications
-* PUT /api/notifications/:id/read
+Important routes:
 
-### Users
 
-* GET /api/users
-* PUT /api/users/:id/role
-* DELETE /api/users/:id
+Authentication:
 
-### Invitations
+POST /api/auth/register
 
-* POST /api/invitations
-* GET /api/invitations
-* GET /api/invitations/token/:token
-* DELETE /api/invitations/:id
+POST /api/auth/login
 
-### Audit Logs
 
-* GET /api/audit-logs
-* GET /api/audit-logs/task/:taskId
+Tasks:
 
-### Metrics
+GET /api/tasks/board/:boardId
 
-* GET /api/metrics/dashboard
+POST /api/tasks
 
----
+PUT /api/tasks/:id
 
-# 🚧 Current Development Roadmap
+DELETE /api/tasks/:id
 
-## Recently Completed
 
-### Collaboration Features
+Comments:
 
-* Comments system
-* Notifications system
-* Activity feed
-* Task assignment workflow
-* Task activity timeline
+GET /api/comments/task/:taskId
 
-### Analytics
+POST /api/comments
 
-* Dashboard metrics endpoint
-* Dashboard metrics cards
+PUT /api/comments/:id
 
-### Audit Logging
+DELETE /api/comments/:id
 
-* Assignment tracking
-* Comment tracking
-* Task activity history
 
----
+Notifications:
 
-## Next Milestone
+GET /api/notifications
 
-### Dashboard Enhancements
+PUT /api/notifications/:id/read
 
-* Auto-refresh dashboard metrics
-* Improved metrics card styling
-* Activity summaries
-* Team insights
 
-### Invitation System Enhancements
+Users:
 
-* Invitation expiration
-* Resend invitation functionality
-* Enhanced email templates
+GET /api/users
 
-### Task Management Enhancements
+PUT /api/users/:id/role
 
-* Task priorities
-* Due dates
-* Search and filtering
+DELETE /api/users/:id
 
-### Production Readiness
 
-* Automated testing
-* Validation layer
-* Rate limiting
-* Helmet security headers
-* Cloud deployment
+Audit:
 
----
+GET /api/audit-logs
 
-# 🧪 Engineering Concepts Demonstrated
+GET /api/audit-logs/task/:taskId
 
-* Multi-tenant SaaS architecture
-* JWT authentication
-* Authorization middleware
-* Role-Based Access Control (RBAC)
-* Secure token generation
-* Email workflow integration
-* React Context API
-* Axios interceptors
-* RESTful API design
-* MongoDB data modeling
-* Audit logging
-* Activity tracking
-* Notification systems
-* Collaboration workflows
-* Optimistic UI updates
-* Drag-and-drop interfaces
-* Environment-based configuration
-* Organization onboarding workflows
 
----
+Metrics:
 
-# 👨‍💻 Author
+GET /api/metrics/dashboard
 
-David Neagoy
 
-GitHub:
-https://github.com/DavidN-code
+# 📁 Important Frontend Files
+
+
+Task Details:
+
+frontend/src/components/tasks/TaskDetailsModal.jsx
+
+
+Handles:
+
+- Editing tasks
+- Assigning users
+- Comments
+- Activity timeline
+
+
+Comments:
+
+frontend/src/components/comments/
+
+Contains:
+
+- CommentForm.jsx
+- CommentList.jsx
+- CommentItem.jsx
+
+
+Comments API:
+
+frontend/src/api/comments.js
+
+
+# 📍 Current Development State
+
+Completed:
+
+✅ Authentication  
+✅ Multi-tenancy  
+✅ RBAC  
+✅ Invitations  
+✅ Email workflow  
+✅ Boards  
+✅ Tasks  
+✅ Kanban  
+✅ Task assignment  
+✅ Notifications  
+✅ Audit logging  
+✅ Organization activity feed  
+✅ Task activity timeline  
+✅ Comments system  
+✅ My Tasks page  
+✅ Task search/sorting  
+
+
+# 🚧 Current Next Steps
+
+Potential next features:
+
+
+## Task Creation Improvements
+
+Current limitation:
+
+- Tasks can be assigned after creation
+- Create Task modal does not yet include assignment selection
+
+
+Possible improvement:
+
+- Add organization member assignment dropdown directly to TaskModal.jsx
+
+
+## Dashboard Improvements
+
+Possible improvements:
+
+- Auto-refresh dashboard activity
+- Better metrics styling
+- Team insights
+
+
+## Production Readiness
+
+Future:
+
+- Automated testing
+- Validation layer
+- Refresh token system
+- Rate limiting
+- Helmet security headers
+- Deployment
+
+
+# 📝 Last Development Work
+
+Recent work focused on:
+
+- My Tasks page implementation
+- Comment system refinement
+- TaskDetailsModal updates
+- Immediate task activity refresh after comment changes
+
+Current modified areas:
+
+- frontend/src/components/tasks/TaskDetailsModal.jsx
+- roadmap.md
+
+
+# 👨‍💻 Project Goal
+
+Finish TeamBoard as a strong portfolio project demonstrating the ability to build a production-style SaaS application.
+
+After completion:
+
+- Polish README for employers
+- Deploy application
+- Prepare GitHub repository
+- Use project as a software developer portfolio piece

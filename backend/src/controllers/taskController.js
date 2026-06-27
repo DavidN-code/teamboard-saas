@@ -32,7 +32,11 @@ exports.createTask = async (req, res, next) => {
       },
     });
 
-    res.status(201).json(task);
+    const populatedTask = await Task.findById(task._id)
+  .populate("assignedTo", "name email")
+  .populate("createdBy", "name email");
+
+  res.status(201).json(populatedTask);
 
   } catch (err) {
     next(err);
@@ -201,34 +205,40 @@ exports.updateTask = async (req, res, next) => {
       });
     }
 
-    // -------------------------
-    // AUDIT LOGGING
-    // -------------------------
-    if (assigneeChanged) {
-      await createAuditLog({
-        action: "ASSIGN_TASK",
-        resourceType: "Task",
-        resourceId: task._id,
-        userId: req.user.userId,
-        organizationId: req.user.organizationId,
-        details: {
-          taskTitle: task.title,
-          assignedTo: task.assignedTo?.name,
-        },
-      });
-    } else {
-      await createAuditLog({
-        action: "UPDATE_TASK",
-        resourceType: "Task",
-        resourceId: task._id,
-        userId: req.user.userId,
-        organizationId: req.user.organizationId,
-        details: {
-          taskTitle: task.title,
-          changes: changes.length ? changes : ["updated task"],
-        },
-      });
-    }
+    
+   // -------------------------
+// AUDIT LOGGING
+// -------------------------
+
+if (assigneeChanged) {
+  await createAuditLog({
+    action: "ASSIGN_TASK",
+    resourceType: "Task",
+    resourceId: task._id,
+    userId: req.user.userId,
+    organizationId: req.user.organizationId,
+    details: {
+      taskTitle: task.title,
+      assignedTo: task.assignedTo?.name,
+    },
+  });
+}
+
+
+// Log other changes separately
+if (changes.length > 0) {
+  await createAuditLog({
+    action: "UPDATE_TASK",
+    resourceType: "Task",
+    resourceId: task._id,
+    userId: req.user.userId,
+    organizationId: req.user.organizationId,
+    details: {
+      taskTitle: task.title,
+      changes,
+    },
+  });
+}
 
     return res.json(task);
   } catch (err) {
