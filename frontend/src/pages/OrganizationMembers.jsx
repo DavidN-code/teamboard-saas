@@ -108,6 +108,20 @@ const [invitations, setInvitations] = useState([]);
     }
   };
 
+  const handleResendInvitation = async (invitationId) => {
+    try {
+      await api.put(`/invitations/${invitationId}/resend`);
+  
+      setInviteMessage("Invitation resent successfully");
+  
+    } catch (err) {
+      console.error(
+        err.response?.data?.message ||
+        "Failed to resend invitation"
+      );
+    }
+  };
+
   return (
     <div>
       <h1>Organization Members</h1>
@@ -140,6 +154,7 @@ const [invitations, setInvitations] = useState([]);
     Send Invite
   </button>
 </form>
+
 </div>
 
       <table>
@@ -218,13 +233,20 @@ const [invitations, setInvitations] = useState([]);
         </td>
 
         <td>
-          <button
-            onClick={() => handleRevokeInvitation(invite._id)}
-            className="bg-red-500 text-white px-2 py-1 rounded text-xs"
-          >
-            Revoke
-          </button>
-        </td>
+  <button
+    onClick={() => handleResendInvitation(invite._id)}
+    className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
+  >
+    Resend
+  </button>
+
+  <button
+    onClick={() => handleRevokeInvitation(invite._id)}
+    className="bg-red-500 text-white px-2 py-1 rounded text-xs"
+  >
+    Revoke
+  </button>
+</td>
       </tr>
     ))}
   </tbody>

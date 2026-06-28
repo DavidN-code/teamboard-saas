@@ -27,9 +27,18 @@ const invitationSchema = new mongoose.Schema(
         unique: true,
       },
 
+      expiresAt: {
+        type: Date,
+        required: true,
+      },
+
     status: {
       type: String,
-      enum: ["pending", "accepted"],
+      enum: [
+        "pending", 
+        "accepted", 
+        "expired",
+        "revoked",],
       default: "pending",
     },
   },

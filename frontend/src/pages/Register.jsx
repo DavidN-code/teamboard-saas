@@ -15,6 +15,7 @@ const Register = () => {
     organizationName: ""
   });
   const [message, setMessage] = useState("");
+  const [invitationError, setInvitationError] = useState("");
 
   useEffect(() => {
     const validateInvitation = async () => {
@@ -29,7 +30,12 @@ const Register = () => {
   
         setInvitation(res.data);
       } catch (err) {
-        console.error("Invalid invitation");
+        console.error(err);
+      
+        setInvitationError(
+          err.response?.data?.message ||
+          "Unable to validate invitation."
+        );
       } finally {
         setLoadingInvite(false);
       }
@@ -52,6 +58,27 @@ const Register = () => {
       setMessage(err.response?.data?.message || "Error occurred");
     }
   };
+
+  if (invitationError) {
+    return (
+      <div
+        style={{
+          maxWidth: "500px",
+          margin: "80px auto",
+          textAlign: "center",
+        }}
+      >
+        <h1>Invitation Unavailable</h1>
+  
+        <p>{invitationError}</p>
+  
+        <p>
+          Please contact your organization administrator
+          to request a new invitation.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>

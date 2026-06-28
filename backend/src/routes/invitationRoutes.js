@@ -10,6 +10,7 @@ const {
     getInvitationByToken,
     getPendingInvitations,
     revokeInvitation,
+    resendInvitation
   } = require("../controllers/invitationController");
 
 router.post(
@@ -33,6 +34,13 @@ router.get(
     authMiddleware,
     allowRoles("owner", "admin"),
     revokeInvitation
+  );
+
+  router.put(
+    "/:id/resend",
+    authMiddleware,
+    allowRoles("owner", "admin"),
+    resendInvitation
   );
 
 module.exports = router;

@@ -46,6 +46,7 @@ function formatAction(activity) {
     DELETE_COMMENT: "deleted a comment",
 
     CREATE_INVITATION: "invited a team member",
+    RESEND_INVITATION: "resent an invitation",
     ACCEPT_INVITATION: "joined the organization",
 
     UPDATE_USER_ROLE: "changed a user role",
@@ -102,6 +103,13 @@ export default function ActivityFeed() {
         <> to <strong>{activity.details.assignedTo}</strong></>
       )}
     </>
+)}
+
+{activity.details?.invitedEmail && (
+  <>
+    {" "}
+    for <strong>{activity.details.invitedEmail}</strong>
+  </>
 )}
 
 {activity.details?.commentPreview && (
