@@ -41,8 +41,8 @@ exports.createInvitation = async (req, res, next) => {
     userId: req.user.userId,
     organizationId: req.user.organizationId,
     details: {
-      invitedEmail: invitation.email,
-    },
+  inviteeEmail: invitation.email,
+},
   });
   
 res.status(201).json({
@@ -167,8 +167,8 @@ exports.getInvitationByToken = async (req, res, next) => {
         userId: req.user.userId,
         organizationId: req.user.organizationId,
         details: {
-          invitedEmail: invitation.email,
-        },
+  inviteeEmail: invitation.email,
+}
       });
   
       res.json({

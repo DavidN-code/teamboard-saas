@@ -6,27 +6,84 @@ function formatAction(activity) {
 
   const changes = activity.details?.changes || [];
 
+  if (activity.action === "CREATE_INVITATION") {
+    return (
+      <>
+        {name} invited{" "}
+        <strong>{activity.details?.inviteeEmail}</strong>
+      </>
+    );
+  }
+
+  if (activity.action === "RESEND_INVITATION") {
+    return (
+      <>
+        {name} resent an invitation to{" "}
+        <strong>{activity.details?.inviteeEmail}</strong>
+      </>
+    );
+  }
+
+  if (activity.action === "CREATE_TASK") {
+    return (
+      <>
+        {name} created task{" "}
+        <strong>"{activity.details?.taskTitle}"</strong>
+      </>
+    );
+  }
+  
+  if (activity.action === "DELETE_TASK") {
+    return (
+      <>
+        {name} deleted task{" "}
+        <strong>"{activity.details?.taskTitle}"</strong>
+      </>
+    );
+  }
+
   if (activity.action === "UPDATE_TASK" && changes.length > 0) {
     return (
       <>
         {name} updated task{" "}
         <strong>"{activity.details.taskTitle}"</strong>
-  
+
         <ul
-  style={{
-    marginTop: "8px",
-    paddingLeft: "24px",
-    fontSize: "14px",
-    color: "#4b5563",
-    listStyleType: "disc",
-  }}
->
+          style={{
+            marginTop: "8px",
+            paddingLeft: "24px",
+            fontSize: "14px",
+            color: "#4b5563",
+            listStyleType: "disc",
+          }}
+        >
           {changes.map((change, index) => (
             <li key={index}>
               {change}
             </li>
           ))}
         </ul>
+      </>
+    );
+  }
+
+  if (activity.action === "CREATE_COMMENT") {
+    return (
+      <>
+        {name} commented on task{" "}
+        <strong>"{activity.details?.taskTitle}"</strong>
+      </>
+    );
+  }
+
+  if (
+    activity.action === "UPDATE_COMMENT" ||
+    activity.action === "DELETE_COMMENT"
+  ) {
+    return (
+      <>
+        {name} {activity.action === "UPDATE_COMMENT" ? "updated" : "deleted"} comment on task{" "}
+        <strong>"{activity.details?.taskTitle}"</strong>
       </>
     );
   }
@@ -45,8 +102,6 @@ function formatAction(activity) {
     UPDATE_COMMENT: "updated a comment",
     DELETE_COMMENT: "deleted a comment",
 
-    CREATE_INVITATION: "invited a team member",
-    RESEND_INVITATION: "resent an invitation",
     ACCEPT_INVITATION: "joined the organization",
 
     UPDATE_USER_ROLE: "changed a user role",
@@ -90,45 +145,38 @@ export default function ActivityFeed() {
               padding: "10px 0",
             }}
           >
-            
-{formatAction(activity)}
+            {formatAction(activity)}
 
-{activity.action === "ASSIGN_TASK" &&
-  activity.details?.taskTitle && (
-    <>
-      {" "}
-      <strong>"{activity.details.taskTitle}"</strong>
+            {activity.action === "ASSIGN_TASK" &&
+              activity.details?.taskTitle && (
+                <>
+                  {" "}
+                  <strong>"{activity.details.taskTitle}"</strong>
 
-      {activity.details?.assignedTo && (
-        <> to <strong>{activity.details.assignedTo}</strong></>
-      )}
-    </>
-)}
+                  {activity.details?.assignedTo && (
+                    <>
+                      {" "}
+                      to <strong>{activity.details.assignedTo}</strong>
+                    </>
+                  )}
+                </>
+              )}
 
-{activity.details?.invitedEmail && (
-  <>
-    {" "}
-    for <strong>{activity.details.invitedEmail}</strong>
-  </>
-)}
-
-{activity.details?.commentPreview && (
-  <div
-    style={{
-      marginTop: "6px",
-      fontStyle: "italic",
-      color: "#666",
-    }}
-  >
-    "{activity.details.commentPreview}"
-  </div>
-)}
+            {activity.details?.commentPreview && (
+              <div
+                style={{
+                  marginTop: "6px",
+                  fontStyle: "italic",
+                  color: "#666",
+                }}
+              >
+                "{activity.details.commentPreview}"
+              </div>
+            )}
 
             <div>
               <small>
-                {new Date(
-                  activity.createdAt
-                ).toLocaleString()}
+                {new Date(activity.createdAt).toLocaleString()}
               </small>
             </div>
           </div>

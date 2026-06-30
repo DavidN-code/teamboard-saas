@@ -16,6 +16,8 @@ exports.createComment = async (req, res, next) => {
       createdBy: req.user.userId,
     });
 
+    const task = await Task.findById(comment.taskId);
+
     await createAuditLog({
       action: "CREATE_COMMENT",
       resourceType: "Task",
@@ -23,11 +25,11 @@ exports.createComment = async (req, res, next) => {
       userId: req.user.userId,
       organizationId: req.user.organizationId,
       details: {
+        taskTitle: task?.title || "Unknown Task",
         commentPreview: comment.content.substring(0, 50),
       },
     });
 
-    const task = await Task.findById(comment.taskId);
 
     if (
       task &&
@@ -84,6 +86,8 @@ exports.updateComment = async (req, res, next) => {
     comment.content = req.body.content;
     await comment.save();
 
+    const task = await Task.findById(comment.taskId);
+
     await createAuditLog({
       action: "UPDATE_COMMENT",
       resourceType: "Task",
@@ -91,6 +95,7 @@ exports.updateComment = async (req, res, next) => {
       userId: req.user.userId,
       organizationId: req.user.organizationId,
       details: {
+        taskTitle: task?.title || "Unknown Task",
         commentPreview: comment.content.substring(0, 50),
       },
     });
@@ -125,6 +130,8 @@ exports.deleteComment = async (req, res, next) => {
 
     await comment.deleteOne();
 
+    const task = await Task.findById(comment.taskId);
+
     await createAuditLog({
       action: "DELETE_COMMENT",
       resourceType: "Task",
@@ -132,6 +139,7 @@ exports.deleteComment = async (req, res, next) => {
       userId: req.user.userId,
       organizationId: req.user.organizationId,
       details: {
+        taskTitle: task?.title || "Unknown Task",
         commentPreview: comment.content.substring(0, 50),
       },
     });
