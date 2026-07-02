@@ -82,7 +82,7 @@ function formatAction(activity) {
   ) {
     return (
       <>
-        {name} {activity.action === "UPDATE_COMMENT" ? "updated" : "deleted"} comment on task{" "}
+        {name} {activity.action === "UPDATE_COMMENT" ? "updated" : "deleted"}  a comment on task{" "}
         <strong>"{activity.details?.taskTitle}"</strong>
       </>
     );
