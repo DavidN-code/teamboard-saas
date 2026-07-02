@@ -1,5 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { formatDate } from "../../utils/formatDate";
 
 export default function TaskCard({ task, onClick }) {
   const isOverdue =
@@ -82,8 +83,7 @@ export default function TaskCard({ task, onClick }) {
       color: "#444",
     }}
   >
-    Due: {new Date(task.dueDate).toLocaleDateString()}
-  </p>
+Due: {formatDate(task.dueDate)}  </p>
 )}
 
 {isOverdue && (
