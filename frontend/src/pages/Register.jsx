@@ -29,6 +29,11 @@ const Register = () => {
         );
   
         setInvitation(res.data);
+
+setForm((prev) => ({
+  ...prev,
+  email: res.data.email,
+}));
       } catch (err) {
         console.error(err);
       
@@ -99,8 +104,13 @@ const Register = () => {
   onChange={handleChange}
   disabled={!!invitation} />
         <input name="password" type="password" placeholder="Password" onChange={handleChange} />
-        <input name="organizationName" placeholder="Organization Name" onChange={handleChange} />
-        <button type="submit">Register</button>
+        {!invitation && (
+  <input
+    name="organizationName"
+    placeholder="Organization Name"
+    onChange={handleChange}
+  />
+)}        <button type="submit">Register</button>
       </form>
       {message && <p>{message}</p>}
     </div>

@@ -13,6 +13,9 @@ const invitationRoutes = require("./routes/invitationRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 const activityFeedRoutes = require("./routes/activityFeedRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const helmet = require("helmet");
+const authLimiter = require("./middleware/authLimiter");
+
 // Middleware
 app.use(express.json());
 
@@ -26,9 +29,11 @@ app.use(cors({
   credentials: true // optional if you want cookies later
 }));
 
+app.use(helmet());
+
 
 // Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use("/api/boards", boardRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/comments", commentRoutes);
@@ -38,6 +43,7 @@ app.use("/api/audit-logs", auditLogRoutes);
 app.use("/api/metrics/dashboard", metricsRoutes);
 app.use("/api/invitations", invitationRoutes);
 app.use("/api/notifications", notificationRoutes);
+
 
 // Health check route
 app.get('/api/health', (req, res) => {

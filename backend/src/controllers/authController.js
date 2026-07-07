@@ -8,9 +8,11 @@ const register = async (req, res, next) => {
       const { name, email, password, organizationName } = req.body;
   
       // 1. Basic validation
-      if (!name || !email || !password || !organizationName) {
-        return res.status(400).json({ message: 'All fields are required' });
-      }
+if (!name || !email || !password) {
+  return res.status(400).json({
+    message: "Name, email, and password are required",
+  });
+}
   
       // 2. Check if user already exists
       const existingUser = await User.findOne({ email });
@@ -30,6 +32,13 @@ const invitation = await Invitation.findOne({
 
 let organization;
 let role = "owner";
+
+// If this is NOT an invited user, require an organization name
+if (!invitation && !organizationName) {
+  return res.status(400).json({
+    message: "Organization name is required",
+  });
+}
 
 // CASE 1: invited user exists
 if (invitation) {
