@@ -529,6 +529,14 @@ Recently added:
 ✅ Invitation-based onboarding
 ✅ Organization-scoped users and data
 
+✅ Helmet
+✅ API rate limiting
+✅ Input validation
+✅ RBAC route protection
+✅ Role-based UI restrictions
+✅ Better task creation error handling
+✅ Unassigned task handling
+
 
 # 🚧 Current Next Steps
 
