@@ -522,6 +522,13 @@ Completed:
 ✅ My Tasks page  
 ✅ Task search/sorting  
 
+Recently added:
+
+✅ Multi-tenant organizations
+✅ Owner/member roles
+✅ Invitation-based onboarding
+✅ Organization-scoped users and data
+
 
 # 🚧 Current Next Steps
 
