@@ -41,7 +41,7 @@ function Column({ id, title, children }) {
 /* ---------------- DASHBOARD ---------------- */
 export default function Dashboard() {
   const { activeBoard } = useActiveBoard();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   const [tasks, setTasks] = useState([]);
@@ -368,11 +368,11 @@ const doneTasks = filteredTasks.filter(
           <h3>Tasks</h3>
           
 
-          {activeBoard && (
-            <button onClick={() => setIsTaskModalOpen(true)}>
-              + New Task
-            </button>
-          )}
+          {activeBoard && user && ["owner", "admin"].includes(user.role) && (
+  <button onClick={() => setIsTaskModalOpen(true)}>
+    + New Task
+  </button>
+)}
 
           {loadingTasks && <p>Loading...</p>}
           {taskError && <p style={{ color: "red" }}>{taskError}</p>}

@@ -12,6 +12,7 @@ export default function TaskModal({
   const [dueDate, setDueDate] = useState("");
   const [users, setUsers] = useState([]);
   const [assignedTo, setAssignedTo] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -35,21 +36,31 @@ export default function TaskModal({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    await onCreateTask({
-      title,
-      description,
-      status: "todo",
-      priority,
-      dueDate,
-      assignedTo,
-    });
-
-    setTitle("");
-    setDescription("");
-    setPriority("medium");
-    setDueDate("");
-    setAssignedTo("");
+  
+    setError("");
+  
+    try {
+      await onCreateTask({
+        title,
+        description,
+        status: "todo",
+        priority,
+        dueDate,
+        assignedTo: assignedTo || null,
+            });
+  
+      setTitle("");
+      setDescription("");
+      setPriority("medium");
+      setDueDate("");
+      setAssignedTo("");
+  
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        "You do not have permission to create tasks."
+      );
+    }
   };
 
 
@@ -75,6 +86,17 @@ export default function TaskModal({
       >
 
         <h2>Create Task</h2>
+
+        {error && (
+  <p
+    style={{
+      color: "red",
+      marginBottom: "12px",
+    }}
+  >
+    {error}
+  </p>
+)}
 
 
         <form onSubmit={handleSubmit}>
