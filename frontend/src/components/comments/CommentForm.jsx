@@ -3,14 +3,36 @@ import { useState } from "react";
 export default function CommentForm({ onCreate }) {
   const [content, setContent] = useState("");
 
+  const [error, setError] = useState("");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!content.trim()) return;
-
-    await onCreate(content);
-
-    setContent("");
+  
+    setError("");
+  
+    if (!content.trim()) {
+      setError("Comment cannot be empty.");
+      return;
+    }
+  
+    if (content.length > 1000) {
+      setError("Comment cannot exceed 1000 characters.");
+      return;
+    }
+  
+    try {
+      await onCreate(content);
+  
+      setContent("");
+      setError("");
+  
+    } catch (err) {
+      setError(
+        err.response?.data?.errors?.[0]?.msg ||
+        err.response?.data?.message ||
+        "Unable to add comment."
+      );
+    }
   };
 
   return (
@@ -20,12 +42,29 @@ export default function CommentForm({ onCreate }) {
         onChange={(e) => setContent(e.target.value)}
         placeholder="Add a comment..."
         rows={3}
+        maxLength={1000}
         style={{
           width: "100%",
-          padding: "10px",
-          marginBottom: "10px",
+  padding: "10px",
+  border: "1px solid #d1d5db",
+  borderRadius: "6px",
+  fontSize: "14px",
+  resize: "vertical",
+  boxSizing: "border-box",
         }}
       />
+
+{error && (
+  <p
+    style={{
+      color: "red",
+      marginBottom: "10px",
+      fontSize: "14px",
+    }}
+  >
+    {error}
+  </p>
+)}
 
       <button type="submit">
         Add Comment

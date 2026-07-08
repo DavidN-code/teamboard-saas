@@ -8,13 +8,31 @@ const {
   deleteComment,
 } = require("../controllers/commentController");
 
+const {
+  createCommentValidator,
+  updateCommentValidator,
+} = require("../validators/commentValidator");
+
+const validateRequest = require("../middleware/validation");
+
 const protect = require("../middleware/authMiddleware");
 
 router.use(protect);
 
-router.post("/", createComment);
+router.post(
+  "/",
+  createCommentValidator,
+  validateRequest,
+  createComment
+);
+
+router.put(
+  "/:id",
+  updateCommentValidator,
+  validateRequest,
+  updateComment
+);
 router.get("/task/:taskId", getCommentsByTask);
-router.put("/:id", updateComment);
 router.delete("/:id", deleteComment);
 
 module.exports = router;
