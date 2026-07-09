@@ -66,9 +66,20 @@ export default function CommentForm({ onCreate }) {
   </p>
 )}
 
-      <button type="submit">
-        Add Comment
-      </button>
+<button
+  type="submit"
+  style={{
+    background: "#2563eb",
+    color: "white",
+    border: "none",
+    padding: "8px 16px",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "600",
+  }}
+>
+  Add Comment
+</button>
     </form>
   );
 }

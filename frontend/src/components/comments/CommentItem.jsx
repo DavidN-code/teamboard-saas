@@ -89,16 +89,33 @@ export default function CommentItem({
     setEditing(true);
     setError("");
   }}
+  style={{
+    background: "#2563eb",
+    color: "white",
+    border: "none",
+    padding: "6px 12px",
+    borderRadius: "6px",
+    cursor: "pointer",
+    marginRight: "8px",
+  }}
 >
   Edit
 </button>
         )}
 
-        <button
-          onClick={() => onDelete(comment._id)}
-        >
-          Delete
-        </button>
+<button
+  onClick={() => onDelete(comment._id)}
+  style={{
+    background: "#dc2626",
+    color: "white",
+    border: "none",
+    padding: "6px 12px",
+    borderRadius: "6px",
+    cursor: "pointer",
+  }}
+>
+  Delete
+</button>
       </div>
     </div>
   );
