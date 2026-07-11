@@ -10,6 +10,8 @@ import {
 import { getUsers } from "../../api/users";
 import { getTaskActivity } from "../../api/auditLogs";
 
+import { useAuth } from "../../context/AuthContext";
+
 function formatActivity(item) {
   const name = item.userId?.name || "Unknown User";
 
@@ -85,6 +87,9 @@ export default function TaskDetailsModal({
   const [users, setUsers] = useState([]);
   const [assignedTo, setAssignedTo] = useState("");
   const [activity, setActivity] = useState([]);
+  const { user } = useAuth();
+  const canEditTask =
+  user?.role === "owner" || user?.role === "admin";
 
   useEffect(() => {
     if (task) {
@@ -232,6 +237,7 @@ export default function TaskDetailsModal({
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            disabled={!canEditTask}
             style={{ width: "100%", padding: "10px", marginTop: "6px" }}
           />
         </div>
@@ -242,6 +248,7 @@ export default function TaskDetailsModal({
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
+            disabled={!canEditTask}
             style={{ width: "100%", padding: "10px", marginTop: "6px" }}
           >
             <option value="todo">Todo</option>
@@ -256,6 +263,7 @@ export default function TaskDetailsModal({
   <select
     value={assignedTo}
     onChange={(e) => setAssignedTo(e.target.value)}
+    disabled={!canEditTask}
     style={{
       width: "100%",
       padding: "10px",
@@ -282,6 +290,7 @@ export default function TaskDetailsModal({
   <select
     value={priority}
     onChange={(e) => setPriority(e.target.value)}
+    disabled={!canEditTask}
     style={{
       width: "100%",
       padding: "10px",
@@ -301,6 +310,7 @@ export default function TaskDetailsModal({
     type="date"
     value={dueDate}
     onChange={(e) => setDueDate(e.target.value)}
+    disabled={!canEditTask}
     style={{
       width: "100%",
       padding: "10px",
@@ -315,6 +325,7 @@ export default function TaskDetailsModal({
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            disabled={!canEditTask}
             rows={5}
             style={{ width: "100%", padding: "10px", marginTop: "6px" }}
           />
@@ -378,6 +389,8 @@ export default function TaskDetailsModal({
 
         {/* ACTIONS */}
         <div style={{ display: "flex", justifyContent: "space-between" }}>
+        {canEditTask && (
+  <>
           <button onClick={() => onDeleteTask(task._id)}>
             Delete Task
           </button>
@@ -396,6 +409,8 @@ export default function TaskDetailsModal({
           >
             Save Changes
           </button>
+          </>
+)}
         </div>
       </div>
     </div>
