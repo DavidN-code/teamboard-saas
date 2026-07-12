@@ -126,36 +126,6 @@ const [invitations, setInvitations] = useState([]);
     <div>
       <h1>Organization Members</h1>
       
-      <div style={{ marginBottom: "20px" }}>
-  <h3>Invite User</h3>
-
-  {inviteMessage && (
-  <p style={{ color: "green" }}>{inviteMessage}</p>
-)}
-
-{inviteError && (
-  <p style={{ color: "red" }}>{inviteError}</p>
-)}
-
-<form
-  onSubmit={(e) => {
-    e.preventDefault();
-    handleInviteUser();
-  }}
->
-  <input
-    type="email"
-    placeholder="email@example.com"
-    value={inviteEmail}
-    onChange={(e) => setInviteEmail(e.target.value)}
-  />
-
-  <button type="submit">
-    Send Invite
-  </button>
-</form>
-
-</div>
 
       <table>
         <thead>
@@ -173,14 +143,21 @@ const [invitations, setInvitations] = useState([]);
               <td>{u.name}</td>
               <td>{u.email}</td>
               <td>
-  {user?.role === "owner" ? (
+  {u.role === "owner" ? (
+    <span
+      className={`px-2 py-1 rounded text-xs font-medium ${getRoleBadgeClass(
+        u.role
+      )}`}
+    >
+      👑 OWNER
+    </span>
+  ) : user?.role === "owner" ? (
     <select
-    value={u.role}
-    onChange={(e) =>
-      handleRoleChange(u._id, e.target.value)
-    }
-  >
-      <option value="owner">Owner</option>
+      value={u.role}
+      onChange={(e) =>
+        handleRoleChange(u._id, e.target.value)
+      }
+    >
       <option value="admin">Admin</option>
       <option value="member">Member</option>
     </select>
@@ -251,6 +228,43 @@ const [invitations, setInvitations] = useState([]);
     ))}
   </tbody>
 </table>
+
+{user?.role === "owner" && (
+      <div style={{ marginBottom: "20px" }}>
+
+      
+  <h3>Invite User</h3>
+
+
+  {inviteMessage && (
+  <p style={{ color: "green" }}>{inviteMessage}</p>
+)}
+
+{inviteError && (
+  <p style={{ color: "red" }}>{inviteError}</p>
+)}
+
+<form
+  onSubmit={(e) => {
+    e.preventDefault();
+    handleInviteUser();
+  }}
+>
+  <input
+    type="email"
+    placeholder="email@example.com"
+    value={inviteEmail}
+    onChange={(e) => setInviteEmail(e.target.value)}
+  />
+
+  <button type="submit">
+    Send Invite
+  </button>
+</form>
+
+</div>
+
+)}
     </div>
   );
 };
