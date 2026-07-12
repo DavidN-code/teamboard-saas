@@ -13,6 +13,7 @@ const [invitations, setInvitations] = useState([]);
     const fetchUsers = async () => {
       try {
         const res = await api.get("/users");
+        console.log("USERS RESPONSE:", res.data);
         setUsers(res.data);
       } catch (err) {
         console.error("Failed to load users:", err);
@@ -46,19 +47,32 @@ const [invitations, setInvitations] = useState([]);
     }
   };
 
-  const handleRoleChange = async (userId, newRole) => {
+  const handleRoleChange = async (selectedUser, newRole) => {
+
+    const confirmed = window.confirm(
+      `Change ${selectedUser.name}'s role from ${selectedUser.role} to ${newRole}?`
+    );
+  
+    if (!confirmed) {
+      return;
+    }
+  
     try {
-      const res = await api.put(`/users/${userId}/role`, {
+      const res = await api.put(`/users/${selectedUser._id}/role`, {
         role: newRole,
       });
   
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
-          user._id === userId ? res.data : user
+          user._id === selectedUser._id ? res.data : user
         )
       );
+  
     } catch (err) {
-      console.error(err.response?.data?.message || "Failed to update role");
+      console.error(
+        err.response?.data?.message ||
+        "Failed to update role"
+      );
     }
   };
 
@@ -133,8 +147,9 @@ const [invitations, setInvitations] = useState([]);
             <th>Name</th>
             <th>Email</th>
             <th>Role</th>
-            <th>Actions</th>
-          </tr>
+            {user?.role === "owner" && (
+      <th>Actions</th>
+    )}          </tr>
         </thead>
 
         <tbody>
@@ -153,11 +168,11 @@ const [invitations, setInvitations] = useState([]);
     </span>
   ) : user?.role === "owner" ? (
     <select
-      value={u.role}
-      onChange={(e) =>
-        handleRoleChange(u._id, e.target.value)
-      }
-    >
+  value={u.role}
+  onChange={(e) =>
+    handleRoleChange(u, e.target.value)
+  }
+>
       <option value="admin">Admin</option>
       <option value="member">Member</option>
     </select>
@@ -171,20 +186,24 @@ const [invitations, setInvitations] = useState([]);
     </span>
   )}
 </td>
-<td>
-  {user?.role === "owner" && (user?.id || user?._id) !== u._id && (
-    <button
-      onClick={() => handleDeleteUser(u._id)}
-      className="bg-red-500 text-white px-2 py-1 rounded text-xs"
-    >
-      Remove
-    </button>
-  )}
-</td>
+{user?.role === "owner" && (
+  <td>
+    {user._id !== u._id && (
+      <button
+        onClick={() => handleDeleteUser(u._id)}
+        className="bg-red-500 text-white px-2 py-1 rounded text-xs"
+      >
+        Remove
+      </button>
+    )}
+  </td>
+)}
             </tr>
           ))}
         </tbody>
       </table>
+      {user?.role === "owner" && (
+        <>
       <h3>Pending Invitations</h3>
       <table>
   <thead>
@@ -192,8 +211,9 @@ const [invitations, setInvitations] = useState([]);
       <th>Email</th>
       <th>Invited By</th>
       <th>Created</th>
-      <th>Actions</th>
-    </tr>
+      {user?.role === "owner" && (
+  <th>Actions</th>
+)}    </tr>
   </thead>
 
   <tbody>
@@ -228,6 +248,8 @@ const [invitations, setInvitations] = useState([]);
     ))}
   </tbody>
 </table>
+</>
+)}
 
 {user?.role === "owner" && (
       <div style={{ marginBottom: "20px" }}>

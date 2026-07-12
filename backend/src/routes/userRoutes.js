@@ -15,7 +15,7 @@ const {
 router.get(
   "/",
   authMiddleware,
-  allowRoles("owner", "admin"),
+  //allowRoles("owner", "admin"),
   getUsers
 );
 
