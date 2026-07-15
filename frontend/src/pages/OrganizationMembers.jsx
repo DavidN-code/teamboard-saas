@@ -145,13 +145,12 @@ if (user?.role === "owner") {
 
       <table>
         <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            {user?.role === "owner" && (
-      <th>Actions</th>
-    )}          </tr>
+        <tr>
+  <th>Name</th>
+  <th>Email</th>
+  <th>Role</th>
+  {user?.role === "owner" && <th>Actions</th>}
+</tr>
         </thead>
 
         <tbody>
@@ -209,13 +208,12 @@ if (user?.role === "owner") {
       <h3>Pending Invitations</h3>
       <table>
   <thead>
-    <tr>
-      <th>Email</th>
-      <th>Invited By</th>
-      <th>Created</th>
-      {user?.role === "owner" && (
-  <th>Actions</th>
-)}    </tr>
+  <tr>
+  <th>Email</th>
+  <th>Invited By</th>
+  <th>Created</th>
+  {user?.role === "owner" && <th>Actions</th>}
+</tr>
   </thead>
 
   <tbody>
