@@ -3,6 +3,8 @@ import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
 const OrganizationMembers = () => {
+  const { user } = useAuth();
+
   const [users, setUsers] = useState([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteMessage, setInviteMessage] = useState("");
@@ -30,11 +32,11 @@ const [invitations, setInvitations] = useState([]);
     };
 
     fetchUsers();
-    fetchInvitations();
-  }, []);
 
-  const { user } = useAuth();
-
+if (user?.role === "owner") {
+  fetchInvitations();
+}
+}, [user]);
   console.log("Current User:", user);
   const getRoleBadgeClass = (role) => {
     switch (role) {
