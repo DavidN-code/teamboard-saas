@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   getNotifications,
   markNotificationRead,
+  markAllNotificationsRead,
 } from "../../api/notifications";
 
 export default function NotificationBell({ onOpenTask }) {
@@ -47,6 +48,44 @@ export default function NotificationBell({ onOpenTask }) {
     }
   };
 
+  const handleMarkAllRead = async () => {
+    try {
+      await markAllNotificationsRead();
+  
+      setNotifications((prev) =>
+        prev.map((n) => ({
+          ...n,
+          read: true,
+        }))
+      );
+  
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case "TASK_ASSIGNED":
+        return "📌";
+  
+      case "TASK_COMMENT":
+        return "💬";
+  
+      case "UPDATE_TASK":
+        return "🔄";
+  
+      case "CREATE_TASK":
+        return "📝";
+  
+      case "DELETE_TASK":
+        return "🗑️";
+  
+      default:
+        return "🔔";
+    }
+  };
+
   return (
     <div style={{ position: "relative" }}>
       <button
@@ -71,7 +110,27 @@ export default function NotificationBell({ onOpenTask }) {
               "0 4px 12px rgba(0,0,0,0.15)",
           }}
         >
-          <h4>Notifications</h4>
+          <div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  }}
+>
+  <h4>Notifications</h4>
+
+  {unreadCount > 0 && (
+    <button
+      onClick={handleMarkAllRead}
+      style={{
+        fontSize: "12px",
+        cursor: "pointer",
+      }}
+    >
+      Mark all read
+    </button>
+  )}
+</div>
 
           {notifications.length === 0 ? (
             <p>No notifications</p>
@@ -89,21 +148,46 @@ export default function NotificationBell({ onOpenTask }) {
                   cursor: "pointer",
                   borderBottom:
                     "1px solid #eee",
+                    background:
+                    notification.read
+                      ? "white"
+                      : "#eff6ff",
+                  
                   fontWeight:
                     notification.read
                       ? "normal"
-                      : "bold",
+                      : "600",
+                  
+                  borderRadius: "6px",
                 }}
               >
-                <div>
-                  {notification.message}
-                </div>
+                <div
+  style={{
+    display: "flex",
+    gap: "8px",
+    alignItems: "flex-start",
+  }}
+>
+  <span>
+    {getNotificationIcon(notification.type)}
+  </span>
 
-                <small>
-                  {new Date(
-                    notification.createdAt
-                  ).toLocaleString()}
-                </small>
+  <div>
+    <div>
+      {notification.message}
+    </div>
+
+    <small
+      style={{
+        color: "#666",
+      }}
+    >
+      {new Date(
+        notification.createdAt
+      ).toLocaleString()}
+    </small>
+  </div>
+</div>
               </div>
             ))
           )}
