@@ -12,7 +12,7 @@ export default function CommentItem({
   const [content, setContent] = useState(comment.content);
 
   const [error, setError] = useState("");
-
+  
   const saveEdit = async () => {
     setError("");
   
@@ -35,6 +35,7 @@ export default function CommentItem({
 
   const canModifyComment =
   user?.role === "owner" ||
+  user?.role === "admin" ||
   String(user?.id) === String(comment.createdBy?._id);
 
 

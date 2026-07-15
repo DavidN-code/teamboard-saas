@@ -79,9 +79,15 @@ exports.updateComment = async (req, res, next) => {
       return res.status(404).json({ message: "Comment not found" });
     }
 
-    if (comment.createdBy.toString() !== req.user.userId) {
-      return res.status(403).json({ message: "Not authorized" });
-    }
+    const isOwner =
+  comment.createdBy.toString() === req.user.userId;
+
+const isAdminOrOwner =
+  req.user.role === "admin" || req.user.role === "owner";
+
+if (!isOwner && !isAdminOrOwner) {
+  return res.status(403).json({ message: "Not authorized" });
+}
 
     comment.content = req.body.content;
     await comment.save();

@@ -537,6 +537,29 @@ Recently added:
 ✅ Better task creation error handling
 ✅ Unassigned task handling
 
+Comment RBAC Testing:
+
+Owner:
+✓ Edit/delete own comments
+✓ Edit/delete member comments
+✓ Edit/delete admin comments
+
+Admin:
+✓ Edit/delete own comments
+✓ Edit/delete member comments
+✓ Edit/delete owner comments
+
+Member:
+✓ Edit/delete own comments
+✓ Cannot edit/delete other users' comments
+
+frontend RBAC work is basically complete:
+
+Task editing permissions ✅
+User management permissions ✅
+Invitation visibility permissions ✅
+Comment permissions ✅
+
 
 # 🚧 Current Next Steps
 
