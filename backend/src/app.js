@@ -20,20 +20,14 @@ const apiLimiter = require("./middleware/apiLimiter");
 // Middleware
 app.use(helmet());
 
-app.use(express.json());
-
-app.use(apiLimiter);
-
-app.post("/test-json", (req, res) => {
-  console.log("Body received:", req.body);
-  res.json({ ok: true });
-});
-
 app.use(cors({
   origin: "http://localhost:5173", // frontend URL
   credentials: true // optional if you want cookies later
 }));
 
+app.use(express.json());
+
+app.use("/api", apiLimiter);
 
 // Routes
 app.use('/api/auth', authLimiter, authRoutes);

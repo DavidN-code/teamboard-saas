@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 export default function CommentItem({
   comment,
   onDelete,
   onUpdate,
 }) {
+  const { user } = useAuth();
+  
   const [editing, setEditing] = useState(false);
   const [content, setContent] = useState(comment.content);
 
@@ -29,6 +32,11 @@ export default function CommentItem({
       );
     }
   };
+
+  const canModifyComment =
+  user?.role === "owner" ||
+  String(user?.id) === String(comment.createdBy?._id);
+
 
   return (
     <div
@@ -79,11 +87,14 @@ export default function CommentItem({
       </small>
 
       <div>
+      {canModifyComment && (
+  <>
         {editing ? (
           <button onClick={saveEdit}>
             Save
           </button>
         ) : (
+          
           <button
   onClick={() => {
     setEditing(true);
@@ -116,6 +127,8 @@ export default function CommentItem({
 >
   Delete
 </button>
+</>
+)}
       </div>
     </div>
   );
