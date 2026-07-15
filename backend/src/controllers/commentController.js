@@ -31,18 +31,47 @@ exports.createComment = async (req, res, next) => {
     });
 
 
-    if (
-      task &&
-      task.createdBy.toString() !== req.user.userId
-    ) {
-      const user = await User.findById(req.user.userId);
+    // -------------------------
+// COMMENT NOTIFICATIONS
+// -------------------------
 
-  await createNotification({
-    userId: task.createdBy,
-    organizationId: req.user.organizationId,
-    type: "TASK_COMMENT",
-    message: `${user.name} commented on your task "${task.title}"`,
-  });
+if (task) {
+  const commentingUser = await User.findById(req.user.userId);
+
+  const notificationTargets = [];
+
+
+  // Notify task creator
+  if (
+    task.createdBy &&
+    task.createdBy.toString() !== req.user.userId
+  ) {
+    notificationTargets.push(task.createdBy.toString());
+  }
+
+
+  // Notify task assignee
+  if (
+    task.assignedTo &&
+    task.assignedTo.toString() !== req.user.userId
+  ) {
+    notificationTargets.push(task.assignedTo.toString());
+  }
+
+
+  // Remove duplicates (creator and assignee could be same person)
+  const uniqueTargets = [...new Set(notificationTargets)];
+
+
+  for (const userId of uniqueTargets) {
+    await createNotification({
+      userId,
+      organizationId: req.user.organizationId,
+      type: "TASK_COMMENT",
+      resourceId: task._id,
+      message: `${commentingUser.name} commented on your task "${task.title}"`,
+    });
+  }
 }
 
     res.status(201).json(comment);

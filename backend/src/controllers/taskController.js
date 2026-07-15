@@ -32,6 +32,22 @@ exports.createTask = async (req, res, next) => {
       },
     });
 
+        // Notify assignee when a task is created and assigned
+        if (
+          assignedTo &&
+          assignedTo.toString() !== req.user.userId
+        ) {
+          const assigningUser = await User.findById(req.user.userId);
+    
+          await createNotification({
+            userId: assignedTo,
+            organizationId: req.user.organizationId,
+            type: "TASK_ASSIGNED",
+            resourceId: task._id,
+            message: `${assigningUser.name} assigned you task "${task.title}"`,
+          });
+        }
+
     const populatedTask = await Task.findById(task._id)
   .populate("assignedTo", "name email")
   .populate("createdBy", "name email");
