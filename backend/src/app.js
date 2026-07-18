@@ -20,10 +20,23 @@ const apiLimiter = require("./middleware/apiLimiter");
 // Middleware
 app.use(helmet());
 
-app.use(cors({
-  origin: "http://localhost:5173", // frontend URL
-  credentials: true // optional if you want cookies later
-}));
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://teamboard-saas-7icq.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
