@@ -31,8 +31,13 @@ exports.createInvitation = async (req, res, next) => {
       });
 
     const inviteLink =
-  `http://localhost:5173/register?token=${token}`;
+    `${process.env.FRONTEND_URL}/register?token=${token}`;
+  try {
   await sendInvitationEmail(email, inviteLink);
+} catch (err) {
+  await invitation.deleteOne();
+  throw err;
+}
 
   await createAuditLog({
     action: "CREATE_INVITATION",
