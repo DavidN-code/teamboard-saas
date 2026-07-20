@@ -3,7 +3,7 @@ const AuditLog = require("../models/AuditLog");
 // GET audit logs (owner/admin only)
 exports.getAuditLogs = async (req, res, next) => {
   try {
-    const { action, resourceType } = req.query;
+    const { action, resourceType, boardId } = req.query;
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -19,6 +19,10 @@ exports.getAuditLogs = async (req, res, next) => {
 
     if (resourceType) {
       query.resourceType = resourceType;
+    }
+
+    if (boardId) {
+      query.boardId = boardId;
     }
 
     const logs = await AuditLog.find(query)

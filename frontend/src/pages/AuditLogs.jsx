@@ -7,6 +7,11 @@ const formatAction = (action) => {
     CREATE_TASK: "Created Task",
     UPDATE_TASK: "Updated Task",
     DELETE_TASK: "Deleted Task",
+
+    CREATE_COMMENT: "Created Comment",
+    UPDATE_COMMENT: "Updated Comment",
+    DELETE_COMMENT: "Deleted Comment",
+
     CREATE_BOARD: "Created Board",
     UPDATE_BOARD: "Updated Board",
     DELETE_BOARD: "Deleted Board",
@@ -32,6 +37,7 @@ const SkeletonRow = () => (
 );
 
 const AuditLogs = () => {
+
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 

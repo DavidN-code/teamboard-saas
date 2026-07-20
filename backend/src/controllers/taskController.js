@@ -25,6 +25,7 @@ exports.createTask = async (req, res, next) => {
       action: "CREATE_TASK",
       resourceType: "Task",
       resourceId: task._id,
+      boardId: task.board,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
       details: {
@@ -231,6 +232,7 @@ if (assigneeChanged) {
     action: "ASSIGN_TASK",
     resourceType: "Task",
     resourceId: task._id,
+    boardId: task.board,
     userId: req.user.userId,
     organizationId: req.user.organizationId,
     details: {
@@ -247,6 +249,7 @@ if (changes.length > 0) {
     action: "UPDATE_TASK",
     resourceType: "Task",
     resourceId: task._id,
+    boardId: task.board,
     userId: req.user.userId,
     organizationId: req.user.organizationId,
     details: {
@@ -277,6 +280,7 @@ exports.deleteTask = async (req, res, next) => {
       action: "DELETE_TASK",
       resourceType: "Task",
       resourceId: task._id,
+      boardId: task.board,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
       details: {

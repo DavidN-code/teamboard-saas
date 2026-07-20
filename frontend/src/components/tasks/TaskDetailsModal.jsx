@@ -74,6 +74,7 @@ export default function TaskDetailsModal({
   task,
   isOpen,
   onClose,
+  onActivityChange,
   onUpdateTask,
   onDeleteTask,
 }) {
@@ -152,6 +153,10 @@ export default function TaskDetailsModal({
     setComments(updated.data);
   
     await refreshActivity();
+
+if (onActivityChange) {
+  onActivityChange();
+}
   };
   
   
@@ -165,6 +170,10 @@ export default function TaskDetailsModal({
     setComments(updated.data);
   
     await refreshActivity();
+
+if (onActivityChange) {
+  onActivityChange();
+}
   };
   
   
@@ -178,6 +187,10 @@ export default function TaskDetailsModal({
     setComments(updated.data);
   
     await refreshActivity();
+
+if (onActivityChange) {
+  onActivityChange();
+}
   };
 
 

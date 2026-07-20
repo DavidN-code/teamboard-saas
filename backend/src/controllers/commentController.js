@@ -22,6 +22,7 @@ exports.createComment = async (req, res, next) => {
       action: "CREATE_COMMENT",
       resourceType: "Task",
       resourceId: comment.taskId,
+      boardId: task?.board,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
       details: {
@@ -127,6 +128,7 @@ if (!isOwner && !isAdminOrOwner) {
       action: "UPDATE_COMMENT",
       resourceType: "Task",
       resourceId: comment.taskId,
+      boardId: task?.board,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
       details: {
@@ -171,6 +173,7 @@ exports.deleteComment = async (req, res, next) => {
       action: "DELETE_COMMENT",
       resourceType: "Task",
       resourceId: comment.taskId,
+      boardId: task?.board,
       userId: req.user.userId,
       organizationId: req.user.organizationId,
       details: {

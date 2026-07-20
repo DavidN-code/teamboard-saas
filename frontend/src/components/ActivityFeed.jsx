@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getActivityFeed } from "../api/activityFeed";
+import { useActiveBoard } from "../context/ActiveBoardContext";
 
 function formatAction(activity) {
   const name = activity.userId?.name || "Unknown User";
@@ -111,17 +112,24 @@ function formatAction(activity) {
   return `${name} ${actionMap[activity.action] || activity.action}`;
 }
 
-export default function ActivityFeed() {
+export default function ActivityFeed({ refreshKey }) {
+  const { activeBoard } = useActiveBoard();
+
   const [activities, setActivities] = useState([]);
 
   useEffect(() => {
     const loadActivity = async () => {
-      const res = await getActivityFeed();
+
+      if (!activeBoard) return;
+
+      const res = await getActivityFeed(activeBoard?._id);
+
       setActivities(res.data);
+
     };
 
     loadActivity();
-  }, []);
+  }, [activeBoard, refreshKey]);
 
   return (
     <div

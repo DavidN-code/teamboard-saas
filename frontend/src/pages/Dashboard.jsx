@@ -45,6 +45,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   const [tasks, setTasks] = useState([]);
+  const [activityRefresh, setActivityRefresh] = useState(0);
   const [loadingTasks, setLoadingTasks] = useState(false);
   const [taskError, setTaskError] = useState("");
 
@@ -157,6 +158,7 @@ const [sortBy, setSortBy] = useState("");
       });
 
       setTasks((prev) => [...prev, res.data]);
+      setActivityRefresh((prev) => prev + 1);
       setIsTaskModalOpen(false);
     } catch (err) {
       console.error("Failed to create task", err);
@@ -170,7 +172,9 @@ const [sortBy, setSortBy] = useState("");
       setTasks((prev) =>
         prev.map((t) => (t._id === taskId ? res.data : t))
       );
-
+      
+      setActivityRefresh((prev) => prev + 1);
+      
       setSelectedTask(res.data);
       setIsDetailsModalOpen(false);
     } catch (err) {
@@ -189,6 +193,8 @@ const [sortBy, setSortBy] = useState("");
       await api.delete(`/tasks/${taskId}`);
 
       setTasks((prev) => prev.filter((t) => t._id !== taskId));
+
+      setActivityRefresh((prev) => prev + 1);
 
       setIsDetailsModalOpen(false);
       setSelectedTask(null);
@@ -507,7 +513,7 @@ const doneTasks = filteredTasks.filter(
           </DragOverlay>
         </DndContext>
 
-        <ActivityFeed />
+        <ActivityFeed refreshKey={activityRefresh} />
 
         {/* MODALS */}
         <TaskModal
@@ -520,6 +526,9 @@ const doneTasks = filteredTasks.filter(
           task={selectedTask}
           isOpen={isDetailsModalOpen}
           onClose={() => setIsDetailsModalOpen(false)}
+          onActivityChange={() =>
+            setActivityRefresh((prev) => prev + 1)
+          }
           onUpdateTask={handleUpdateTask}
           onDeleteTask={handleDeleteTask}
         />

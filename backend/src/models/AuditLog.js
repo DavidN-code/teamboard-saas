@@ -13,6 +13,10 @@ const auditLogSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
+  boardId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Board",
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -23,7 +27,7 @@ const auditLogSchema = new mongoose.Schema({
     required: true,
   },
   details: {
-    type: Object, // optional extra info
+    type: Object, 
   }
 }, { timestamps: true });
 
