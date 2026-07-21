@@ -1,26 +1,26 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const ActiveBoardContext = createContext();
 
 export function ActiveBoardProvider({ children }) {
-  const [activeBoard, setActiveBoardState] = useState(() => {
+  const [activeBoard, setActiveBoard] = useState(() => {
     const savedBoard = localStorage.getItem("activeBoard");
 
-    return savedBoard ? JSON.parse(savedBoard) : null;
+    return savedBoard
+      ? JSON.parse(savedBoard)
+      : null;
   });
 
-  const setActiveBoard = (board) => {
-    setActiveBoardState(board);
-
-    if (board) {
+  useEffect(() => {
+    if (activeBoard) {
       localStorage.setItem(
         "activeBoard",
-        JSON.stringify(board)
+        JSON.stringify(activeBoard)
       );
     } else {
       localStorage.removeItem("activeBoard");
     }
-  };
+  }, [activeBoard]);
 
   return (
     <ActiveBoardContext.Provider

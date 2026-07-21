@@ -14,13 +14,34 @@ export default function Sidebar() {
   const fetchBoards = async () => {
     try {
       const res = await api.get("/boards");
+  
       setBoards(res.data);
-
-      // Auto-select first board if none selected
-      if (!activeBoard && res.data.length > 0) {
+  
+      if (res.data.length === 0) {
+        setActiveBoard(null);
+        return;
+      }
+  
+      // Check if saved active board still exists
+      const savedBoardExists = activeBoard
+        ? res.data.some(
+            (board) => board._id === activeBoard._id
+          )
+        : false;
+  
+      // Restore saved board if it exists
+      if (savedBoardExists) {
+        const updatedBoard = res.data.find(
+          (board) => board._id === activeBoard._id
+        );
+  
+        setActiveBoard(updatedBoard);
+      }
+      // Otherwise default to first board
+      else {
         setActiveBoard(res.data[0]);
       }
-
+  
     } catch (err) {
       console.error("Failed to load boards", err);
     }
