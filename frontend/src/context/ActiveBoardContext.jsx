@@ -6,47 +6,38 @@ const ActiveBoardContext = createContext();
 export function ActiveBoardProvider({ children }) {
   const { user } = useAuth();
 
-  const storageKey = user
-    ? `activeBoard_${user._id}`
-    : null;
-    console.log("ACTIVE BOARD USER:", user);
-console.log("ACTIVE BOARD STORAGE KEY:", storageKey);
+  const [activeBoard, setActiveBoard] = useState(null);
+  const [boardInitialized, setBoardInitialized] = useState(false);
 
-  const [activeBoard, setActiveBoard] = useState(() => {
-    return null;
-  });
-
-
-  // Load user's saved board when user changes
   useEffect(() => {
-    if (!storageKey) {
+    if (!user?.id) {
       setActiveBoard(null);
+      setBoardInitialized(false);
       return;
     }
 
-    const savedBoard = localStorage.getItem(storageKey);
-
-    setActiveBoard(
-      savedBoard ? JSON.parse(savedBoard) : null
+    const savedBoard = localStorage.getItem(
+      `activeBoard_${user.id}`
     );
 
-  }, [storageKey]);
-
-
-  // Save user's selected board
-  useEffect(() => {
-    if (!storageKey) return;
-
-    if (activeBoard) {
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify(activeBoard)
-      );
-    } else {
-      localStorage.removeItem(storageKey);
+    if (savedBoard) {
+      setActiveBoard(JSON.parse(savedBoard));
     }
 
-  }, [activeBoard, storageKey]);
+    setBoardInitialized(true);
+
+  }, [user]);
+
+
+  useEffect(() => {
+    if (!user?.id || !activeBoard) return;
+
+    localStorage.setItem(
+      `activeBoard_${user.id}`,
+      JSON.stringify(activeBoard)
+    );
+
+  }, [activeBoard, user]);
 
 
   return (
@@ -54,12 +45,14 @@ console.log("ACTIVE BOARD STORAGE KEY:", storageKey);
       value={{
         activeBoard,
         setActiveBoard,
+        boardInitialized,
       }}
     >
       {children}
     </ActiveBoardContext.Provider>
   );
 }
+
 
 export function useActiveBoard() {
   return useContext(ActiveBoardContext);

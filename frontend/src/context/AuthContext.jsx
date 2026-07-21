@@ -11,6 +11,9 @@ export const AuthProvider = ({ children }) => {
   const login = (token, userData) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(userData));
+
+    // Clear previous user's board selection
+  localStorage.removeItem("activeBoard");
   
     setToken(token);
     setUser(userData);
@@ -18,8 +21,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("activeBoard");
+    localStorage.removeItem("user");  
   
     setToken(null);
     setUser(null);

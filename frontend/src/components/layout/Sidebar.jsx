@@ -8,8 +8,11 @@ export default function Sidebar() {
   const [newBoardName, setNewBoardName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { activeBoard, setActiveBoard } = useActiveBoard();
-
+  const {
+    activeBoard,
+    setActiveBoard,
+    boardInitialized,
+  } = useActiveBoard();
   // Fetch boards
   const fetchBoards = async () => {
     try {
@@ -38,7 +41,7 @@ export default function Sidebar() {
         setActiveBoard(updatedBoard);
       }
       // Otherwise default to first board
-      else {
+      else if (boardInitialized) {
         setActiveBoard(res.data[0]);
       }
   
