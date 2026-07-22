@@ -117,6 +117,32 @@ useEffect(() => {
     setActivityRefresh((prev) => prev + 1);
   });
 
+  channel.bind("task-updated", (updatedTask) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task._id === updatedTask._id
+          ? updatedTask
+          : task
+      )
+    );
+  
+    setActivityRefresh((prev) => prev + 1);
+  });
+
+  channel.bind("task-deleted", (data) => {
+    setTasks((prev) =>
+      prev.filter(
+        (task) => task._id !== data.taskId
+      )
+    );
+  
+    setActivityRefresh((prev) => prev + 1);
+  });
+
+  channel.bind("activity-updated", () => {
+    setActivityRefresh((prev) => prev + 1);
+  });
+
   return () => {
     pusher.unsubscribe(
       `board-${activeBoard._id}`

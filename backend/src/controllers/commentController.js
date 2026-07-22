@@ -3,6 +3,7 @@ const createAuditLog = require("../services/auditLogService");
 const createNotification = require("../services/notificationService");
 const Task = require("../models/Task");
 const User = require("../models/User");
+const pusher = require("../services/pusherService");
 
 // CREATE COMMENT
 exports.createComment = async (req, res, next) => {
@@ -75,7 +76,27 @@ if (task) {
   }
 }
 
-    res.status(201).json(comment);
+// -------------------------
+// PUSHER REAL-TIME COMMENT CREATED
+// -------------------------
+
+await pusher.trigger(
+  `task-${task._id}`,
+  "comment-created",
+  comment
+);
+
+const populatedComment =
+  await Comment.findById(comment._id)
+    .populate("createdBy", "name email");
+
+await pusher.trigger(
+  `task-${task._id}`,
+  "comment-created",
+  populatedComment
+);
+
+res.status(201).json(populatedComment);    
   } catch (err) {
     next(err);
   }
@@ -137,8 +158,27 @@ if (!isOwner && !isAdminOrOwner) {
       },
     });
 
-    res.json(comment);
-  } catch (err) {
+    // -------------------------
+// PUSHER REAL-TIME COMMENT UPDATED
+// -------------------------
+
+await pusher.trigger(
+  `task-${task._id}`,
+  "comment-updated",
+  comment
+);
+
+const populatedComment =
+  await Comment.findById(comment._id)
+    .populate("createdBy", "name email");
+
+await pusher.trigger(
+  `task-${task._id}`,
+  "comment-updated",
+  populatedComment
+);
+
+res.json(populatedComment);  } catch (err) {
     next(err);
   }
 };
@@ -181,6 +221,18 @@ exports.deleteComment = async (req, res, next) => {
         commentPreview: comment.content.substring(0, 50),
       },
     });
+
+    // -------------------------
+// PUSHER REAL-TIME COMMENT DELETED
+// -------------------------
+
+await pusher.trigger(
+  `task-${task._id}`,
+  "comment-deleted",
+  {
+    commentId: comment._id,
+  }
+);
 
     res.json({ message: "Comment deleted successfully" });
   } catch (err) {

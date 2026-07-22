@@ -53,13 +53,12 @@ exports.createTask = async (req, res, next) => {
         const populatedTask = await Task.findById(task._id)
         .populate("assignedTo", "name email")
         .populate("createdBy", "name email");
-      
-      // Broadcast to everyone viewing this board
-      await pusher.trigger(
-        `board-${task.board}`,
-        "task-created",
-        populatedTask
-      );
+
+        await pusher.trigger(
+          `board-${task.board}`,
+          "task-created",
+          populatedTask
+        );
       
       res.status(201).json(populatedTask);
 
@@ -267,7 +266,13 @@ if (changes.length > 0) {
   });
 }
 
-    return res.json(task);
+await pusher.trigger(
+  `board-${task.board}`,
+  "task-updated",
+  task
+);
+
+return res.json(task);
   } catch (err) {
     next(err);
   }
@@ -295,7 +300,15 @@ exports.deleteTask = async (req, res, next) => {
         taskTitle: task.title,
       },
     });
-
+    
+    await pusher.trigger(
+      `board-${task.board}`,
+      "task-deleted",
+      {
+        taskId: task._id,
+      }
+    );
+  
     res.json({ message: 'Task deleted successfully' });
 
   } catch (err) {

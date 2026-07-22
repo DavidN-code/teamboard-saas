@@ -12,6 +12,8 @@ import { getTaskActivity } from "../../api/auditLogs";
 
 import { useAuth } from "../../context/AuthContext";
 
+import pusher from "../../services/pusher";
+
 function formatActivity(item) {
   const name = item.userId?.name || "Unknown User";
 
@@ -31,8 +33,8 @@ function formatActivity(item) {
     case "UPDATE_COMMENT":
       return `${name} updated a comment: "${item.details.commentPreview}"`;
 
-    case "DELETE_COMMENT":
-      return `${name} deleted a comment`;
+      case "DELETE_COMMENT":
+        return `${name} deleted a comment: "${item.details.commentPreview}"`;
 
     case "DELETE_TASK":
       return `${name} deleted task "${item.details.taskTitle}"`;
@@ -193,6 +195,72 @@ if (onActivityChange) {
 }
   };
 
+  useEffect(() => {
+    if (!task) return;
+  
+    const channel = pusher.subscribe(
+      `task-${task._id}`
+    );
+  
+    // -------------------------
+    // COMMENT CREATED
+    // -------------------------
+  
+    channel.bind("comment-created", (newComment) => {
+      setComments((prev) => {
+        const exists = prev.some(
+          (comment) => comment._id === newComment._id
+        );
+  
+        if (exists) return prev;
+  
+        return [...prev, newComment];
+      });
+  
+      refreshActivity();
+    });
+  
+  
+    // -------------------------
+    // COMMENT UPDATED
+    // -------------------------
+  
+    channel.bind("comment-updated", (updatedComment) => {
+      setComments((prev) =>
+        prev.map((comment) =>
+          comment._id === updatedComment._id
+            ? updatedComment
+            : comment
+        )
+      );
+  
+      refreshActivity();
+    });
+  
+  
+    // -------------------------
+    // COMMENT DELETED
+    // -------------------------
+  
+    channel.bind("comment-deleted", (data) => {
+      setComments((prev) =>
+        prev.filter(
+          (comment) =>
+            comment._id !== data.commentId
+        )
+      );
+  
+      refreshActivity();
+    });
+  
+  
+    return () => {
+      pusher.unsubscribe(
+        `task-${task._id}`
+      );
+    };
+  
+  }, [task]);
 
   // Prevent rendering if modal is closed or task data is missing
   if (!isOpen || !task) return null;
