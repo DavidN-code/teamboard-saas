@@ -2,6 +2,7 @@ const Task = require('../models/Task');
 const createAuditLog = require("../services/auditLogService");
 const createNotification = require("../services/notificationService");
 const User = require("../models/User");
+const pusher = require("../services/pusherService");
 
 // CREATE a new Task
 exports.createTask = async (req, res, next) => {
@@ -49,11 +50,18 @@ exports.createTask = async (req, res, next) => {
           });
         }
 
-    const populatedTask = await Task.findById(task._id)
-  .populate("assignedTo", "name email")
-  .populate("createdBy", "name email");
-
-  res.status(201).json(populatedTask);
+        const populatedTask = await Task.findById(task._id)
+        .populate("assignedTo", "name email")
+        .populate("createdBy", "name email");
+      
+      // Broadcast to everyone viewing this board
+      await pusher.trigger(
+        `board-${task.board}`,
+        "task-created",
+        populatedTask
+      );
+      
+      res.status(201).json(populatedTask);
 
   } catch (err) {
     next(err);

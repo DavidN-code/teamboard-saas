@@ -14,6 +14,8 @@ import ActivityFeed from "../components/ActivityFeed";
 
 import NotificationBell from "../components/notifications/NotificationBell";
 
+import pusher from "../services/pusher";
+
 import {
   DndContext,
   closestCenter,
@@ -91,6 +93,38 @@ const [sortBy, setSortBy] = useState("");
     fetchTasks();
   }, [activeBoard]);
 
+  /* ---------------- REAL-TIME TASK UPDATES ---------------- */
+useEffect(() => {
+  if (!activeBoard) return;
+
+  const channel = pusher.subscribe(
+    `board-${activeBoard._id}`
+  );
+
+  channel.bind("task-created", (newTask) => {
+    setTasks((prev) => {
+      const exists = prev.some(
+        (task) => task._id === newTask._id
+      );
+  
+      if (exists) {
+        return prev;
+      }
+  
+      return [...prev, newTask];
+    });
+  
+    setActivityRefresh((prev) => prev + 1);
+  });
+
+  return () => {
+    pusher.unsubscribe(
+      `board-${activeBoard._id}`
+    );
+  };
+
+}, [activeBoard]);
+
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
@@ -157,7 +191,17 @@ const [sortBy, setSortBy] = useState("");
         board: activeBoard._id,
       });
 
-      setTasks((prev) => [...prev, res.data]);
+      setTasks((prev) => {
+        const exists = prev.some(
+          (task) => task._id === res.data._id
+        );
+      
+        if (exists) {
+          return prev;
+        }
+      
+        return [...prev, res.data];
+      });
       setActivityRefresh((prev) => prev + 1);
       setIsTaskModalOpen(false);
     } catch (err) {
