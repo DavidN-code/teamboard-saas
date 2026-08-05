@@ -21,11 +21,39 @@ function formatActivity(item) {
     case "CREATE_TASK":
       return `${name} created task "${item.details.taskTitle}"`;
 
-    case "ASSIGN_TASK":
-      return `${name} assigned task "${item.details.taskTitle}" to ${item.details.assignedTo}`;
+      case "ASSIGN_TASK":
+        if (!item.details.assignedTo) {
+          return `${name} unassigned task "${item.details.taskTitle}"`;
+        }
+      
+        return `${name} assigned task "${item.details.taskTitle}" to ${item.details.assignedTo}`;
 
-    case "UPDATE_TASK":
-      return `${name} updated task "${item.details.taskTitle}"`;
+      case "UPDATE_TASK": {
+        const changes = item.details?.changes || [];
+      
+        if (changes.length === 0) {
+          return `${name} updated task "${item.details.taskTitle}"`;
+        }
+      
+        return (
+          <>
+            <div>
+              {name} updated task "{item.details.taskTitle}"
+            </div>
+      
+            <ul
+              style={{
+                margin: "4px 0 0 20px",
+                padding: 0,
+              }}
+            >
+              {changes.map((change, index) => (
+                <li key={index}>{change}</li>
+              ))}
+            </ul>
+          </>
+        );
+      }
 
     case "CREATE_COMMENT":
       return `${name} commented: "${item.details.commentPreview}"`;
@@ -91,51 +119,98 @@ export default function TaskDetailsModal({
   const [assignedTo, setAssignedTo] = useState("");
   const [activity, setActivity] = useState([]);
   const { user } = useAuth();
-  const canEditTask =
-  user?.role === "owner" || user?.role === "admin";
+  const canEditTask = user?.role === "owner" || user?.role === "admin";
+  const [activityRefresh, setActivityRefresh] = useState(0);
 
-  useEffect(() => {
-    if (task) {
-      setAssignedTo(task.assignedTo?._id || "");
-      setTitle(task.title || "");
-      setDescription(task.description || "");
-      setStatus(task.status || "todo");
-      setDueDate(
-        task.dueDate
-          ? task.dueDate.split("T")[0]
-          : ""
-      );
-      setPriority(task.priority || "medium");
+  // Load task fields when a task is opened/changed
+useEffect(() => {
+  if (!task) return;
+
+  setAssignedTo(task.assignedTo?._id || "");
+  setTitle(task.title || "");
+  setDescription(task.description || "");
+  setStatus(task.status || "todo");
+  setDueDate(
+    task.dueDate
+      ? task.dueDate.split("T")[0]
+      : ""
+  );
+  setPriority(task.priority || "medium");
+
+}, [task]);
+
+
+// Load users when task modal opens
+useEffect(() => {
+  const loadUsers = async () => {
+    try {
+      const res = await getUsers();
+      setUsers(res.data);
+    } catch (err) {
+      console.error("Failed to load users", err);
+    }
+  };
+
+  loadUsers();
+
+}, []);
+
+
+// Load comments and activity when task changes
+// or when Pusher tells us something changed
+useEffect(() => {
+  const loadComments = async () => {
+    if (!task) return;
+
+    const res = await getComments(task._id);
+    setComments(res.data);
+  };
+
+  const loadActivity = async () => {
+    if (!task) return;
+
+    const res = await getTaskActivity(task._id);
+    setActivity(res.data);
+  };
+
+  loadComments();
+  loadActivity();
+
+}, [task, activityRefresh]);
+
+useEffect(() => {
+  if (!task) return;
+
+  const channelName = `board-${task.board}`;
+  const channel = pusher.subscribe(channelName);
+
+  const handleTaskUpdated = (updatedTask) => {
+    if (updatedTask._id !== task._id) {
+      return;
     }
 
-    const loadUsers = async () => {
-      try {
-        const res = await getUsers();
-        setUsers(res.data);
-      } catch (err) {
-        console.error("Failed to load users", err);
-      }
-    };
-  
-    loadUsers();
+    setTitle(updatedTask.title || "");
+    setDescription(updatedTask.description || "");
+    setStatus(updatedTask.status || "todo");
+    setPriority(updatedTask.priority || "medium");
 
-    const loadComments = async () => {
-      if (task) {
-        const res = await getComments(task._id);
-        setComments(res.data);
-      }
-    };
-    loadComments();
+    setDueDate(
+      updatedTask.dueDate
+        ? updatedTask.dueDate.split("T")[0]
+        : ""
+    );
 
-    const loadActivity = async () => {
-      if (task) {
-        const res = await getTaskActivity(task._id);
-        setActivity(res.data);
-      }
-    };
-    
-    loadActivity();
-  }, [task]);
+    setAssignedTo(updatedTask.assignedTo?._id || "");
+
+    setActivityRefresh((prev) => prev + 1);
+  };
+
+  channel.bind("task-updated", handleTaskUpdated);
+
+  return () => {
+    channel.unbind("task-updated", handleTaskUpdated);
+  };
+}, [task?._id, task?.board]);
 
   // ✅ safe render check AFTER hooks
   const refreshActivity = async () => {
@@ -255,9 +330,7 @@ if (onActivityChange) {
   
   
     return () => {
-      pusher.unsubscribe(
-        `task-${task._id}`
-      );
+      channel.unbind_all();
     };
   
   }, [task]);
@@ -453,9 +526,9 @@ if (onActivityChange) {
     {getActivityIcon(item.action)}
   </span>
 
-  <span>
-    {formatActivity(item)}
-  </span>
+  <div>
+  {formatActivity(item)}
+</div>
 </div>
 
         <small>

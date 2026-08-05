@@ -1,30 +1,37 @@
 const path = require("path");
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
-console.log("🔥 SERVER STARTED");
-console.log("EMAIL_USER (server):", process.env.EMAIL_USER);
-console.log("EMAIL_PASS exists (server):", !!process.env.EMAIL_PASS);
-console.log("CWD:", process.cwd());
-const mongoose = require('mongoose');
-const app = require('./app');
+const mongoose = require("mongoose");
+
+require("dotenv").config({
+  path: path.resolve(__dirname, "../.env"),
+});
+
+const app = require("./app");
 
 const PORT = process.env.PORT || 5050;
 
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  console.warn(
+    "Email configuration is incomplete. Check EMAIL_USER and EMAIL_PASS."
+  );
+}
+
 const startServer = async () => {
   try {
-    // Connect to MongoDB 
-    console.log('Connecting to MongoDB...');
+    if (!process.env.MONGO_URI) {
+      throw new Error("MONGO_URI is not configured.");
+    }
 
-    console.log('MONGO_URI:', process.env.MONGO_URI);
+    console.log("Connecting to MongoDB...");
 
     await mongoose.connect(process.env.MONGO_URI);
 
-    console.log('Connected to MongoDB');
+    console.log("✅ Connected to MongoDB");
 
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`🚀 TeamBoard API running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('MongoDB connection error:', error);
+    console.error("Server startup failed:", error);
     process.exit(1);
   }
 };

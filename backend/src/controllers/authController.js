@@ -101,9 +101,6 @@ const login = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    console.log("LOGIN SECRET:", process.env.JWT_SECRET);
-
-
     // 3. Create JWT token
     const token = jwt.sign(
       {

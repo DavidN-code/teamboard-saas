@@ -23,10 +23,15 @@ const logAction = async ({
 
     // Notify connected clients that activity changed
     if (boardId) {
+    
       await pusher.trigger(
         `board-${boardId}`,
         "activity-updated",
-        {}
+        {
+          action,
+          resourceId,
+          timestamp: Date.now(),
+        }
       );
     }
 

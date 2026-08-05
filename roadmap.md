@@ -1,53 +1,53 @@
 # TeamBoard – Multi-Tenant Project Management SaaS
 
-## 🚀 Project Vision
+# 🚀 Project Vision
 
 TeamBoard is a production-oriented multi-tenant SaaS application designed to demonstrate the architecture, security practices, and engineering patterns commonly found in modern software products.
 
-The project focuses on solving real-world business problems such as organization management, team onboarding, access control, auditability, notifications, collaboration, and project tracking while showcasing full-stack development skills.
+The project focuses on solving real-world business problems such as organization management, team onboarding, access control, audit logging, notifications, real-time collaboration, and project tracking while showcasing modern full-stack software engineering.
 
 ---
 
 # 📍 Current Development Status
 
-TeamBoard has progressed beyond the core application-building phase.
+TeamBoard is feature-complete in most core areas and has entered the production polish phase.
 
-Completed systems:
+## Completed Systems
 
 * Authentication
-* JWT-based authorization
+* JWT authorization
 * Multi-tenant organization architecture
 * Role-Based Access Control (RBAC)
-* Team onboarding
-* Invitation workflow
-* Email invitations
+* Organization invitations
+* Email invitation workflow
 * Boards
 * Tasks
-* Kanban workflow
+* Kanban board
 * Task assignment
 * Comments
 * Notifications
 * Audit logging
-* Activity feeds
-* Task activity timelines
+* Organization Activity Feed
+* Task Activity Timeline
 * Dashboard metrics
-* Task search
-* Task filtering
-* Task sorting
+* My Tasks
+* Task search, filtering, and sorting
+* Organization member management
+* Security middleware
 
-Current development focus:
+## Current Development Focus
 
+* Real-time synchronization
 * Production polish
 * Testing
 * Deployment preparation
-* Security improvements
 * Portfolio refinement
 
 ---
 
 # 🎯 Engineering Goals
 
-This project is designed to demonstrate proficiency in:
+TeamBoard is intended to demonstrate proficiency in:
 
 * Full-stack application development
 * Multi-tenant SaaS architecture
@@ -55,13 +55,13 @@ This project is designed to demonstrate proficiency in:
 * Role-Based Access Control (RBAC)
 * Team onboarding workflows
 * Transactional email systems
-* Audit logging and activity tracking
+* Audit logging
+* Real-time collaboration
 * Notification systems
-* Collaboration systems
 * REST API design
 * MongoDB data modeling
-* Modern React application architecture
-* Production-ready backend development
+* Modern React architecture
+* Production-ready backend engineering
 
 ---
 
@@ -73,9 +73,10 @@ This project is designed to demonstrate proficiency in:
 * Express
 * MongoDB Atlas
 * Mongoose
-* JSON Web Tokens (JWT)
+* JWT Authentication
 * bcrypt
 * Nodemailer
+* Pusher
 
 ## Frontend
 
@@ -85,19 +86,20 @@ This project is designed to demonstrate proficiency in:
 * Vite
 * @dnd-kit/core
 * @dnd-kit/sortable
+* Pusher JS
 
 ## Planned Production Infrastructure
 
 * Backend → Render
 * Frontend → Vercel
 * Database → MongoDB Atlas
-* Email Delivery → Resend or SendGrid
+* Email → Resend or SendGrid
 
 ---
 
 # 🔐 Security & Authentication
 
-## Completed
+## Implemented
 
 ### Authentication
 
@@ -105,33 +107,32 @@ This project is designed to demonstrate proficiency in:
 * User login
 * JWT authentication
 * Protected API routes
-* Persistent login sessions
+* Persistent login
 * Automatic unauthorized-session handling
 * Axios token injection
 
-### Security Foundations
+### Security
 
-* Password hashing with bcrypt
+* bcrypt password hashing
 * Authorization middleware
-* Role-restricted endpoints
-* Secure invitation token generation
-* Environment-based configuration
+* Role-protected endpoints
+* Secure invitation tokens
+* Helmet
+* API rate limiting
 * Centralized error handling
 * Organization-level data isolation
 
 ## Planned
 
 * Refresh token architecture
-* Rate limiting
-* Helmet security headers
-* Input validation layer (Zod or Joi)
-* Account recovery workflows
+* Password recovery
+* Additional security hardening
 
 ---
 
 # 🏢 Multi-Tenant Architecture
 
-## Completed
+## Implemented
 
 ### Organization System
 
@@ -148,15 +149,13 @@ This project is designed to demonstrate proficiency in:
 
 ### Data Isolation
 
-* Organization-level access control
+* Organization-level authorization
 * Resource ownership enforcement
-* Multi-tenant authorization architecture
-
----
+* Multi-tenant data isolation
 
 # 🛡 Role-Based Access Control (RBAC)
 
-## Completed
+## Implemented
 
 ### User Roles
 
@@ -167,59 +166,57 @@ This project is designed to demonstrate proficiency in:
 ### Backend Authorization
 
 * Authorization middleware
-* Role-restricted endpoints
+* Role-protected endpoints
 * Owner-only management actions
 * Organization-level permission enforcement
 
 ### Frontend Controls
 
-* Role-aware rendering
-* Owner-only controls
+* Role-aware UI rendering
 * Permission-based actions
+* Restricted management controls
 
 ### Organization Administration
 
 * Change user roles
 * Remove users
-* Invitation permissions
+* Manage invitation permissions
 
 ---
 
 # 👥 Team Onboarding & Organization Management
 
-## Completed
+## Implemented
 
 ### Member Management
 
 * Organization Members page
 * User listing
-* Role display
-* Role editing
+* Role display and editing
 * User removal workflow
 
 ### Invitation System
 
 * Invitation model
 * Invitation API
-* Invitation token generation
-* Invitation token validation
+* Secure invitation token generation
+* Token validation
 * Pending invitation tracking
-* Invitation status tracking
+* Invitation status management
 * Invitation revocation
 
 ### Invitation Workflow
 
-* Create invitation
-* Generate secure token
-* Store invitation
-* Email invitation delivery
-* Invitation validation
-* Detect invitation during registration
-* Auto-fill invited email
-* Lock invited email field
-* Automatic organization assignment
-* Automatic member role assignment
-* Invitation acceptance tracking
+* Create invitations
+* Generate secure tokens
+* Email delivery
+* Validate invitations
+* Detect invitations during registration
+* Pre-fill invited email
+* Prevent invited email modification
+* Automatically assign organization membership
+* Assign default member roles
+* Track invitation acceptance
 
 ### Email Delivery
 
@@ -234,7 +231,7 @@ This project is designed to demonstrate proficiency in:
 
 ## Boards
 
-### Completed
+Implemented:
 
 * Create boards
 * View boards
@@ -245,177 +242,175 @@ This project is designed to demonstrate proficiency in:
 
 ## Tasks
 
-### Completed
+Implemented:
 
-* Create tasks
-* Edit tasks
-* Delete tasks
-* Status tracking
+* Create, edit, and delete tasks
+* Task status management
 * Board filtering
-* Optimistic updates
 * Task assignment
 * Task creator tracking
 * Task Details Modal
 * Task activity timeline
-* Task comments
-* Task priorities
+* Comments
+* Priority levels
 * Due dates
 * Search
 * Filtering
 * Sorting
+* Optimistic UI updates
 
 ---
 
 # 🖱 Kanban Workflow System
 
-## Completed
+Implemented using `@dnd-kit`
+
+Features:
 
 * Drag-and-drop task management
 * Todo column
 * In Progress column
 * Done column
-* Backend synchronization
 * Drag overlay previews
+* Backend synchronization
 * Optimistic UI updates
 
 ---
 
 # 📜 Audit Logging
 
-## Completed
+## Implemented
 
 ### Audit System
 
 * Audit log model
 * Audit log API
-* Audit log frontend page
-* Pagination
+* Audit log frontend interface
 * Filtering
 * User population
-* Task activity endpoint
+* Task activity history endpoint
+* Organization Activity Feed integration
 
-### Tracked Activity
+### Tracked Events
 
 #### Boards
 
-* CREATE_BOARD
-* UPDATE_BOARD
-* DELETE_BOARD
+* `CREATE_BOARD`
+* `UPDATE_BOARD`
+* `DELETE_BOARD`
 
 #### Tasks
 
-* CREATE_TASK
-* UPDATE_TASK
-* DELETE_TASK
-* ASSIGN_TASK
+* `CREATE_TASK`
+* `UPDATE_TASK`
+* `DELETE_TASK`
+* `ASSIGN_TASK`
 
 #### Comments
 
-* CREATE_COMMENT
-* UPDATE_COMMENT
-* DELETE_COMMENT
+* `CREATE_COMMENT`
+* `UPDATE_COMMENT`
+* `DELETE_COMMENT`
 
-#### Organization Events
+#### Organization
 
-* CREATE_INVITATION
-* ACCEPT_INVITATION
-* UPDATE_USER_ROLE
-* REMOVE_USER
+* `CREATE_INVITATION`
+* `ACCEPT_INVITATION`
+* `UPDATE_USER_ROLE`
+* `REMOVE_USER`
 
-## Planned
+## Future Improvements
 
-* Expand audit coverage
-* More detailed organization administration events
-
----
+* Expand audit coverage to additional administrative events
+* Add more detailed event metadata
 
 # 🔔 Notifications
 
-## Completed
+## Implemented
 
 ### Notification System
 
 * Notification model
 * Notification API
 * Notification Bell UI
+* Persistent notifications
 * Unread counts
-* Mark as read
-* Notification persistence
-* Click-to-open task navigation
+* Mark notifications as read
+* Click notification → open related task
 
 ### Notification Types
 
-* TASK_ASSIGNED
-* TASK_COMMENT
+* `TASK_ASSIGNED`
+* `TASK_COMMENT`
 
 ---
 
 # 💬 Collaboration Features
 
-## Completed
+## Implemented
 
 ### Comments
 
 * Create comments
 * Edit comments
 * Delete comments
-* Comment history
 * User attribution
+* Comment history
 * Comment notifications
 
-### Activity Feed
+### Activity Systems
 
-* Organization-wide activity feed
+* Organization Activity Feed
 * Human-readable activity messages
 * Assignment tracking
 * Comment tracking
-
-### Task Activity Timeline
-
+* Task Activity Timeline
 * Task-specific audit history
 * Activity icons
 * User attribution
-* Assignment history
-* Comment history
 
 ---
 
 # 📊 Dashboard Metrics
 
-## Completed
+## Implemented
 
 ### Metrics Endpoint
 
+Provides:
+
 * User count
 * Board count
-* Total task count
+* Task count
 * Todo count
 * In Progress count
-* Done count
+* Completed count
 
-### Dashboard Cards
+### Dashboard UI
+
+Displays metric cards for:
 
 * Users
 * Boards
 * Tasks
 * Todo
 * In Progress
-* Done
+* Completed
 
 ---
 
 # ⚡ API Architecture
 
-## Completed
+## Implemented
 
 ### Axios Infrastructure
 
 * Centralized API client
-* Automatic JWT injection
+* JWT token injection
 * Global authentication handling
-* Consistent request architecture
+* Consistent API communication
 
-### REST API Modules
+### API Modules
 
 * Authentication
 * Boards
@@ -433,6 +428,8 @@ This project is designed to demonstrate proficiency in:
 
 ## Phase 1 — Authentication & Foundations ✅ Complete
 
+Implemented:
+
 * Registration
 * Login
 * JWT authentication
@@ -444,6 +441,8 @@ This project is designed to demonstrate proficiency in:
 
 ## Phase 2 — Boards & Tasks ✅ Complete
 
+Implemented:
+
 * Board CRUD
 * Task CRUD
 * Board-task relationships
@@ -453,6 +452,8 @@ This project is designed to demonstrate proficiency in:
 
 ## Phase 3 — Kanban Workflow ✅ Complete
 
+Implemented:
+
 * Drag-and-drop task movement
 * Workflow columns
 * Status synchronization
@@ -461,6 +462,8 @@ This project is designed to demonstrate proficiency in:
 ---
 
 ## Phase 4 — Organization Management ✅ Complete
+
+Implemented:
 
 ### User Administration
 
@@ -476,71 +479,111 @@ This project is designed to demonstrate proficiency in:
 * Organization assignment
 * Email delivery
 
----
+## Phase 5 — Real-Time Collaboration 🔄 In Progress
+
+- Pusher integration
+- Task synchronization
+- Real-time task updates
+- Real-time activity feed updates
+- Multi-tab synchronization
+
+Known limitation:
+- Dashboard activity feed may require refresh after repeated edits to the same task from another session.
 
 ## Phase 5 — Collaboration Systems ✅ Complete
 
-### Collaboration
+Implemented:
 
-* Comments
+* Comments system
 * Notifications
-* Activity Feed
-* Task Assignment Tracking
+* Organization Activity Feed
+* Task assignment tracking
 * Task Activity Timeline
+* Audit-driven collaboration history
 
 ---
 
-## Phase 6 — Dashboard Analytics ✅ Complete
+## Phase 6 — Production Readiness ⏳ Planned
 
-### Dashboard
+- Automated testing
+- Deployment
+- CI/CD
+- Final security review
+- Portfolio polish
+
+
+## Phase 6 — Dashboard & Analytics ✅ Complete
+
+Implemented:
 
 * Organization metrics
 * User counts
 * Board counts
 * Task counts
 * Workflow status metrics
+* Dashboard metric cards
 
 ---
 
-## Phase 7 — Invitation System Enhancements 🚧 Mostly Complete
+## Phase 7 — Invitation System ✅ Complete
 
-### Completed
+Implemented:
 
-* Invitation expiration planning
 * Invitation workflow
+* Secure invitation tokens
 * Invitation validation
 * Invitation acceptance
+* Organization assignment
 * Email delivery
+* Invitation tracking
 
-### Remaining Improvements
+Future improvements:
 
 * Invitation expiration enforcement
-* Resend invitation functionality
 * Improved email templates
 * Email branding
 
 ---
 
-## Phase 8 — Advanced Task Management 🚧
+## Phase 8 — Advanced Task Management ✅ Complete
 
-Completed:
+Implemented:
 
-### Task Features
+* Task priorities
+* Due dates
+* Search
+* Filtering
+* Sorting
+* Task assignment
+* Comments
+* Activity tracking
 
-✅ Task priorities  
-✅ Due dates  
-✅ Search  
-✅ Filtering  
-✅ Sorting  
-
-Remaining improvements:
+Future improvements:
 
 * Advanced filtering options
-* More advanced task organization features
+* Additional task organization features
 
 ---
 
-## Phase 9 — Production Readiness
+## Phase 9 — Real-Time Collaboration 🔄 In Progress
+
+Current focus:
+
+* Pusher real-time integration
+* Multi-tab synchronization
+* Real-time task updates
+* Real-time assignment updates
+* Real-time Activity Feed updates
+
+Current blocker:
+
+* Task updates synchronize correctly across tabs.
+* Backend broadcasting and Pusher delivery are working.
+* Remaining work is ensuring the Organization Activity Feed refreshes correctly on all connected clients after assignment changes.
+
+---
+
+## Phase 10 — Production Readiness ⏳ Planned
 
 ### Deployment
 
@@ -550,10 +593,9 @@ Remaining improvements:
 
 ### Security
 
-* Refresh tokens
-* Validation layer
-* Rate limiting
-* Helmet
+* Refresh token architecture
+* Additional validation improvements
+* Security hardening
 
 ### Testing
 
@@ -575,12 +617,11 @@ TeamBoard demonstrates experience with:
 * Email integrations
 * Audit logging systems
 * Notification systems
-* Collaboration systems
-* React state management
-* RESTful API design
+* Real-time collaboration
+* React application architecture
+* REST API design
 * MongoDB data modeling
 * Secure backend development
-* Modern frontend architecture
 * Production-oriented engineering practices
 
 ---
@@ -590,4 +631,5 @@ TeamBoard demonstrates experience with:
 David Neagoy
 
 GitHub:
+
 https://github.com/DavidN-code

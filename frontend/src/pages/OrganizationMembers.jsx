@@ -15,7 +15,6 @@ const [invitations, setInvitations] = useState([]);
     const fetchUsers = async () => {
       try {
         const res = await api.get("/users");
-        console.log("USERS RESPONSE:", res.data);
         setUsers(res.data);
       } catch (err) {
         console.error("Failed to load users:", err);
@@ -37,7 +36,6 @@ if (user?.role === "owner") {
   fetchInvitations();
 }
 }, [user]);
-  console.log("Current User:", user);
   const getRoleBadgeClass = (role) => {
     switch (role) {
       case "owner":

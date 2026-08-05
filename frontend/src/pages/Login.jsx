@@ -34,7 +34,6 @@ const Login = () => {
   
       setMessage("Login successful!");
   
-      console.log("TOKEN:", token);
     } catch (err) {
       console.error(err);
       setMessage(err.response?.data?.message || "Login failed");

@@ -50,7 +50,10 @@ exports.createTask = async (req, res, next) => {
           });
         }
 
-        const populatedTask = await Task.findById(task._id)
+        const populatedTask = await Task.findOne({
+          _id: task._id,
+          organizationId: req.user.organizationId,
+        })
         .populate("assignedTo", "name email")
         .populate("createdBy", "name email");
 
@@ -138,8 +141,6 @@ exports.updateTask = async (req, res, next) => {
   try {
     const updates = req.body;
 
-    console.log("UPDATES RECEIVED:", updates);
-
     // normalize empty assignment
     if (updates.assignedTo === "") {
       updates.assignedTo = null;
@@ -154,11 +155,11 @@ exports.updateTask = async (req, res, next) => {
     if (!existingTask) {
       return res.status(404).json({ message: "Task not found" });
     }
-
+    
     const assigneeChanged =
-      updates.assignedTo &&
-      updates.assignedTo.toString() !==
-        (existingTask.assignedTo?.toString() || "");
+  updates.assignedTo !== undefined &&
+  updates.assignedTo?.toString() !==
+    (existingTask.assignedTo?.toString() || "");
 
     // update task
     let task = await Task.findOneAndUpdate(
@@ -170,10 +171,6 @@ exports.updateTask = async (req, res, next) => {
       { new: true }
     ).populate("assignedTo", "name email");
 
-    console.log("updates.assignedTo:", updates.assignedTo);
-    console.log("task.assignedTo:", task.assignedTo);
-    console.log("req.user.userId:", req.user.userId);
-
     // -------------------------
     // BUILD CHANGE LIST
     // -------------------------
@@ -184,6 +181,13 @@ exports.updateTask = async (req, res, next) => {
         `renamed task from "${existingTask.title}" to "${updates.title}"`
       );
     }
+
+    if (
+  updates.description !== undefined &&
+  updates.description !== existingTask.description
+) {
+  changes.push("updated the task description");
+}
 
     if (updates.status && updates.status !== existingTask.status) {
       changes.push(
@@ -244,11 +248,12 @@ if (assigneeChanged) {
     organizationId: req.user.organizationId,
     details: {
       taskTitle: task.title,
-      assignedTo: task.assignedTo?.name,
+      assignedTo: task.assignedTo?.name || null,
+previousAssignee: existingTask.assignedTo || null,
     },
   });
+  
 }
-
 
 // Log other changes separately
 if (changes.length > 0) {
@@ -265,14 +270,21 @@ if (changes.length > 0) {
     },
   });
 }
+const populatedTask = await Task.findOne({
+  _id: task._id,
+  organizationId: req.user.organizationId,
+})
+.populate("assignedTo", "name email")
+.populate("createdBy", "name email")
+.lean();
 
-await pusher.trigger(
-  `board-${task.board}`,
+const response = await pusher.trigger(
+  `board-${populatedTask.board}`,
   "task-updated",
-  task
+  populatedTask
 );
 
-return res.json(task);
+return res.json(populatedTask);
   } catch (err) {
     next(err);
   }

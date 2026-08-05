@@ -3,7 +3,6 @@ const Board = require("../models/Board");
 const Task = require("../models/Task");
 
 exports.getDashboardMetrics = async (req, res, next) => {
-    console.log("🔥 METRICS CONTROLLER HIT");
   try {
 
     const organizationId = req.user.organizationId;

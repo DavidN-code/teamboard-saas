@@ -71,6 +71,20 @@ const [statusFilter, setStatusFilter] = useState("");
 const [priorityFilter, setPriorityFilter] = useState("");
 const [sortBy, setSortBy] = useState("");
 
+useEffect(() => {
+  const handler = (eventName, data) => {
+  };
+
+  pusher.bind_global(handler);
+
+  return () => {
+    pusher.unbind_global(handler);
+  };
+}, []);
+
+useEffect(() => {
+}, [activityRefresh]);
+
   /* ---------------- LOAD TASKS ---------------- */
   useEffect(() => {
     const fetchTasks = async () => {
@@ -94,62 +108,62 @@ const [sortBy, setSortBy] = useState("");
   }, [activeBoard]);
 
   /* ---------------- REAL-TIME TASK UPDATES ---------------- */
-useEffect(() => {
-  if (!activeBoard) return;
-
-  const channel = pusher.subscribe(
-    `board-${activeBoard._id}`
-  );
-
-  channel.bind("task-created", (newTask) => {
-    setTasks((prev) => {
-      const exists = prev.some(
-        (task) => task._id === newTask._id
-      );
+  useEffect(() => {
+    if (!activeBoard) return;
   
-      if (exists) {
-        return prev;
-      }
+    const channelName = `board-${activeBoard._id}`;
   
-      return [...prev, newTask];
+    const channel = pusher.subscribe(channelName);
+
+    channel.bind("task-created", (newTask) => {
+      setTasks((prev) => {
+        const exists = prev.some(
+          (task) => task._id === newTask._id
+        );
+  
+        if (exists) {
+          return prev;
+        }
+  
+        return [...prev, newTask];
+      });
+  
+      setActivityRefresh((prev) => prev + 1);
     });
   
-    setActivityRefresh((prev) => prev + 1);
-  });
-
-  channel.bind("task-updated", (updatedTask) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task._id === updatedTask._id
-          ? updatedTask
-          : task
-      )
-    );
   
-    setActivityRefresh((prev) => prev + 1);
-  });
+    channel.bind("task-updated", (updatedTask) => {
 
-  channel.bind("task-deleted", (data) => {
-    setTasks((prev) =>
-      prev.filter(
-        (task) => task._id !== data.taskId
-      )
-    );
+      setTasks((prev) =>
+        prev.map((task) =>
+          task._id === updatedTask._id
+            ? updatedTask
+            : task
+        )
+      );
   
-    setActivityRefresh((prev) => prev + 1);
-  });
-
-  channel.bind("activity-updated", () => {
-    setActivityRefresh((prev) => prev + 1);
-  });
-
-  return () => {
-    pusher.unsubscribe(
-      `board-${activeBoard._id}`
-    );
-  };
-
-}, [activeBoard]);
+      setActivityRefresh((prev) => prev + 1);
+    });
+  
+  
+    channel.bind("task-deleted", (data) => {
+      setTasks((prev) =>
+        prev.filter(
+          (task) => task._id !== data.taskId
+        )
+      );
+  
+      setActivityRefresh((prev) => prev + 1);
+    });
+  
+    channel.bind("activity-updated", (data) => {
+  
+      setActivityRefresh((prev) => {
+        return prev + 1;
+      });
+    });
+  
+  }, [activeBoard?._id]);
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -244,9 +258,9 @@ useEffect(() => {
       );
       
       setActivityRefresh((prev) => prev + 1);
-      
-      setSelectedTask(res.data);
+
       setIsDetailsModalOpen(false);
+      setSelectedTask(null);
     } catch (err) {
       console.error("Failed to update task", err);
     }
@@ -292,7 +306,6 @@ useEffect(() => {
   };
 
   const handleDragEnd = async (event) => {
-    console.log(localStorage.getItem("token"));
     const { active, over } = event;
 
     setActiveTask(null);
@@ -316,6 +329,9 @@ useEffect(() => {
           t._id === taskId ? { ...t, status: newStatus } : t
         )
       );
+
+      setActivityRefresh((prev) => prev + 1);
+
     } catch (err) {
       console.error("Drag update failed", err);
     }

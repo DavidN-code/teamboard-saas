@@ -2,8 +2,7 @@ const User = require("../models/User");
 
 // GET all users in current organization
 exports.getUsers = async (req, res, next) => {
-  console.log("USER ROUTE HIT");
-console.log("REQ USER:", req.user);
+  
   try {
     const users = await User.find({
       organizationId: req.user.organizationId,

@@ -5,7 +5,6 @@ const { Resend } = require("resend");
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendInvitationEmail = async (email, inviteLink) => {
-  console.log("🔥 sendInvitationEmail CALLED");
 
   try {
     const response = await resend.emails.send({
@@ -48,8 +47,7 @@ const sendInvitationEmail = async (email, inviteLink) => {
       `,
     });
 
-    console.log("✅ Email sent:", response);
-
+    console.log(`✅ Invitation email sent to ${email}`);
     return response;
 
   } catch (error) {

@@ -81,9 +81,6 @@ const AuditLogs = () => {
     fetchData();
   }, [actionFilter, resourceFilter, page]);
 
-  console.log("loading:", loading);
-console.log("logs length:", logs.length);
-
   return (
     <div className="audit-page">
   

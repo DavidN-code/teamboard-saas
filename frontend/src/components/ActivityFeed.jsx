@@ -43,6 +43,25 @@ function formatAction(activity) {
     );
   }
 
+  if (activity.action === "ASSIGN_TASK") {
+    if (!activity.details?.assignedTo) {
+      return (
+        <>
+          {name} unassigned task{" "}
+          <strong>"{activity.details?.taskTitle}"</strong>
+        </>
+      );
+    }
+  
+    return (
+      <>
+        {name} assigned task{" "}
+        <strong>"{activity.details?.taskTitle}"</strong>{" "}
+        to <strong>{activity.details.assignedTo}</strong>
+      </>
+    );
+  }
+
   if (activity.action === "UPDATE_TASK" && changes.length > 0) {
     return (
       <>
@@ -93,8 +112,6 @@ function formatAction(activity) {
     CREATE_TASK: "created",
     DELETE_TASK: "deleted",
 
-    ASSIGN_TASK: "assigned",
-
     CREATE_BOARD: "created a board",
     UPDATE_BOARD: "updated a board",
     DELETE_BOARD: "deleted a board",
@@ -118,16 +135,17 @@ export default function ActivityFeed({ refreshKey }) {
   const [activities, setActivities] = useState([]);
 
   useEffect(() => {
+  
     const loadActivity = async () => {
-
+  
       if (!activeBoard) return;
-
-      const res = await getActivityFeed(activeBoard?._id);
-
+  
+      const res = await getActivityFeed(activeBoard._id);
+  
       setActivities(res.data);
-
+  
     };
-
+  
     loadActivity();
   }, [activeBoard, refreshKey]);
 
@@ -154,21 +172,6 @@ export default function ActivityFeed({ refreshKey }) {
             }}
           >
             {formatAction(activity)}
-
-            {activity.action === "ASSIGN_TASK" &&
-              activity.details?.taskTitle && (
-                <>
-                  {" "}
-                  <strong>"{activity.details.taskTitle}"</strong>
-
-                  {activity.details?.assignedTo && (
-                    <>
-                      {" "}
-                      to <strong>{activity.details.assignedTo}</strong>
-                    </>
-                  )}
-                </>
-              )}
 
             {activity.details?.commentPreview && (
               <div
