@@ -10,17 +10,28 @@ export default function NotificationBell({ onOpenTask }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    loadNotifications();
+    let cancelled = false;
+  
+    const fetchNotifications = async () => {
+      try {
+        const res = await getNotifications();
+  
+        if (!cancelled) {
+          setNotifications(res.data);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error("Failed to load notifications", err);
+        }
+      }
+    };
+  
+    fetchNotifications();
+  
+    return () => {
+      cancelled = true;
+    };
   }, []);
-
-  const loadNotifications = async () => {
-    try {
-      const res = await getNotifications();
-      setNotifications(res.data);
-    } catch (err) {
-      console.error("Failed to load notifications", err);
-    }
-  };
 
   const unreadCount = notifications.filter(
     (n) => !n.read

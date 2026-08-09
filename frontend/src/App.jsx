@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Register from "./pages/Register.jsx";
 import LoginPage from "./pages/Login.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import { useAuth } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard.jsx";
 import AuditLogs from "./pages/AuditLogs.jsx";
 import OrganizationMembers from "./pages/OrganizationMembers.jsx";

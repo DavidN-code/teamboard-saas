@@ -55,10 +55,6 @@ const AuditLogs = () => {
       try {
         setLoading(true);
   
-        // 1. TEST USERS FIRST (debug auth)
-        const usersRes = await api.get("/users");
-  
-        // 2. FETCH AUDIT LOGS
         const res = await api.get("/audit-logs", {
           params: {
             action: actionFilter || undefined,
@@ -70,9 +66,9 @@ const AuditLogs = () => {
   
         setLogs(res.data.logs);
         setTotalPages(res.data.totalPages);
-  
-      } catch (err) {
-        console.error("API ERROR:", err.response?.data || err);
+      } 
+      catch (err) {
+        console.error("Failed to load audit logs:", err.response?.data || err);
       } finally {
         setLoading(false);
       }

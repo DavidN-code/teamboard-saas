@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import CommentList from "../comments/CommentList";
 import CommentForm from "../comments/CommentForm";
 import {
@@ -121,6 +121,8 @@ export default function TaskDetailsModal({
   const { user } = useAuth();
   const canEditTask = user?.role === "owner" || user?.role === "admin";
   const [activityRefresh, setActivityRefresh] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
 
   // Load task fields when a task is opened/changed
 useEffect(() => {
@@ -338,6 +340,30 @@ if (onActivityChange) {
   // Prevent rendering if modal is closed or task data is missing
   if (!isOpen || !task) return null;
 
+  const selectedAssignee = users.find(
+    (member) => member._id === assignedTo
+  );
+
+  const handleSave = async () => {
+    if (savingRef.current) return;
+  
+    savingRef.current = true;
+    setSaving(true);
+  
+    try {
+      await onUpdateTask(task._id, {
+        title,
+        description,
+        status,
+        priority,
+        dueDate,
+        assignedTo,
+      });
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
+    }
+  };
 
   return (
     <div
@@ -368,7 +394,7 @@ if (onActivityChange) {
             marginBottom: "20px",
           }}
         >
-          <h2>{task.title}</h2>
+          <h2>{title}</h2>
 
           <div style={{ fontSize: "14px", color: "#666" }}>
   <div>
@@ -378,7 +404,7 @@ if (onActivityChange) {
 
   <div>
     Assigned to:{" "}
-    {task.assignedTo?.name || "Unassigned"}
+    {selectedAssignee?.name || "Unassigned"}
   </div>
 </div>
 
@@ -550,19 +576,16 @@ if (onActivityChange) {
           </button>
 
           <button
-            onClick={() =>
-              onUpdateTask(task._id, {
-                title,
-                description,
-                status,
-                priority,
-                dueDate,
-                assignedTo,
-              })
-            }
-          >
-            Save Changes
-          </button>
+  type="button"
+  onClick={handleSave}
+  disabled={saving}
+  style={{
+    cursor: saving ? "not-allowed" : "pointer",
+    opacity: saving ? 0.65 : 1,
+  }}
+>
+  {saving ? "Saving..." : "Save Changes"}
+</button>
           </>
 )}
         </div>

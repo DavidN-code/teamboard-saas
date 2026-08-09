@@ -2,8 +2,11 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { formatDate } from "../../utils/formatDate";
 
-export default function TaskCard({ task, onClick }) {
-  const isOverdue =
+export default function TaskCard({
+  task,
+  onClick,
+  dragOverlay = false,
+}) {  const isOverdue =
   task.dueDate &&
   new Date(task.dueDate) < new Date() &&
   task.status !== "done";
@@ -15,13 +18,30 @@ export default function TaskCard({ task, onClick }) {
     transition,
     isDragging,
   } = useSortable({
-    id: task._id,
+    id: dragOverlay
+      ? `overlay-${task._id}`
+      : task._id,
+    disabled: dragOverlay,
   });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
-    transition: transition || "transform 200ms ease",
-    opacity: isDragging ? 0.5 : 1,
+    transform: dragOverlay
+      ? "scale(1.03)"
+      : CSS.Transform.toString(transform),
+  
+    transition: dragOverlay
+      ? "none"
+      : transition || "transform 200ms ease",
+  
+    opacity: dragOverlay
+      ? 1
+      : isDragging
+        ? 0.2
+        : 1,
+  
+    boxShadow: dragOverlay
+      ? "0 14px 30px rgba(0,0,0,0.18)"
+      : "0 2px 6px rgba(0,0,0,0.06)",
   };
 
   const handleClick = (e) => {
@@ -30,20 +50,39 @@ export default function TaskCard({ task, onClick }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style}>
+    <div
+  ref={dragOverlay ? null : setNodeRef}
+  style={{
+    ...style,
+    background: "#fff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "10px",
+    padding: "14px",
+    marginBottom: "12px",
+  }}
+>
       
       {/* Drag handle ONLY */}
       <div
-        {...attributes}
-        {...listeners}
-        style={{ cursor: "grab", paddingBottom: "6px" }}
-      >
-        ☰
-      </div>
+  {...(!dragOverlay ? attributes : {})}
+  {...(!dragOverlay ? listeners : {})}
+  style={{
+    cursor: dragOverlay ? "grabbing" : "grab",
+    paddingBottom: "10px",
+    color: "#9ca3af",
+    fontSize: "18px",
+  }}
+>
+  ☰
+</div>
 
       {/* Click area */}
-      <div onClick={handleClick}>
-
+      <div
+  onClick={handleClick}
+  style={{
+    cursor: "pointer",
+  }}
+>
   <div
     style={{
       marginBottom: "6px",
@@ -57,7 +96,16 @@ export default function TaskCard({ task, onClick }) {
     {!task.priority && "🟡 Medium"}
   </div>
 
-  <strong>{task.title}</strong>
+  <div
+  style={{
+    fontSize: "17px",
+    fontWeight: "700",
+    color: "#111827",
+    lineHeight: "1.3",
+  }}
+>
+  {task.title}
+</div>
 
         <p style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>
   {task.description || "No description"}

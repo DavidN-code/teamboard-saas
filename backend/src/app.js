@@ -40,6 +40,12 @@ app.use(
 
 app.use(express.json());
 
+// Health check
+app.get("/api/health", (req, res) => {
+  res.json({ status: "OK" });
+});
+
+// General API rate limiting
 app.use("/api", apiLimiter);
 
 // Routes
@@ -54,15 +60,7 @@ app.use("/api/metrics/dashboard", metricsRoutes);
 app.use("/api/invitations", invitationRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-
-// Health check route
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK' });
-});
-
-
 app.use(errorMiddleware);
-
 
 module.exports = app;
 

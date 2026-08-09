@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Sidebar from "../components/layout/Sidebar";
@@ -18,7 +18,7 @@ import pusher from "../services/pusher";
 
 import {
   DndContext,
-  closestCenter,
+  pointerWithin,
   useDroppable,
   DragOverlay,
 } from "@dnd-kit/core";
@@ -33,9 +33,65 @@ function Column({ id, title, children }) {
   const { setNodeRef } = useDroppable({ id });
 
   return (
-    <div ref={setNodeRef}>
-      <h4>{title}</h4>
+    <div
+      ref={setNodeRef}
+      style={{
+        background: "#f8fafc",
+        border: "1px solid #e5e7eb",
+        borderRadius: "12px",
+        padding: "16px",
+        minHeight: "500px",
+      }}
+    >
+      <h3
+        style={{
+          marginTop: 0,
+          marginBottom: "16px",
+          fontSize: "18px",
+          fontWeight: "600",
+          color: "#374151",
+        }}
+      >
+        {title}
+      </h3>
+
       {children}
+    </div>
+  );
+}
+
+function MetricCard({ label, value }) {
+  return (
+    <div
+      style={{
+        background: "#fff",
+        border: "1px solid #e5e7eb",
+        borderRadius: "12px",
+        padding: "16px",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+      }}
+    >
+      <h4
+        style={{
+          margin: 0,
+          fontSize: "14px",
+          fontWeight: "500",
+          color: "#6b7280",
+        }}
+      >
+        {label}
+      </h4>
+
+      <p
+        style={{
+          margin: "8px 0 0",
+          fontSize: "28px",
+          fontWeight: "700",
+          color: "#111827",
+        }}
+      >
+        {value}
+      </p>
     </div>
   );
 }
@@ -56,34 +112,14 @@ export default function Dashboard() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const [activeTask, setActiveTask] = useState(null);
+  const dragOriginStatus = useRef(null);
+  const dragCurrentStatus = useRef(null);
   const [metrics, setMetrics] = useState(null);
-
-  const metricCardStyle = {
-    background: "#fff",
-    border: "1px solid #e5e7eb",
-    borderRadius: "12px",
-    padding: "16px",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-  };
 
   const [searchTerm, setSearchTerm] = useState("");
 const [statusFilter, setStatusFilter] = useState("");
 const [priorityFilter, setPriorityFilter] = useState("");
 const [sortBy, setSortBy] = useState("");
-
-useEffect(() => {
-  const handler = (eventName, data) => {
-  };
-
-  pusher.bind_global(handler);
-
-  return () => {
-    pusher.unbind_global(handler);
-  };
-}, []);
-
-useEffect(() => {
-}, [activityRefresh]);
 
   /* ---------------- LOAD TASKS ---------------- */
   useEffect(() => {
@@ -152,15 +188,21 @@ useEffect(() => {
           (task) => task._id !== data.taskId
         )
       );
-  
+    
+      setSelectedTask((currentTask) => {
+        if (currentTask?._id === data.taskId) {
+          setIsDetailsModalOpen(false);
+          return null;
+        }
+    
+        return currentTask;
+      });
+    
       setActivityRefresh((prev) => prev + 1);
     });
   
-    channel.bind("activity-updated", (data) => {
-  
-      setActivityRefresh((prev) => {
-        return prev + 1;
-      });
+    channel.bind("activity-updated", () => {
+      setActivityRefresh((prev) => prev + 1);
     });
   
   }, [activeBoard?._id]);
@@ -302,39 +344,124 @@ useEffect(() => {
   /* ---------------- DRAG ---------------- */
   const handleDragStart = (event) => {
     const task = tasks.find((t) => t._id === event.active.id);
+  
+    if (!task) return;
+  
+    dragOriginStatus.current = task.status;
+    dragCurrentStatus.current = task.status;
+
     setActiveTask(task);
   };
 
-  const handleDragEnd = async (event) => {
-    const { active, over } = event;
+  const handleDragOver = (event) => {
+  const { active, over } = event;
 
-    setActiveTask(null);
+  if (!over) return;
 
-    if (!over) return;
+  const taskId = active.id;
+  const overId = over.id;
 
-    const taskId = active.id;
-    const newStatus = over.id;
+  const validColumns = ["todo", "in-progress", "done"];
 
-    // only allow column drops
-    const validColumns = ["todo", "in-progress", "done"];
-    if (!validColumns.includes(newStatus)) return;
+  setTasks((prev) => {
+    let newStatus;
 
-    try {
-      await api.put(`/tasks/${taskId}`, {
-        status: newStatus,
-      });
-
-      setTasks((prev) =>
-        prev.map((t) =>
-          t._id === taskId ? { ...t, status: newStatus } : t
-        )
+    if (validColumns.includes(overId)) {
+      newStatus = overId;
+    } else {
+      const taskUnderPointer = prev.find(
+        (task) => task._id === overId
       );
 
-      setActivityRefresh((prev) => prev + 1);
-
-    } catch (err) {
-      console.error("Drag update failed", err);
+      newStatus = taskUnderPointer?.status;
     }
+
+    if (!newStatus) return prev;
+
+    const draggedTask = prev.find(
+      (task) => task._id === taskId
+    );
+
+    if (!draggedTask) return prev;
+
+    dragCurrentStatus.current = newStatus;
+
+    if (draggedTask.status === newStatus) {
+      return prev;
+    }
+
+    return prev.map((task) =>
+      task._id === taskId
+        ? { ...task, status: newStatus }
+        : task
+    );
+  });
+};
+
+  const handleDragEnd = async (event) => {
+  const { active, over } = event;
+
+  const taskId = active.id;
+  const originalStatus = dragOriginStatus.current;
+  const newStatus = dragCurrentStatus.current;
+
+  setActiveTask(null);
+
+  dragOriginStatus.current = null;
+  dragCurrentStatus.current = null;
+
+  if (!over) {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task._id === taskId
+          ? { ...task, status: originalStatus }
+          : task
+      )
+    );
+
+    return;
+  }
+
+  if (!newStatus || newStatus === originalStatus) {
+    return;
+  }
+
+  try {
+    await api.put(`/tasks/${taskId}`, {
+      status: newStatus,
+    });
+
+    setActivityRefresh((prev) => prev + 1);
+  } catch (err) {
+    console.error("Drag update failed", err);
+
+    setTasks((prev) =>
+      prev.map((task) =>
+        task._id === taskId
+          ? { ...task, status: originalStatus }
+          : task
+      )
+    );
+  }
+};
+
+  const handleDragCancel = () => {
+    if (activeTask && dragOriginStatus.current) {
+      const taskId = activeTask._id;
+      const originalStatus = dragOriginStatus.current;
+  
+      setTasks((prev) =>
+        prev.map((task) =>
+          task._id === taskId
+            ? { ...task, status: originalStatus }
+            : task
+        )
+      );
+    }
+  
+    setActiveTask(null);
+    dragOriginStatus.current = null;
+      dragCurrentStatus.current = null;
   };
 
  /* ---------------- FILTERED KANBAN COLUMNS ---------------- */
@@ -403,128 +530,178 @@ const doneTasks = filteredTasks.filter(
   }}
 >
     
-    <div style={metricCardStyle}>
-    <h4
-  style={{
-    margin: 0,
-    fontSize: "14px",
-    color: "#6b7280",
-  }}
->
-  Users
-</h4>
-
-<p
-  style={{
-    margin: "8px 0 0",
-    fontSize: "28px",
-    fontWeight: "bold",
-  }}
->
-  {metrics.users}
-</p>
-    </div>
-
-    <div style={metricCardStyle}>
-      <h4>Boards</h4>
-      <p>{metrics.boards}</p>
-    </div>
-
-    <div style={metricCardStyle}>
-      <h4>Tasks</h4>
-      <p>{metrics.tasks}</p>
-    </div>
-
-    <div style={metricCardStyle}>
-      <h4>Todo</h4>
-      <p>{metrics.todo}</p>
-    </div>
-
-    <div style={metricCardStyle}>
-      <h4>In Progress</h4>
-      <p>{metrics.inProgress}</p>
-    </div>
-
-    <div style={metricCardStyle}>
-      <h4>Done</h4>
-      <p>{metrics.done}</p>
-    </div>
+<MetricCard label="Users" value={metrics.users} />
+<MetricCard label="Boards" value={metrics.boards} />
+<MetricCard label="Tasks" value={metrics.tasks} />
+<MetricCard label="Todo" value={metrics.todo} />
+<MetricCard label="In Progress" value={metrics.inProgress} />
+<MetricCard label="Done" value={metrics.done} />
 
   </div>
 )}
 
-
         {/* TASK CONTROLS */}
-        <div style={{ marginTop: "20px" }}>
-        
-          <h3>Tasks</h3>
-          
-
-          {activeBoard && user && ["owner", "admin"].includes(user.role) && (
-  <button onClick={() => setIsTaskModalOpen(true)}>
-    + New Task
-  </button>
-)}
-
-          {loadingTasks && <p>Loading...</p>}
-          {taskError && <p style={{ color: "red" }}>{taskError}</p>}
-        </div>
-
-        <div
-  style={{
-    display: "flex",
-    gap: "10px",
-    marginBottom: "20px",
-  }}
->
-  <input
-    type="text"
-    placeholder="Search tasks..."
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
+<section style={{ marginTop: "28px", marginBottom: "20px" }}>
+  <div
     style={{
-      padding: "10px",
-      flex: 1,
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      marginBottom: "16px",
     }}
-  />
-
-  <select
-    value={statusFilter}
-    onChange={(e) => setStatusFilter(e.target.value)}
   >
-    <option value="">All Statuses</option>
-    <option value="todo">Todo</option>
-    <option value="in-progress">In Progress</option>
-    <option value="done">Done</option>
-  </select>
+    <h2
+      style={{
+        margin: 0,
+        fontSize: "22px",
+        color: "#111827",
+      }}
+    >
+      Tasks
+    </h2>
 
-  <select
-    value={priorityFilter}
-    onChange={(e) => setPriorityFilter(e.target.value)}
+    {activeBoard && (
+      <span
+        style={{
+          fontSize: "16px",
+          color: "#6b7280",
+        }}
+      >
+        — {activeBoard.name}
+      </span>
+    )}
+  </div>
+
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      flexWrap: "wrap",
+      gap: "12px",
+      padding: "14px",
+      background: "#fff",
+      border: "1px solid #e5e7eb",
+      borderRadius: "12px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+    }}
   >
-    <option value="">All Priorities</option>
-    <option value="high">High</option>
-    <option value="medium">Medium</option>
-    <option value="low">Low</option>
-  </select>
-</div>
+    <input
+      type="search"
+      placeholder="Search tasks..."
+      aria-label="Search tasks"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      style={{
+        flex: "1 1 260px",
+        minWidth: 0,
+        padding: "10px 12px",
+        border: "1px solid #d1d5db",
+        borderRadius: "8px",
+        fontSize: "14px",
+        outline: "none",
+      }}
+    />
 
-<select
-  value={sortBy}
-  onChange={(e) => setSortBy(e.target.value)}
->
-  <option value="">No Sorting</option>
-  <option value="priority">Priority</option>
-  <option value="dueDate">Due Date</option>
-  <option value="createdAt">Newest Created</option>
-</select>
+    <select
+      aria-label="Sort tasks"
+      value={sortBy}
+      onChange={(e) => setSortBy(e.target.value)}
+      style={{
+        padding: "10px 12px",
+        border: "1px solid #d1d5db",
+        borderRadius: "8px",
+        background: "#fff",
+        fontSize: "14px",
+        cursor: "pointer",
+      }}
+    >
+      <option value="">No Sorting</option>
+      <option value="priority">Priority</option>
+      <option value="dueDate">Due Date</option>
+      <option value="createdAt">Newest Created</option>
+    </select>
+
+    <select
+      aria-label="Filter tasks by status"
+      value={statusFilter}
+      onChange={(e) => setStatusFilter(e.target.value)}
+      style={{
+        padding: "10px 12px",
+        border: "1px solid #d1d5db",
+        borderRadius: "8px",
+        background: "#fff",
+        fontSize: "14px",
+        cursor: "pointer",
+      }}
+    >
+      <option value="">All Statuses</option>
+      <option value="todo">Todo</option>
+      <option value="in-progress">In Progress</option>
+      <option value="done">Done</option>
+    </select>
+
+    <select
+      aria-label="Filter tasks by priority"
+      value={priorityFilter}
+      onChange={(e) => setPriorityFilter(e.target.value)}
+      style={{
+        padding: "10px 12px",
+        border: "1px solid #d1d5db",
+        borderRadius: "8px",
+        background: "#fff",
+        fontSize: "14px",
+        cursor: "pointer",
+      }}
+    >
+      <option value="">All Priorities</option>
+      <option value="high">High</option>
+      <option value="medium">Medium</option>
+      <option value="low">Low</option>
+    </select>
+
+    {activeBoard &&
+      user &&
+      ["owner", "admin"].includes(user.role) && (
+        <button
+          type="button"
+          onClick={() => setIsTaskModalOpen(true)}
+          style={{
+            border: "none",
+            borderRadius: "8px",
+            padding: "10px 16px",
+            background: "#2563eb",
+            color: "#fff",
+            fontWeight: "600",
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+          }}
+        >
+          + New Task
+        </button>
+      )}
+  </div>
+
+  {loadingTasks && (
+    <p style={{ color: "#6b7280", marginTop: "12px" }}>
+      Loading tasks...
+    </p>
+  )}
+
+  {taskError && (
+    <p style={{ color: "#dc2626", marginTop: "12px" }}>
+      {taskError}
+    </p>
+  )}
+</section>
 
         {/* DND */}
         <DndContext
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
+  collisionDetection={pointerWithin}
+  onDragStart={handleDragStart}
+  onDragOver={handleDragOver}
+  onDragEnd={handleDragEnd}
+  onDragCancel={handleDragCancel}
+>
           {/* SINGLE SORTABLE CONTEXT (IMPORTANT FIX) */}
           <SortableContext
   items={filteredTasks.map((t) => t._id)}
@@ -538,7 +715,7 @@ const doneTasks = filteredTasks.filter(
                 marginTop: "20px",
               }}
             >
-              <Column id="todo" title="Todo">
+              <Column id="todo" title={`Todo (${todoTasks.length})`}>
                 {todoTasks.map((task) => (
                   <TaskCard
                     key={task._id}
@@ -551,7 +728,10 @@ const doneTasks = filteredTasks.filter(
                 ))}
               </Column>
 
-              <Column id="in-progress" title="In Progress">
+              <Column
+  id="in-progress"
+  title={`In Progress (${inProgressTasks.length})`}
+>
                 {inProgressTasks.map((task) => (
                   <TaskCard
                     key={task._id}
@@ -565,7 +745,7 @@ const doneTasks = filteredTasks.filter(
                 ))}
               </Column>
 
-              <Column id="done" title="Done">
+              <Column id="done" title={`Done (${doneTasks.length})`}>
                 {doneTasks.map((task) => (
                   <TaskCard
                     key={task._id}
@@ -582,21 +762,13 @@ const doneTasks = filteredTasks.filter(
 
           {/* DRAG PREVIEW */}
           <DragOverlay>
-            {activeTask ? (
-              <div
-                style={{
-                  padding: "12px",
-                  background: "white",
-                  border: "1px solid #ddd",
-                  borderRadius: "8px",
-                  boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
-                }}
-              >
-                <strong>{activeTask.title}</strong>
-                <p>{activeTask.description}</p>
-              </div>
-            ) : null}
-          </DragOverlay>
+  {activeTask ? (
+    <TaskCard
+      task={activeTask}
+      dragOverlay
+    />
+  ) : null}
+</DragOverlay>
         </DndContext>
 
         <ActivityFeed refreshKey={activityRefresh} />

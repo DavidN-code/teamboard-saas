@@ -1,39 +1,51 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function CommentForm({ onCreate }) {
   const [content, setContent] = useState("");
 
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
+  const [submitting, setSubmitting] = useState(false);
+const submittingRef = useRef(false);
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (submittingRef.current) return;
+
+  setError("");
+
+  const trimmedContent = content.trim();
+
+  if (!trimmedContent) {
+    setError("Comment cannot be empty.");
+    return;
+  }
+
+  if (trimmedContent.length > 1000) {
+    setError("Comment cannot exceed 1000 characters.");
+    return;
+  }
+
+  submittingRef.current = true;
+  setSubmitting(true);
+
+  try {
+    await onCreate(trimmedContent);
+
+    setContent("");
     setError("");
-  
-    if (!content.trim()) {
-      setError("Comment cannot be empty.");
-      return;
-    }
-  
-    if (content.length > 1000) {
-      setError("Comment cannot exceed 1000 characters.");
-      return;
-    }
-  
-    try {
-      await onCreate(content);
-  
-      setContent("");
-      setError("");
-  
-    } catch (err) {
-      setError(
-        err.response?.data?.errors?.[0]?.msg ||
+  } catch (err) {
+    setError(
+      err.response?.data?.errors?.[0]?.msg ||
         err.response?.data?.message ||
         "Unable to add comment."
-      );
-    }
-  };
+    );
+  } finally {
+    submittingRef.current = false;
+    setSubmitting(false);
+  }
+};
 
   return (
     <form onSubmit={handleSubmit}>
@@ -68,17 +80,19 @@ export default function CommentForm({ onCreate }) {
 
 <button
   type="submit"
+  disabled={submitting}
   style={{
-    background: "#2563eb",
+    background: submitting ? "#93c5fd" : "#2563eb",
     color: "white",
     border: "none",
     padding: "8px 16px",
     borderRadius: "6px",
-    cursor: "pointer",
+    cursor: submitting ? "not-allowed" : "pointer",
     fontWeight: "600",
+    opacity: submitting ? 0.75 : 1,
   }}
 >
-  Add Comment
+  {submitting ? "Adding..." : "Add Comment"}
 </button>
     </form>
   );

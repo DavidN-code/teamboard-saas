@@ -1,6 +1,7 @@
 const Board = require('../models/Board');
 const mongoose = require('mongoose');
 const createAuditLog = require("../services/auditLogService");
+const pusher = require("../services/pusherService");
 
 // GET all boards for the user's organization
 exports.getBoards = async (req, res, next) => {
@@ -44,6 +45,11 @@ exports.createBoard = async (req, res, next) => {
       createdBy: req.user.userId,
     });
     res.status(201).json(board);
+    await pusher.trigger(
+      `organization-${req.user.organizationId}`,
+      "board-created",
+      board
+    );
     await createAuditLog({
       action: "CREATE_BOARD",
       resourceType: "Board",
@@ -64,12 +70,16 @@ exports.updateBoard = async (req, res, next) => {
     const board = await Board.findOneAndUpdate(
       { _id: req.params.id, organizationId: req.user.organizationId },
       { name },
-      { new: true }
-    );
+      { returnDocument: "after" }    );
 
     if (!board) return res.status(404).json({ message: 'Board not found' });
 
     res.json(board);
+    await pusher.trigger(
+      `organization-${req.user.organizationId}`,
+      "board-created",
+      board
+    );
     await createAuditLog({
       action: "UPDATE_BOARD",
       resourceType: "Board",
@@ -93,6 +103,13 @@ exports.deleteBoard = async (req, res, next) => {
     if (!board) return res.status(404).json({ message: 'Board not found' });
 
     res.json({ message: 'Board deleted successfully' });
+    await pusher.trigger(
+      `organization-${req.user.organizationId}`,
+      "board-deleted",
+      {
+        _id: board._id,
+      }
+    );
     await createAuditLog({
       action: "DELETE_BOARD",
       resourceType: "Board",

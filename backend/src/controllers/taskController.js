@@ -156,10 +156,17 @@ exports.updateTask = async (req, res, next) => {
       return res.status(404).json({ message: "Task not found" });
     }
     
-    const assigneeChanged =
+    const incomingAssigneeId = updates.assignedTo
+  ? updates.assignedTo.toString()
+  : null;
+
+const existingAssigneeId = existingTask.assignedTo
+  ? existingTask.assignedTo.toString()
+  : null;
+
+const assigneeChanged =
   updates.assignedTo !== undefined &&
-  updates.assignedTo?.toString() !==
-    (existingTask.assignedTo?.toString() || "");
+  incomingAssigneeId !== existingAssigneeId;
 
     // update task
     let task = await Task.findOneAndUpdate(
@@ -168,7 +175,7 @@ exports.updateTask = async (req, res, next) => {
         organizationId: req.user.organizationId,
       },
       updates,
-      { new: true }
+      { returnDocument: "after" }
     ).populate("assignedTo", "name email");
 
     // -------------------------

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 
 export default function CommentItem({
@@ -11,25 +11,45 @@ export default function CommentItem({
   const [editing, setEditing] = useState(false);
   const [content, setContent] = useState(comment.content);
 
+  const [savingEdit, setSavingEdit] = useState(false);
+const savingEditRef = useRef(false);
+
+  useEffect(() => {
+    if (!editing) {
+      setContent(comment.content);
+    }
+  }, [comment.content, editing]);
+
   const [error, setError] = useState("");
   
   const saveEdit = async () => {
+    if (savingEditRef.current) return;
+  
     setError("");
   
-    if (!content.trim()) {
+    const trimmedContent = content.trim();
+  
+    if (!trimmedContent) {
       setError("Comment cannot be empty.");
       return;
     }
   
+    savingEditRef.current = true;
+    setSavingEdit(true);
+  
     try {
-      await onUpdate(comment._id, content);
+      await onUpdate(comment._id, trimmedContent);
+      setContent(trimmedContent);
       setEditing(false);
     } catch (err) {
       setError(
         err.response?.data?.errors?.[0]?.msg ||
-        err.response?.data?.message ||
-        "Unable to update comment."
+          err.response?.data?.message ||
+          "Unable to update comment."
       );
+    } finally {
+      savingEditRef.current = false;
+      setSavingEdit(false);
     }
   };
 
@@ -91,9 +111,17 @@ export default function CommentItem({
       {canModifyComment && (
   <>
         {editing ? (
-          <button onClick={saveEdit}>
-            Save
-          </button>
+          <button
+          type="button"
+          onClick={saveEdit}
+          disabled={savingEdit}
+          style={{
+            cursor: savingEdit ? "not-allowed" : "pointer",
+            opacity: savingEdit ? 0.65 : 1,
+          }}
+        >
+          {savingEdit ? "Saving..." : "Save"}
+        </button>
         ) : (
           
           <button
