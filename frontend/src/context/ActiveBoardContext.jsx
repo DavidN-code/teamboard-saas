@@ -1,7 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { useAuth } from "./AuthContext";
-
-const ActiveBoardContext = createContext();
+import { useEffect, useState } from "react";
+import { useAuth } from "./useAuth";
+import { ActiveBoardContext } from "./activeBoardContext";
 
 export function ActiveBoardProvider({ children }) {
   const { user } = useAuth();
@@ -10,22 +9,20 @@ export function ActiveBoardProvider({ children }) {
   const [boardInitialized, setBoardInitialized] = useState(false);
 
   useEffect(() => {
-    if (!user?.id) {
-      setActiveBoard(null);
-      setBoardInitialized(false);
-      return;
-    }
-
+    if (!user?.id) return;
+  
     const savedBoard = localStorage.getItem(
       `activeBoard_${user.id}`
     );
-
-    if (savedBoard) {
-      setActiveBoard(JSON.parse(savedBoard));
-    }
-
-    setBoardInitialized(true);
-
+  
+    const parsedBoard = savedBoard
+      ? JSON.parse(savedBoard)
+      : null;
+  
+    queueMicrotask(() => {
+      setActiveBoard(parsedBoard);
+      setBoardInitialized(true);
+    });
   }, [user]);
 
 
@@ -51,9 +48,4 @@ export function ActiveBoardProvider({ children }) {
       {children}
     </ActiveBoardContext.Provider>
   );
-}
-
-
-export function useActiveBoard() {
-  return useContext(ActiveBoardContext);
 }

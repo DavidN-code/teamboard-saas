@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Sidebar from "../components/layout/Sidebar";
-import { useActiveBoard } from "../context/ActiveBoardContext";
-import { useAuth } from "../context/AuthContext";
+import { useActiveBoard } from "../context/useActiveBoard";
+import { useAuth } from "../context/useAuth";
 import api from "../api/axios";
 
 import TaskModal from "../components/tasks/TaskModal";
@@ -99,6 +99,7 @@ function MetricCard({ label, value }) {
 /* ---------------- DASHBOARD ---------------- */
 export default function Dashboard() {
   const { activeBoard } = useActiveBoard();
+  const activeBoardId = activeBoard?._id;
   const { logout, user } = useAuth();
   const navigate = useNavigate();
 
@@ -145,10 +146,9 @@ const [sortBy, setSortBy] = useState("");
 
   /* ---------------- REAL-TIME TASK UPDATES ---------------- */
   useEffect(() => {
-    if (!activeBoard) return;
+    if (!activeBoardId) return;
   
-    const channelName = `board-${activeBoard._id}`;
-  
+    const channelName = `board-${activeBoardId}`;
     const channel = pusher.subscribe(channelName);
 
     channel.bind("task-created", (newTask) => {
@@ -205,7 +205,7 @@ const [sortBy, setSortBy] = useState("");
       setActivityRefresh((prev) => prev + 1);
     });
   
-  }, [activeBoard?._id]);
+  }, [activeBoardId]);
 
   useEffect(() => {
     const fetchMetrics = async () => {

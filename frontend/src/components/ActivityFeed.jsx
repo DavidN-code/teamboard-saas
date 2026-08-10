@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getActivityFeed } from "../api/activityFeed";
-import { useActiveBoard } from "../context/ActiveBoardContext";
+import { useActiveBoard } from "../context/useActiveBoard";
 
 function formatAction(activity) {
   const name = activity.userId?.name || "Unknown User";

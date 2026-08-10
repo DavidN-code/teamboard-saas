@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useCallback, useRef, useEffect, useState } from "react";
 import CommentList from "../comments/CommentList";
 import CommentForm from "../comments/CommentForm";
 import {
@@ -10,7 +10,7 @@ import {
 import { getUsers } from "../../api/users";
 import { getTaskActivity } from "../../api/auditLogs";
 
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 
 import pusher from "../../services/pusher";
 
@@ -180,14 +180,17 @@ useEffect(() => {
 
 }, [task, activityRefresh]);
 
-useEffect(() => {
-  if (!task) return;
+const taskId = task?._id;
+const boardId = task?.board;
 
-  const channelName = `board-${task.board}`;
+useEffect(() => {
+  if (!taskId || !boardId) return;
+
+  const channelName = `board-${boardId}`;
   const channel = pusher.subscribe(channelName);
 
   const handleTaskUpdated = (updatedTask) => {
-    if (updatedTask._id !== task._id) {
+    if (updatedTask._id !== taskId) {
       return;
     }
 
@@ -212,13 +215,15 @@ useEffect(() => {
   return () => {
     channel.unbind("task-updated", handleTaskUpdated);
   };
-}, [task?._id, task?.board]);
+}, [taskId, boardId]);
 
   // ✅ safe render check AFTER hooks
-  const refreshActivity = async () => {
-    const res = await getTaskActivity(task._id);
+  const refreshActivity = useCallback(async () => {
+    if (!taskId) return;
+  
+    const res = await getTaskActivity(taskId);
     setActivity(res.data);
-  };
+  }, [taskId]);
   
   
   const handleCreateComment = async (content) => {
@@ -273,10 +278,10 @@ if (onActivityChange) {
   };
 
   useEffect(() => {
-    if (!task) return;
+    if (!taskId) return;
   
     const channel = pusher.subscribe(
-      `task-${task._id}`
+      `task-${taskId}`
     );
   
     // -------------------------
@@ -335,8 +340,7 @@ if (onActivityChange) {
       channel.unbind_all();
     };
   
-  }, [task]);
-
+  }, [taskId, refreshActivity]);
   // Prevent rendering if modal is closed or task data is missing
   if (!isOpen || !task) return null;
 

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 import pusher from "../../services/pusher";
 import api from "../../api/axios";
-import { useActiveBoard } from "../../context/ActiveBoardContext";
+import { useActiveBoard } from "../../context/useActiveBoard";
 import { Link } from "react-router-dom";
 
 export default function Sidebar() {
@@ -48,9 +48,12 @@ export default function Sidebar() {
     }
   };
 
-  useEffect(() => {
-    fetchBoards();
-  }, []);
+  // Initial board hydration only.
+// Making fetchBoards reactive causes repeated requests because it can update activeBoard.
+useEffect(() => {
+  fetchBoards();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   useEffect(() => {
     if (!user?.organizationId) return;
