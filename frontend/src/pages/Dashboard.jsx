@@ -98,7 +98,7 @@ function MetricCard({ label, value }) {
 
 /* ---------------- DASHBOARD ---------------- */
 export default function Dashboard() {
-  const { activeBoard } = useActiveBoard();
+  const { activeBoard, setActiveBoard } = useActiveBoard();
   const activeBoardId = activeBoard?._id;
   const { logout, user } = useAuth();
   const navigate = useNavigate();
@@ -331,13 +331,32 @@ const [sortBy, setSortBy] = useState("");
 
   const handleOpenNotificationTask = async (taskId) => {
     try {
-      const res = await api.get(`/tasks/${taskId}`);
+      const taskRes = await api.get(`/tasks/${taskId}`);
+      const task = taskRes.data;
   
-      setSelectedTask(res.data);
+      const taskBoardId =
+        typeof task.board === "object"
+          ? task.board._id
+          : task.board;
+  
+      if (
+        taskBoardId &&
+        taskBoardId !== activeBoard?._id
+      ) {
+        const boardRes = await api.get(
+          `/boards/${taskBoardId}`
+        );
+  
+        setActiveBoard(boardRes.data);
+      }
+  
+      setSelectedTask(task);
       setIsDetailsModalOpen(true);
-  
     } catch (err) {
-      console.error("Failed to open task from notification", err);
+      console.error(
+        "Failed to open task from notification",
+        err
+      );
     }
   };
 
