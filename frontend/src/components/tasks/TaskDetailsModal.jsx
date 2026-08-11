@@ -371,153 +371,329 @@ if (onActivityChange) {
 
   return (
     <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.5)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-start",
-        paddingTop: "40px",
-      }}
-    >
-      <div
   style={{
-    background: "white",
-    padding: "24px",
-    borderRadius: "8px",
-    width: "500px",
-    maxHeight: "80vh",
-    overflowY: "auto",
+    position: "fixed",
+    inset: 0,
+    background: "rgba(15, 23, 42, 0.55)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "32px 20px",
+    zIndex: 1000,
   }}
 >
+  <div
+    style={{
+      background: "#ffffff",
+      width: "100%",
+      maxWidth: "720px",
+      maxHeight: "90vh",
+      overflowY: "auto",
+      borderRadius: "14px",
+      boxShadow: "0 24px 60px rgba(0, 0, 0, 0.22)",
+      padding: "28px 32px 32px",
+      boxSizing: "border-box",
+    }}
+  >
         <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: "20px",
-          }}
-        >
-          <h2>{title}</h2>
-
-          <div style={{ fontSize: "14px", color: "#666" }}>
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: "24px",
+    paddingBottom: "20px",
+    marginBottom: "24px",
+    borderBottom: "1px solid #e5e7eb",
+  }}
+>
   <div>
-    Created by:{" "}
-    {task.createdBy?.name || "Unknown"}
+    <h2
+      style={{
+        margin: "0 0 8px",
+        fontSize: "24px",
+        lineHeight: 1.25,
+        color: "#111827",
+      }}
+    >
+      {title || "Untitled Task"}
+    </h2>
+
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "8px 20px",
+        fontSize: "14px",
+        color: "#6b7280",
+      }}
+    >
+      <span>
+        Created by{" "}
+        <strong style={{ color: "#374151" }}>
+          {task.createdBy?.name || "Unknown"}
+        </strong>
+      </span>
+
+      <span>
+        Assigned to{" "}
+        <strong style={{ color: "#374151" }}>
+          {selectedAssignee?.name || "Unassigned"}
+        </strong>
+      </span>
+    </div>
   </div>
 
-  <div>
-    Assigned to:{" "}
-    {selectedAssignee?.name || "Unassigned"}
-  </div>
+  <button
+    type="button"
+    onClick={onClose}
+    aria-label="Close task details"
+    style={{
+      flexShrink: 0,
+      width: "36px",
+      height: "36px",
+      border: "none",
+      borderRadius: "8px",
+      background: "#f3f4f6",
+      color: "#374151",
+      fontSize: "20px",
+      lineHeight: 1,
+      cursor: "pointer",
+    }}
+  >
+    ×
+  </button>
 </div>
-
-          <button onClick={onClose}>X</button>
-        </div>
 
         {/* TITLE */}
-        <div style={{ marginBottom: "16px" }}>
-          <strong>Title</strong>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            disabled={!canEditTask}
-            style={{ width: "100%", padding: "10px", marginTop: "6px" }}
-          />
-        </div>
-
-        {/* STATUS */}
-        <div style={{ marginBottom: "16px" }}>
-          <strong>Status</strong>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            disabled={!canEditTask}
-            style={{ width: "100%", padding: "10px", marginTop: "6px" }}
-          >
-            <option value="todo">Todo</option>
-            <option value="in-progress">In Progress</option>
-            <option value="done">Done</option>
-          </select>
-        </div>
-
-        <div style={{ marginBottom: "16px" }}>
-  <strong>Assigned To</strong>
-
-  <select
-    value={assignedTo}
-    onChange={(e) => setAssignedTo(e.target.value)}
-    disabled={!canEditTask}
+<div style={{ marginBottom: "20px" }}>
+  <label
     style={{
-      width: "100%",
-      padding: "10px",
-      marginTop: "6px",
+      display: "block",
+      marginBottom: "7px",
+      fontSize: "14px",
+      fontWeight: "600",
+      color: "#374151",
     }}
   >
-    <option value="">Unassigned</option>
-
-    {users.map((user) => (
-      <option
-        key={user._id}
-        value={user._id}
-      >
-        {user.name}
-      </option>
-    ))}
-  </select>
-</div>
-
-{/* PRIORITY */}
-<div style={{ marginBottom: "16px" }}>
-  <strong>Priority</strong>
-
-  <select
-    value={priority}
-    onChange={(e) => setPriority(e.target.value)}
-    disabled={!canEditTask}
-    style={{
-      width: "100%",
-      padding: "10px",
-      marginTop: "6px",
-    }}
-  >
-    <option value="low">Low</option>
-    <option value="medium">Medium</option>
-    <option value="high">High</option>
-  </select>
-</div>
-
-<div style={{ marginBottom: "16px" }}>
-  <strong>Due Date</strong>
+    Title
+  </label>
 
   <input
-    type="date"
-    value={dueDate}
-    onChange={(e) => setDueDate(e.target.value)}
+    value={title}
+    onChange={(e) => setTitle(e.target.value)}
     disabled={!canEditTask}
     style={{
       width: "100%",
-      padding: "10px",
-      marginTop: "6px",
+      boxSizing: "border-box",
+      padding: "11px 12px",
+      border: "1px solid #d1d5db",
+      borderRadius: "8px",
+      background: canEditTask ? "#fff" : "#f9fafb",
+      color: "#111827",
+      fontSize: "15px",
+      outline: "none",
     }}
   />
 </div>
 
+        {/* STATUS */}
+        <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "18px",
+    marginBottom: "20px",
+  }}
+>
+  <div>
+    <label
+      style={{
+        display: "block",
+        marginBottom: "7px",
+        fontSize: "14px",
+        fontWeight: "600",
+        color: "#374151",
+      }}
+    >
+      Status
+    </label>
+
+    <select
+      value={status}
+      onChange={(e) => setStatus(e.target.value)}
+      disabled={!canEditTask}
+      style={{
+        width: "100%",
+        boxSizing: "border-box",
+        padding: "11px 12px",
+        border: "1px solid #d1d5db",
+        borderRadius: "8px",
+        background: canEditTask ? "#fff" : "#f9fafb",
+        fontSize: "15px",
+      }}
+    >
+      <option value="todo">Todo</option>
+      <option value="in-progress">In Progress</option>
+      <option value="done">Done</option>
+    </select>
+  </div>
+
+  <div>
+    <label
+      style={{
+        display: "block",
+        marginBottom: "7px",
+        fontSize: "14px",
+        fontWeight: "600",
+        color: "#374151",
+      }}
+    >
+      Assigned To
+    </label>
+
+    <select
+      value={assignedTo}
+      onChange={(e) => setAssignedTo(e.target.value)}
+      disabled={!canEditTask}
+      style={{
+        width: "100%",
+        boxSizing: "border-box",
+        padding: "11px 12px",
+        border: "1px solid #d1d5db",
+        borderRadius: "8px",
+        background: canEditTask ? "#fff" : "#f9fafb",
+        fontSize: "15px",
+      }}
+    >
+      <option value="">Unassigned</option>
+
+      {users.map((user) => (
+        <option key={user._id} value={user._id}>
+          {user.name}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  <div>
+    <label
+      style={{
+        display: "block",
+        marginBottom: "7px",
+        fontSize: "14px",
+        fontWeight: "600",
+        color: "#374151",
+      }}
+    >
+      Priority
+    </label>
+
+    <select
+      value={priority}
+      onChange={(e) => setPriority(e.target.value)}
+      disabled={!canEditTask}
+      style={{
+        width: "100%",
+        boxSizing: "border-box",
+        padding: "11px 12px",
+        border: "1px solid #d1d5db",
+        borderRadius: "8px",
+        background: canEditTask ? "#fff" : "#f9fafb",
+        fontSize: "15px",
+      }}
+    >
+      <option value="low">Low</option>
+      <option value="medium">Medium</option>
+      <option value="high">High</option>
+    </select>
+  </div>
+
+  <div>
+    <label
+      style={{
+        display: "block",
+        marginBottom: "7px",
+        fontSize: "14px",
+        fontWeight: "600",
+        color: "#374151",
+      }}
+    >
+      Due Date
+    </label>
+
+    <input
+      type="date"
+      value={dueDate}
+      onChange={(e) => setDueDate(e.target.value)}
+      disabled={!canEditTask}
+      style={{
+        width: "100%",
+        boxSizing: "border-box",
+        padding: "10px 12px",
+        border: "1px solid #d1d5db",
+        borderRadius: "8px",
+        background: canEditTask ? "#fff" : "#f9fafb",
+        fontSize: "15px",
+      }}
+    />
+  </div>
+</div>
+
         {/* DESCRIPTION */}
-        <div style={{ marginBottom: "16px" }}>
-          <strong>Description</strong>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            disabled={!canEditTask}
-            rows={5}
-            style={{ width: "100%", padding: "10px", marginTop: "6px" }}
-          />
-        </div>
+<div style={{ marginBottom: "28px" }}>
+  <label
+    style={{
+      display: "block",
+      marginBottom: "7px",
+      fontSize: "14px",
+      fontWeight: "600",
+      color: "#374151",
+    }}
+  >
+    Description
+  </label>
+
+  <textarea
+    value={description}
+    onChange={(e) => setDescription(e.target.value)}
+    disabled={!canEditTask}
+    rows={4}
+    style={{
+      width: "100%",
+      boxSizing: "border-box",
+      padding: "11px 12px",
+      border: "1px solid #d1d5db",
+      borderRadius: "8px",
+      background: canEditTask ? "#fff" : "#f9fafb",
+      color: "#111827",
+      fontSize: "15px",
+      lineHeight: 1.5,
+      resize: "vertical",
+      outline: "none",
+    }}
+  />
+</div>
 
         {/* COMMENTS */}
-<div style={{ marginBottom: "16px" }}>
-  <strong>Comments</strong>
+        <div
+  style={{
+    marginTop: "8px",
+    marginBottom: "24px",
+    padding: "20px",
+    background: "#f9fafb",
+    border: "1px solid #e5e7eb",
+    borderRadius: "10px",
+  }}
+>
+  <h3
+    style={{
+      margin: "0 0 16px",
+      fontSize: "16px",
+      color: "#111827",
+    }}
+  >
+    Comments
+  </h3>
 
   <CommentList
     comments={comments}
@@ -525,74 +701,142 @@ if (onActivityChange) {
     onUpdate={handleUpdateComment}
   />
 
-  <CommentForm
-    onCreate={handleCreateComment}
-  />
+  <div style={{ marginTop: "16px" }}>
+    <CommentForm onCreate={handleCreateComment} />
+  </div>
 </div>
 
 {/* ACTIVITY TIMELINE */}
-<div style={{ marginBottom: "16px" }}>
-  <strong>Activity Timeline</strong>
+<div
+  style={{
+    marginBottom: "24px",
+    padding: "20px",
+    background: "#ffffff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "10px",
+  }}
+>
+  <h3
+    style={{
+      margin: "0 0 14px",
+      fontSize: "16px",
+      color: "#111827",
+    }}
+  >
+    Activity Timeline
+  </h3>
 
   {activity.length === 0 ? (
-    <p>No activity yet.</p>
+    <p
+      style={{
+        margin: 0,
+        color: "#6b7280",
+        fontSize: "14px",
+      }}
+    >
+      No activity yet.
+    </p>
   ) : (
     activity.map((item) => (
       <div
         key={item._id}
         style={{
-          padding: "8px 0",
-          borderBottom: "1px solid #eee",
+          display: "flex",
+          gap: "12px",
+          padding: "12px 0",
+          borderBottom: "1px solid #f0f1f3",
         }}
       >
         <div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  }}
->
-  <span style={{ fontSize: "20px" }}>
-    {getActivityIcon(item.action)}
-  </span>
+          style={{
+            width: "32px",
+            height: "32px",
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "8px",
+            background: "#f3f4f6",
+            fontSize: "16px",
+          }}
+        >
+          {getActivityIcon(item.action)}
+        </div>
 
-  <div>
-  {formatActivity(item)}
-</div>
-</div>
+        <div style={{ minWidth: 0 }}>
+          <div
+            style={{
+              color: "#374151",
+              fontSize: "14px",
+              lineHeight: 1.5,
+            }}
+          >
+            {formatActivity(item)}
+          </div>
 
-        <small>
-          {new Date(
-            item.createdAt
-          ).toLocaleString()}
-        </small>
+          <div
+            style={{
+              marginTop: "4px",
+              color: "#9ca3af",
+              fontSize: "12px",
+            }}
+          >
+            {new Date(item.createdAt).toLocaleString()}
+          </div>
+        </div>
       </div>
     ))
   )}
 </div>
 
         {/* ACTIONS */}
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-        {canEditTask && (
-  <>
-          <button onClick={() => onDeleteTask(task._id)}>
-            Delete Task
-          </button>
-
-          <button
-  type="button"
-  onClick={handleSave}
-  disabled={saving}
+        <div
   style={{
-    cursor: saving ? "not-allowed" : "pointer",
-    opacity: saving ? 0.65 : 1,
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: "20px",
+    borderTop: "1px solid #e5e7eb",
   }}
 >
-  {saving ? "Saving..." : "Save Changes"}
-</button>
-          </>
-)}
-        </div>
+  {canEditTask && (
+    <>
+      <button
+        type="button"
+        onClick={() => onDeleteTask(task._id)}
+        style={{
+          padding: "10px 16px",
+          border: "1px solid #fecaca",
+          borderRadius: "8px",
+          background: "#fff",
+          color: "#dc2626",
+          fontWeight: "600",
+          cursor: "pointer",
+        }}
+      >
+        Delete Task
+      </button>
+
+      <button
+        type="button"
+        onClick={handleSave}
+        disabled={saving}
+        style={{
+          padding: "10px 18px",
+          border: "none",
+          borderRadius: "8px",
+          background: saving ? "#93c5fd" : "#2563eb",
+          color: "#fff",
+          fontWeight: "600",
+          cursor: saving ? "not-allowed" : "pointer",
+          opacity: saving ? 0.75 : 1,
+        }}
+      >
+        {saving ? "Saving..." : "Save Changes"}
+      </button>
+    </>
+  )}
+</div>
       </div>
     </div>
   );
