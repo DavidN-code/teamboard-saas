@@ -1,4 +1,5 @@
 const Notification = require("../models/Notification");
+const pusher = require("./pusherService");
 
 const createNotification = async ({
   userId,
@@ -7,13 +8,21 @@ const createNotification = async ({
   resourceId,
   message,
 }) => {
-  return Notification.create({
+  const notification = await Notification.create({
     userId,
     organizationId,
     type,
     resourceId,
     message,
   });
+
+  await pusher.trigger(
+    `user-${userId}`,
+    "notification-created",
+    notification
+  );
+
+  return notification;
 };
 
 module.exports = createNotification;

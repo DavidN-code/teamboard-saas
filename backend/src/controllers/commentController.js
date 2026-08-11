@@ -80,12 +80,6 @@ if (task) {
 // PUSHER REAL-TIME COMMENT CREATED
 // -------------------------
 
-await pusher.trigger(
-  `task-${task._id}`,
-  "comment-created",
-  comment
-);
-
 const populatedComment =
   await Comment.findById(comment._id)
     .populate("createdBy", "name email");
@@ -161,12 +155,6 @@ if (!isOwner && !isAdminOrOwner) {
     // -------------------------
 // PUSHER REAL-TIME COMMENT UPDATED
 // -------------------------
-
-await pusher.trigger(
-  `task-${task._id}`,
-  "comment-updated",
-  comment
-);
 
 const populatedComment =
   await Comment.findById(comment._id)

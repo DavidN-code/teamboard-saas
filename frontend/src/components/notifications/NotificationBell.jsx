@@ -4,13 +4,22 @@ import {
   markNotificationRead,
   markAllNotificationsRead,
 } from "../../api/notifications";
+import { useAuth } from "../../context/useAuth";
+import pusher from "../../services/pusher";
 
 export default function NotificationBell({ onOpenTask }) {
     const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     let cancelled = false;
+  
+    if (!user?.id) {
+      return () => {
+        cancelled = true;
+      };
+    }
   
     const fetchNotifications = async () => {
       try {
@@ -31,9 +40,45 @@ export default function NotificationBell({ onOpenTask }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [user?.id]);
 
-  const unreadCount = notifications.filter(
+  useEffect(() => {
+    if (!user?.id) return;
+  
+    const channelName = `user-${user.id}`;
+    const channel = pusher.subscribe(channelName);
+  
+    const handleNotificationCreated = (newNotification) => {
+      setNotifications((prev) => {
+        const exists = prev.some(
+          (notification) => notification._id === newNotification._id
+        );
+  
+        return exists ? prev : [newNotification, ...prev];
+      });
+    };
+  
+    channel.bind(
+      "notification-created",
+      handleNotificationCreated
+    );
+  
+    return () => {
+      channel.unbind(
+        "notification-created",
+        handleNotificationCreated
+      );
+    };
+  }, [user?.id]);
+
+  const visibleNotifications = user?.id
+  ? notifications.filter(
+      (notification) =>
+        String(notification.userId) === String(user.id)
+    )
+  : [];
+
+  const unreadCount = visibleNotifications.filter(
     (n) => !n.read
   ).length;
 
@@ -143,10 +188,10 @@ export default function NotificationBell({ onOpenTask }) {
   )}
 </div>
 
-          {notifications.length === 0 ? (
+          {visibleNotifications.length === 0 ? (
             <p>No notifications</p>
           ) : (
-            notifications.map((notification) => (
+            visibleNotifications.map((notification) => (
               <div
                 key={notification._id}
                 onClick={() =>

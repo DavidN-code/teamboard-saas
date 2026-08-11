@@ -204,6 +204,8 @@ useEffect(() => {
           ✅ My Tasks
         </Link>
       </nav>
+
+      {user && ["owner", "admin"].includes(user.role) && (
   
       <div style={{ marginBottom: "24px" }}>
         <p
@@ -255,7 +257,8 @@ useEffect(() => {
           </button>
         </form>
       </div>
-  
+      )}
+      
       <div>
         <p
           style={{

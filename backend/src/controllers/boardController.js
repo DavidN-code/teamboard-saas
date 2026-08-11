@@ -35,7 +35,7 @@ exports.getBoardById = async (req, res, next) => {
   }
 };
 
-// CREATE a new board (only Owner can create)
+// CREATE a new board (Owner or Admin can create)
 exports.createBoard = async (req, res, next) => {
   try {
     const { name } = req.body;
