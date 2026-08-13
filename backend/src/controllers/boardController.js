@@ -77,7 +77,7 @@ exports.updateBoard = async (req, res, next) => {
     res.json(board);
     await pusher.trigger(
       `organization-${req.user.organizationId}`,
-      "board-created",
+      "board-updated",
       board
     );
     await createAuditLog({

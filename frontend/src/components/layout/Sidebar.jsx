@@ -10,6 +10,9 @@ export default function Sidebar() {
   const [newBoardName, setNewBoardName] = useState("");
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
+  const [openBoardMenu, setOpenBoardMenu] = useState(null);
+  const [renamingBoardId, setRenamingBoardId] = useState(null);
+  const [renameBoardName, setRenameBoardName] = useState("");
 
   const {
     activeBoard,
@@ -88,13 +91,33 @@ useEffect(() => {
     };
   
     const handleBoardDeleted = ({ _id }) => {
-      setBoards((prev) =>
-        prev.filter((board) => board._id !== _id)
-      );
-  
-      setActiveBoard((currentBoard) =>
-        currentBoard?._id === _id ? null : currentBoard
-      );
+      setBoards((prev) => {
+        const deletedIndex = prev.findIndex(
+          (board) => board._id === _id
+        );
+    
+        const remainingBoards = prev.filter(
+          (board) => board._id !== _id
+        );
+    
+        setActiveBoard((currentBoard) => {
+          if (currentBoard?._id !== _id) {
+            return currentBoard;
+          }
+    
+          if (remainingBoards.length === 0) {
+            return null;
+          }
+    
+          return (
+            remainingBoards[deletedIndex] ||
+            remainingBoards[deletedIndex - 1] ||
+            remainingBoards[0]
+          );
+        });
+    
+        return remainingBoards;
+      });
     };
   
     channel.bind("board-created", handleBoardCreated);
@@ -136,6 +159,42 @@ useEffect(() => {
       console.error("Failed to create board", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRenameBoard = async (boardId) => {
+    const trimmedName = renameBoardName.trim();
+  
+    if (!trimmedName) return;
+  
+    try {
+      await api.put(`/boards/${boardId}`, {
+        name: trimmedName,
+      });
+  
+      setRenamingBoardId(null);
+      setRenameBoardName("");
+      setOpenBoardMenu(null);
+    } catch (err) {
+      console.error("Failed to rename board", err);
+    }
+  };
+
+  const handleDeleteBoard = async (board) => {
+    const confirmed = window.confirm(
+      `Delete "${board.name}"?\n\nThis action cannot be undone.`
+    );
+  
+    if (!confirmed) {
+      setOpenBoardMenu(null);
+      return;
+    }
+  
+    try {
+      await api.delete(`/boards/${board._id}`);
+      setOpenBoardMenu(null);
+    } catch (err) {
+      console.error("Failed to delete board", err);
     }
   };
 
@@ -296,28 +355,200 @@ useEffect(() => {
               const isActive = activeBoard?._id === board._id;
   
               return (
-                <button
+                <div
                   key={board._id}
-                  type="button"
-                  onClick={() => setActiveBoard(board)}
                   style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    border: "none",
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
                     borderLeft: isActive
                       ? "3px solid #2563eb"
                       : "3px solid transparent",
                     borderRadius: "8px",
                     background: isActive ? "#eff6ff" : "transparent",
-                    color: isActive ? "#1d4ed8" : "#374151",
-                    fontSize: "14px",
-                    fontWeight: isActive ? "600" : "500",
-                    textAlign: "left",
-                    cursor: "pointer",
                   }}
                 >
-                  {board.name}
-                </button>
+                  {renamingBoardId === board._id ? (
+  <div
+    style={{
+      flex: 1,
+      display: "flex",
+      gap: "6px",
+      padding: "6px",
+      minWidth: 0,
+    }}
+  >
+    <input
+      autoFocus
+      value={renameBoardName}
+      onChange={(e) => setRenameBoardName(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          handleRenameBoard(board._id);
+        }
+
+        if (e.key === "Escape") {
+          setRenamingBoardId(null);
+          setRenameBoardName("");
+        }
+      }}
+      style={{
+        flex: 1,
+        minWidth: 0,
+        padding: "7px 8px",
+        border: "1px solid #93c5fd",
+        borderRadius: "6px",
+        fontSize: "14px",
+        outline: "none",
+      }}
+    />
+
+    <button
+      type="button"
+      onClick={() => handleRenameBoard(board._id)}
+      style={{
+        border: "none",
+        borderRadius: "6px",
+        padding: "6px 8px",
+        background: "#2563eb",
+        color: "#fff",
+        cursor: "pointer",
+        fontWeight: "600",
+      }}
+    >
+      ✓
+    </button>
+
+    <button
+      type="button"
+      onClick={() => {
+        setRenamingBoardId(null);
+        setRenameBoardName("");
+      }}
+      style={{
+        border: "none",
+        borderRadius: "6px",
+        padding: "6px 8px",
+        background: "#e5e7eb",
+        color: "#374151",
+        cursor: "pointer",
+      }}
+    >
+      ×
+    </button>
+  </div>
+) : (
+  <button
+    type="button"
+    onClick={() => setActiveBoard(board)}
+    style={{
+      flex: 1,
+      minWidth: 0,
+      padding: "10px 12px",
+      border: "none",
+      background: "transparent",
+      color: isActive ? "#1d4ed8" : "#374151",
+      fontSize: "14px",
+      fontWeight: isActive ? "600" : "500",
+      textAlign: "left",
+      cursor: "pointer",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    }}
+  >
+    {board.name}
+  </button>
+)}
+              
+              {user?.role === "owner" &&
+  renamingBoardId !== board._id && (
+                    <button
+                      type="button"
+                      aria-label={`Manage ${board.name}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+              
+                        setOpenBoardMenu((current) =>
+                          current === board._id ? null : board._id
+                        );
+                      }}
+                      style={{
+                        flexShrink: 0,
+                        width: "36px",
+                        height: "36px",
+                        marginRight: "4px",
+                        border: "none",
+                        borderRadius: "6px",
+                        background: "transparent",
+                        color: "#6b7280",
+                        fontSize: "20px",
+                        lineHeight: 1,
+                        cursor: "pointer",
+                      }}
+                    >
+                      ⋯
+                    </button>
+                  )}
+              
+                  {user?.role === "owner" &&
+                    openBoardMenu === board._id && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "40px",
+                          right: "4px",
+                          zIndex: 20,
+                          width: "140px",
+                          padding: "6px",
+                          background: "#ffffff",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: "8px",
+                          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
+                        }}
+                      >
+                        <button
+  type="button"
+  onClick={() => {
+    setRenamingBoardId(board._id);
+    setRenameBoardName(board.name);
+    setOpenBoardMenu(null);
+  }}
+  style={{
+    width: "100%",
+    padding: "8px 10px",
+    border: "none",
+    borderRadius: "6px",
+    background: "transparent",
+    color: "#374151",
+    fontSize: "14px",
+    textAlign: "left",
+    cursor: "pointer",
+  }}
+>
+  Rename
+</button>
+              
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteBoard(board)}
+                          style={{
+                            width: "100%",
+                            padding: "8px 10px",
+                            border: "none",
+                            borderRadius: "6px",
+                            background: "transparent",
+                            color: "#dc2626",
+                            fontSize: "14px",
+                            textAlign: "left",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                </div>
               );
             })
           )}
