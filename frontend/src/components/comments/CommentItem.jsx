@@ -64,6 +64,8 @@ const savingEditRef = useRef(false);
       style={{
         padding: "10px 0",
         marginBottom: "10px",
+        minWidth: 0,
+maxWidth: "100%",
       }}
     >
       <strong>
@@ -71,8 +73,15 @@ const savingEditRef = useRef(false);
       </strong>
 
       {!editing ? (
-  <p>{comment.content}</p>
-) : (
+        <p
+  style={{
+    overflowWrap: "anywhere",
+    wordBreak: "break-word",
+    whiteSpace: "pre-wrap",
+  }}
+>
+  {comment.content}
+</p>) : (
   <>
     <textarea
   value={content}

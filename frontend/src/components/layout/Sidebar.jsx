@@ -5,8 +5,11 @@ import api from "../../api/axios";
 import { useActiveBoard } from "../../context/useActiveBoard";
 import { Link } from "react-router-dom";
 
-export default function Sidebar() {
-  const [boards, setBoards] = useState([]);
+export default function Sidebar({
+  isMobile = false,
+  isOpen = true,
+  onClose,
+}) {  const [boards, setBoards] = useState([]);
   const [newBoardName, setNewBoardName] = useState("");
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
@@ -200,18 +203,46 @@ useEffect(() => {
 
   return (
     <aside
-      style={{
-        width: "250px",
-        minWidth: "250px",
-        minHeight: "100vh",
-        padding: "20px 16px",
-        background: "#ffffff",
-        borderRight: "1px solid #e5e7eb",
-        boxSizing: "border-box",
-      }}
-    >
-      <div style={{ marginBottom: "28px" }}>
-        <h2
+    style={{
+      width: "250px",
+      minWidth: "250px",
+      height: "100vh",
+      minHeight: "100vh",
+      padding: "20px 16px",
+      background: "#ffffff",
+      borderRight: "1px solid #e5e7eb",
+      boxSizing: "border-box",
+    
+      position: isMobile ? "fixed" : "sticky",
+      top: 0,
+      alignSelf: "flex-start",
+      overflowY: "auto",
+    
+      ...(isMobile
+        ? {
+            left: 0,
+            zIndex: 1001,
+            transform: isOpen
+              ? "translateX(0)"
+              : "translateX(-100%)",
+            transition: "transform 0.22s ease",
+            boxShadow: isOpen
+              ? "4px 0 20px rgba(0, 0, 0, 0.14)"
+              : "none",
+          }
+        : {}),
+    }}
+>
+<div
+  style={{
+    marginBottom: "28px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  }}
+>
+  <div>
+    <h2
           style={{
             margin: 0,
             fontSize: "20px",
@@ -231,6 +262,28 @@ useEffect(() => {
         >
           Project workspace
         </p>
+        </div>
+
+{isMobile && (
+  <button
+    type="button"
+    onClick={onClose}
+    aria-label="Close navigation"
+    style={{
+      width: "36px",
+      height: "36px",
+      border: "none",
+      borderRadius: "8px",
+      background: "#f3f4f6",
+      color: "#374151",
+      fontSize: "20px",
+      lineHeight: 1,
+      cursor: "pointer",
+    }}
+  >
+    ×
+  </button>
+)}
       </div>
   
       <nav style={{ marginBottom: "28px" }}>

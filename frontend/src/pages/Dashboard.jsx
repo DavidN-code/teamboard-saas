@@ -29,7 +29,7 @@ import {
 } from "@dnd-kit/sortable";
 
 /* ---------------- COLUMN ---------------- */
-function Column({ id, title, children }) {
+function Column({ id, title, children, isMobile }) {
   const { setNodeRef } = useDroppable({ id });
 
   return (
@@ -41,6 +41,8 @@ function Column({ id, title, children }) {
         borderRadius: "12px",
         padding: "16px",
         minHeight: "500px",
+        minWidth: isMobile ? "280px" : 0,
+        flex: isMobile ? "0 0 280px" : undefined,
       }}
     >
       <h3
@@ -112,6 +114,8 @@ export default function Dashboard() {
   const [selectedTask, setSelectedTask] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   const [activeTask, setActiveTask] = useState(null);
   const dragOriginStatus = useRef(null);
   const dragCurrentStatus = useRef(null);
@@ -121,6 +125,28 @@ export default function Dashboard() {
 const [statusFilter, setStatusFilter] = useState("");
 const [priorityFilter, setPriorityFilter] = useState("");
 const [sortBy, setSortBy] = useState("");
+
+const [isMobile, setIsMobile] = useState(
+  () => window.matchMedia("(max-width: 768px)").matches
+);
+
+useEffect(() => {
+  const mediaQuery = window.matchMedia("(max-width: 768px)");
+
+  const handleChange = (event) => {
+    setIsMobile(event.matches);
+
+    if (!event.matches) {
+      setIsSidebarOpen(false);
+    }
+  };
+
+  mediaQuery.addEventListener("change", handleChange);
+
+  return () => {
+    mediaQuery.removeEventListener("change", handleChange);
+  };
+}, []);
 
   /* ---------------- LOAD TASKS ---------------- */
   useEffect(() => {
@@ -496,11 +522,45 @@ const doneTasks = filteredTasks.filter(
   (t) => t.status === "done"
 );
 
-  return (
-    <div style={{ display: "flex", height: "100vh" }}>
-      <Sidebar />
+return (
+  <div
+    style={{
+      display: "flex",
+      minHeight: "100vh",
+      background: "#f8fafc",
+    }}
+  >
+    {!isMobile && <Sidebar />}
 
-      <div style={{ flex: 1, padding: "20px" }}>
+    {isMobile && (
+      <>
+        {isSidebarOpen && (
+          <div
+            onClick={() => setIsSidebarOpen(false)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 1000,
+              background: "rgba(15, 23, 42, 0.45)",
+            }}
+          />
+        )}
+
+        <Sidebar
+          isMobile
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
+      </>
+    )}
+
+    <div
+      style={{
+        flex: 1,
+        minWidth: 0,
+        padding: isMobile ? "16px" : "20px",
+      }}
+    >
         {/* HEADER */}
 
         <div
@@ -511,13 +571,51 @@ const doneTasks = filteredTasks.filter(
     marginBottom: "24px",
   }}
 >
+<div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    minWidth: 0,
+  }}
+>
+{isMobile && (
+  <button
+    type="button"
+    onClick={() => setIsSidebarOpen(true)}
+    aria-label="Open navigation"
+    style={{
+      position: "fixed",
+      top: "16px",
+      left: "16px",
+      zIndex: 900,
+      width: "42px",
+      height: "42px",
+      flexShrink: 0,
+      border: "1px solid #e5e7eb",
+      borderRadius: "10px",
+      background: "#ffffff",
+      color: "#374151",
+      fontSize: "20px",
+      cursor: "pointer",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.12)",
+    }}
+  >
+    ☰
+  </button>
+)}
+
   <h1
     style={{
-      margin: 0,
+      margin: isMobile ? "0 0 0 52px" : 0,
+      fontSize: isMobile ? "22px" : "32px",
+      color: "#111827",
+      whiteSpace: "nowrap",
     }}
   >
     Dashboard Overview
   </h1>
+</div>
 
   <div
     style={{
@@ -726,15 +824,24 @@ const doneTasks = filteredTasks.filter(
   items={filteredTasks.map((t) => t._id)}
   strategy={verticalListSortingStrategy}
 >
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: "20px",
-                marginTop: "20px",
-              }}
-            >
-              <Column id="todo" title={`Todo (${todoTasks.length})`}>
+<div
+  style={{
+    display: isMobile ? "flex" : "grid",
+    gridTemplateColumns: isMobile
+      ? undefined
+      : "repeat(3, 1fr)",
+    gap: "20px",
+    marginTop: "20px",
+    overflowX: isMobile ? "auto" : "visible",
+    paddingBottom: isMobile ? "12px" : 0,
+    WebkitOverflowScrolling: "touch",
+  }}
+>
+              <Column 
+              id="todo" 
+              title={`Todo (${todoTasks.length})`} 
+              isMobile={isMobile}
+              >
                 {todoTasks.map((task) => (
                   <TaskCard
                     key={task._id}
@@ -750,6 +857,7 @@ const doneTasks = filteredTasks.filter(
               <Column
   id="in-progress"
   title={`In Progress (${inProgressTasks.length})`}
+  isMobile={isMobile}
 >
                 {inProgressTasks.map((task) => (
                   <TaskCard
@@ -764,7 +872,11 @@ const doneTasks = filteredTasks.filter(
                 ))}
               </Column>
 
-              <Column id="done" title={`Done (${doneTasks.length})`}>
+              <Column 
+              id="done" 
+              title={`Done (${doneTasks.length})`} 
+              isMobile={isMobile}
+              >
                 {doneTasks.map((task) => (
                   <TaskCard
                     key={task._id}

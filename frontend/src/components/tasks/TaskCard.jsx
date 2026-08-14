@@ -59,6 +59,8 @@ export default function TaskCard({
     borderRadius: "10px",
     padding: "14px",
     marginBottom: "12px",
+    minWidth: 0,
+overflow: "hidden",
   }}
 >
       
@@ -81,6 +83,9 @@ export default function TaskCard({
   onClick={handleClick}
   style={{
     cursor: "pointer",
+    minWidth: 0,
+    maxWidth: "100%",
+    overflow: "hidden",
   }}
 >
   <div
@@ -102,12 +107,24 @@ export default function TaskCard({
     fontWeight: "700",
     color: "#111827",
     lineHeight: "1.3",
+    maxWidth: "100%",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word",
+    whiteSpace: "normal",
   }}
 >
   {task.title}
 </div>
 
-        <p style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>
+<p
+  style={{
+    fontSize: "14px",
+    color: "#666",
+    marginTop: "8px",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word",
+  }}
+>
   {task.description || "No description"}
 </p>
 

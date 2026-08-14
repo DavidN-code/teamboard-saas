@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   getNotifications,
   markNotificationRead,
@@ -10,6 +10,7 @@ import pusher from "../../services/pusher";
 export default function NotificationBell({ onOpenTask }) {
     const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
+  const notificationRef = useRef(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -70,6 +71,25 @@ export default function NotificationBell({ onOpenTask }) {
       );
     };
   }, [user?.id]);
+
+  useEffect(() => {
+    if (!open) return;
+  
+    const handleOutsideClick = (event) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      ) {
+        setOpen(false);
+      }
+    };
+  
+    document.addEventListener("pointerdown", handleOutsideClick);
+  
+    return () => {
+      document.removeEventListener("pointerdown", handleOutsideClick);
+    };
+  }, [open]);
 
   const visibleNotifications = user?.id
   ? notifications.filter(
@@ -143,8 +163,10 @@ export default function NotificationBell({ onOpenTask }) {
   };
 
   return (
-    <div style={{ position: "relative" }}>
-      <button
+<div
+  ref={notificationRef}
+  style={{ position: "relative" }}
+>      <button
         onClick={() => setOpen(!open)}
       >
         🔔 {unreadCount}

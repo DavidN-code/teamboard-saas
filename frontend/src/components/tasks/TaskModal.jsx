@@ -33,6 +33,36 @@ export default function TaskModal({
 
   if (!isOpen) return null;
 
+const hasUnsavedChanges =
+  title.trim() !== "" ||
+  description.trim() !== "" ||
+  priority !== "medium" ||
+  dueDate !== "" ||
+  assignedTo !== "";
+
+  const resetForm = () => {
+    setTitle("");
+    setDescription("");
+    setPriority("medium");
+    setDueDate("");
+    setAssignedTo("");
+    setError("");
+  };
+
+  const handleRequestClose = () => {
+    if (hasUnsavedChanges) {
+      const shouldDiscard = window.confirm(
+        "You have unsaved task information. Close without creating the task?"
+      );
+  
+      if (!shouldDiscard) {
+        return;
+      }
+    }
+  
+    resetForm();
+    onClose();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,11 +79,7 @@ export default function TaskModal({
         assignedTo: assignedTo || null,
             });
   
-      setTitle("");
-      setDescription("");
-      setPriority("medium");
-      setDueDate("");
-      setAssignedTo("");
+            resetForm();
   
     } catch (err) {
       setError(
@@ -66,6 +92,7 @@ export default function TaskModal({
 
   return (
     <div
+      onClick={handleRequestClose}
       style={{
         position: "fixed",
         inset: 0,
@@ -76,9 +103,10 @@ export default function TaskModal({
       }}
     >
 
-      <div
-        style={{
-          background: "white",
+<div
+  onClick={(e) => e.stopPropagation()}
+  style={{
+    background: "white",
           padding: "20px",
           borderRadius: "8px",
           width: "400px",
@@ -211,8 +239,7 @@ export default function TaskModal({
 
             <button
               type="button"
-              onClick={onClose}
-            >
+              onClick={handleRequestClose}            >
               Cancel
             </button>
 

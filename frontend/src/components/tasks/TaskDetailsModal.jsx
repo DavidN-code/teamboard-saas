@@ -45,6 +45,8 @@ function formatActivity(item) {
               style={{
                 margin: "4px 0 0 20px",
                 padding: 0,
+                overflowWrap: "anywhere",
+                wordBreak: "break-word",
               }}
             >
               {changes.map((change, index) => (
@@ -348,6 +350,53 @@ if (onActivityChange) {
     (member) => member._id === assignedTo
   );
 
+  const originalDueDate = task.dueDate
+  ? task.dueDate.split("T")[0]
+  : "";
+
+const originalAssignedTo =
+  task.assignedTo?._id || "";
+
+const hasUnsavedChanges =
+  canEditTask &&
+  (
+    title !== (task.title || "") ||
+    description !== (task.description || "") ||
+    status !== (task.status || "todo") ||
+    priority !== (task.priority || "medium") ||
+    dueDate !== originalDueDate ||
+    assignedTo !== originalAssignedTo
+  );
+
+  const handleRequestClose = () => {
+    if (hasUnsavedChanges) {
+      const shouldDiscard = window.confirm(
+        "You have unsaved changes. Close without saving them?"
+      );
+  
+      if (!shouldDiscard) {
+        return;
+      }
+  
+      resetTaskFields();
+    }
+  
+    onClose();
+  };
+
+  const resetTaskFields = () => {
+    setTitle(task.title || "");
+    setDescription(task.description || "");
+    setStatus(task.status || "todo");
+    setPriority(task.priority || "medium");
+    setDueDate(
+      task.dueDate
+        ? task.dueDate.split("T")[0]
+        : ""
+    );
+    setAssignedTo(task.assignedTo?._id || "");
+  };
+
   const handleSave = async () => {
     if (savingRef.current) return;
   
@@ -371,24 +420,27 @@ if (onActivityChange) {
 
   return (
     <div
+    onClick={handleRequestClose}
   style={{
     position: "fixed",
     inset: 0,
     background: "rgba(15, 23, 42, 0.55)",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
-    padding: "32px 20px",
+    alignItems: "flex-start",
+    padding: "24px 16px",
+    overflowY: "auto",
     zIndex: 1000,
   }}
 >
   <div
+    onClick={(e) => e.stopPropagation()}
     style={{
       background: "#ffffff",
       width: "100%",
       maxWidth: "720px",
-      maxHeight: "90vh",
-      overflowY: "auto",
+      maxHeight: "none",
+      overflowY: "visible",
       borderRadius: "14px",
       boxShadow: "0 24px 60px rgba(0, 0, 0, 0.22)",
       padding: "28px 32px 32px",
@@ -406,17 +458,26 @@ if (onActivityChange) {
     borderBottom: "1px solid #e5e7eb",
   }}
 >
-  <div>
-    <h2
-      style={{
-        margin: "0 0 8px",
-        fontSize: "24px",
-        lineHeight: 1.25,
-        color: "#111827",
-      }}
-    >
-      {title || "Untitled Task"}
-    </h2>
+<div
+  style={{
+    minWidth: 0,
+    flex: 1,
+  }}
+>
+  <h2
+    style={{
+      margin: "0 0 8px",
+      fontSize: "24px",
+      lineHeight: 1.25,
+      color: "#111827",
+      maxWidth: "100%",
+      overflowWrap: "anywhere",
+      wordBreak: "break-word",
+      whiteSpace: "normal",
+    }}
+  >
+    {title || "Untitled Task"}
+  </h2>
 
     <div
       style={{
@@ -445,7 +506,7 @@ if (onActivityChange) {
 
   <button
     type="button"
-    onClick={onClose}
+    onClick={handleRequestClose}
     aria-label="Close task details"
     style={{
       flexShrink: 0,
@@ -769,6 +830,8 @@ if (onActivityChange) {
               color: "#374151",
               fontSize: "14px",
               lineHeight: 1.5,
+              overflowWrap: "anywhere",
+              wordBreak: "break-word",
             }}
           >
             {formatActivity(item)}

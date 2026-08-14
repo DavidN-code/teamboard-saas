@@ -156,6 +156,9 @@ export default function ActivityFeed({ refreshKey }) {
         padding: "20px",
         borderRadius: "8px",
         marginTop: "20px",
+        minWidth: 0,
+        maxWidth: "100%",
+        overflow: "hidden",
       }}
     >
       <h3>Organization Activity Feed</h3>
@@ -169,6 +172,10 @@ export default function ActivityFeed({ refreshKey }) {
             style={{
               borderBottom: "1px solid #eee",
               padding: "10px 0",
+              minWidth: 0,
+              maxWidth: "100%",
+              overflowWrap: "anywhere",
+              wordBreak: "break-word",
             }}
           >
             {formatAction(activity)}
