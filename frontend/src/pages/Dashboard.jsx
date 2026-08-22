@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 
-import Sidebar from "../components/layout/Sidebar";
 import { useActiveBoard } from "../context/useActiveBoard";
 import { useAuth } from "../context/useAuth";
 import api from "../api/axios";
@@ -21,6 +20,10 @@ import {
   pointerWithin,
   useDroppable,
   DragOverlay,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
 
 import {
@@ -102,8 +105,24 @@ function MetricCard({ label, value }) {
 export default function Dashboard() {
   const { activeBoard, setActiveBoard } = useActiveBoard();
   const activeBoardId = activeBoard?._id;
-  const { logout, user } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isMobile } = useOutletContext();
+  const canManageTasks = user && ["owner", "admin"].includes(user.role);
+
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+  
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 8,
+      },
+    })
+  );
 
   const [tasks, setTasks] = useState([]);
   const [activityRefresh, setActivityRefresh] = useState(0);
@@ -113,8 +132,6 @@ export default function Dashboard() {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [activeTask, setActiveTask] = useState(null);
   const dragOriginStatus = useRef(null);
@@ -126,33 +143,17 @@ const [statusFilter, setStatusFilter] = useState("");
 const [priorityFilter, setPriorityFilter] = useState("");
 const [sortBy, setSortBy] = useState("");
 
-const [isMobile, setIsMobile] = useState(
-  () => window.matchMedia("(max-width: 768px)").matches
-);
-
-useEffect(() => {
-  const mediaQuery = window.matchMedia("(max-width: 768px)");
-
-  const handleChange = (event) => {
-    setIsMobile(event.matches);
-
-    if (!event.matches) {
-      setIsSidebarOpen(false);
-    }
-  };
-
-  mediaQuery.addEventListener("change", handleChange);
-
-  return () => {
-    mediaQuery.removeEventListener("change", handleChange);
-  };
-}, []);
-
   /* ---------------- LOAD TASKS ---------------- */
   useEffect(() => {
     const fetchTasks = async () => {
-      if (!activeBoard) return;
-
+      if (!activeBoard) {
+        setTasks([]);
+        setSelectedTask(null);
+        setIsDetailsModalOpen(false);
+        setTaskError("");
+        setLoadingTasks(false);
+        return;
+      }
       try {
         setLoadingTasks(true);
         setTaskError("");
@@ -233,18 +234,35 @@ useEffect(() => {
   
   }, [activeBoardId]);
 
-  useEffect(() => {
-    const fetchMetrics = async () => {
-      try {
-        const res = await api.get("/metrics/dashboard");
-        setMetrics(res.data);
-      } catch (err) {
-        console.error("Failed to load metrics", err);
-      }
-    };
+  const fetchMetrics = async () => {
+    try {
+      const res = await api.get("/metrics/dashboard");
+      setMetrics(res.data);
+    } catch (err) {
+      console.error("Failed to load metrics", err);
+    }
+  };
   
+  useEffect(() => {
     fetchMetrics();
   }, []);
+
+  useEffect(() => {
+    if (!user?.organizationId) return;
+  
+    const channelName = `organization-${user.organizationId}`;
+    const channel = pusher.subscribe(channelName);
+  
+    const handleMetricsUpdated = () => {
+      fetchMetrics();
+    };
+  
+    channel.bind("metrics-updated", handleMetricsUpdated);
+  
+    return () => {
+      channel.unbind("metrics-updated", handleMetricsUpdated);
+    };
+  }, [user?.organizationId]);
 
   const filteredTasks = tasks
   .filter((task) => {
@@ -314,6 +332,7 @@ useEffect(() => {
       setIsTaskModalOpen(false);
     } catch (err) {
       console.error("Failed to create task", err);
+      throw err;
     }
   };
 
@@ -388,6 +407,7 @@ useEffect(() => {
 
   /* ---------------- DRAG ---------------- */
   const handleDragStart = (event) => {
+    if (!canManageTasks) return;
     const task = tasks.find((t) => t._id === event.active.id);
   
     if (!task) return;
@@ -399,6 +419,7 @@ useEffect(() => {
   };
 
   const handleDragOver = (event) => {
+    if (!canManageTasks) return;
   const { active, over } = event;
 
   if (!over) return;
@@ -444,6 +465,7 @@ useEffect(() => {
 };
 
   const handleDragEnd = async (event) => {
+    if (!canManageTasks) return;
   const { active, over } = event;
 
   const taskId = active.id;
@@ -530,29 +552,6 @@ return (
       background: "#f8fafc",
     }}
   >
-    {!isMobile && <Sidebar />}
-
-    {isMobile && (
-      <>
-        {isSidebarOpen && (
-          <div
-            onClick={() => setIsSidebarOpen(false)}
-            style={{
-              position: "fixed",
-              inset: 0,
-              zIndex: 1000,
-              background: "rgba(15, 23, 42, 0.45)",
-            }}
-          />
-        )}
-
-        <Sidebar
-          isMobile
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-        />
-      </>
-    )}
 
     <div
       style={{
@@ -566,8 +565,10 @@ return (
         <div
   style={{
     display: "flex",
+    flexDirection: isMobile ? "column" : "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: isMobile ? "stretch" : "center",
+    gap: isMobile ? "14px" : 0,
     marginBottom: "24px",
   }}
 >
@@ -579,31 +580,6 @@ return (
     minWidth: 0,
   }}
 >
-{isMobile && (
-  <button
-    type="button"
-    onClick={() => setIsSidebarOpen(true)}
-    aria-label="Open navigation"
-    style={{
-      position: "fixed",
-      top: "16px",
-      left: "16px",
-      zIndex: 900,
-      width: "42px",
-      height: "42px",
-      flexShrink: 0,
-      border: "1px solid #e5e7eb",
-      borderRadius: "10px",
-      background: "#ffffff",
-      color: "#374151",
-      fontSize: "20px",
-      cursor: "pointer",
-      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.12)",
-    }}
-  >
-    ☰
-  </button>
-)}
 
   <h1
     style={{
@@ -622,18 +598,32 @@ return (
       display: "flex",
       gap: "12px",
       alignItems: "center",
+      justifyContent: isMobile ? "flex-end" : "initial",
+      marginLeft: isMobile ? "52px" : 0,
+      flexWrap: "wrap",
     }}
   >
     <NotificationBell onOpenTask={handleOpenNotificationTask} />
 
-    <button
-      onClick={() => {
-        logout();
-        navigate("/login");
-      }}
-    >
-      Logout
-    </button>
+    {user && (
+  <div
+    style={{
+      fontSize: "14px",
+      color: "#6b7280",
+      whiteSpace: "nowrap",
+    }}
+  >
+    <strong style={{ color: "#374151" }}>
+      {user.name}
+    </strong>
+    {" · "}
+    {user.role
+      ? user.role.charAt(0).toUpperCase() +
+        user.role.slice(1)
+      : ""}
+  </div>
+)}
+
   </div>
 </div>
 
@@ -811,8 +801,37 @@ return (
   )}
 </section>
 
+{!activeBoard && (
+  <div
+    style={{
+      padding: "32px",
+      marginTop: "20px",
+      background: "#fff",
+      border: "1px solid #e5e7eb",
+      borderRadius: "12px",
+      textAlign: "center",
+      color: "#6b7280",
+    }}
+  >
+    <h3
+      style={{
+        margin: "0 0 8px",
+        color: "#111827",
+      }}
+    >
+      No boards yet
+    </h3>
+
+    <p style={{ margin: 0 }}>
+      Create a board to start organizing tasks.
+    </p>
+  </div>
+)}
+
         {/* DND */}
-        <DndContext
+        {activeBoard && (
+  <DndContext
+  sensors={sensors}  
   collisionDetection={pointerWithin}
   onDragStart={handleDragStart}
   onDragOver={handleDragOver}
@@ -844,13 +863,14 @@ return (
               >
                 {todoTasks.map((task) => (
                   <TaskCard
-                    key={task._id}
-                    task={task}
-                    onClick={() => {
-                      setIsDetailsModalOpen(true);
-                      setSelectedTask(task);
-                    }}
-                  />
+                  key={task._id}
+                  task={task}
+                  canDrag={canManageTasks}
+                  onClick={() => {
+                    setIsDetailsModalOpen(true);
+                    setSelectedTask(task);
+                  }}
+                />
                 ))}
               </Column>
 
@@ -861,14 +881,14 @@ return (
 >
                 {inProgressTasks.map((task) => (
                   <TaskCard
-                    key={task._id}
-                    task={task}
-                    onClick={() => {
-                      
-                      setIsDetailsModalOpen(true);
-                      setSelectedTask(task);
-                    }}
-                  />
+                  key={task._id}
+                  task={task}
+                  canDrag={canManageTasks}
+                  onClick={() => {
+                    setIsDetailsModalOpen(true);
+                    setSelectedTask(task);
+                  }}
+                />
                 ))}
               </Column>
 
@@ -879,13 +899,14 @@ return (
               >
                 {doneTasks.map((task) => (
                   <TaskCard
-                    key={task._id}
-                    task={task}
-                    onClick={() => {
-                      setIsDetailsModalOpen(true);
-                      setSelectedTask(task);
-                    }}
-                  />
+                  key={task._id}
+                  task={task}
+                  canDrag={canManageTasks}
+                  onClick={() => {
+                    setIsDetailsModalOpen(true);
+                    setSelectedTask(task);
+                  }}
+                />
                 ))}
               </Column>
             </div>
@@ -901,9 +922,11 @@ return (
   ) : null}
 </DragOverlay>
         </DndContext>
+)}
 
-        <ActivityFeed refreshKey={activityRefresh} />
-
+        {activeBoard && (
+  <ActivityFeed refreshKey={activityRefresh} />
+)}
         {/* MODALS */}
         <TaskModal
           isOpen={isTaskModalOpen}

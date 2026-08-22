@@ -1,4 +1,5 @@
 const Board = require('../models/Board');
+const Task = require("../models/Task");
 const mongoose = require('mongoose');
 const createAuditLog = require("../services/auditLogService");
 const pusher = require("../services/pusherService");
@@ -50,6 +51,11 @@ exports.createBoard = async (req, res, next) => {
       "board-created",
       board
     );
+    await pusher.trigger(
+      `organization-${req.user.organizationId}`,
+      "metrics-updated",
+      {}
+    );
     await createAuditLog({
       action: "CREATE_BOARD",
       resourceType: "Board",
@@ -95,14 +101,27 @@ exports.updateBoard = async (req, res, next) => {
 // DELETE a board (only Owner)
 exports.deleteBoard = async (req, res, next) => {
   try {
-    const board = await Board.findOneAndDelete({
+    const board = await Board.findOne({
       _id: req.params.id,
       organizationId: req.user.organizationId,
     });
 
-    if (!board) return res.status(404).json({ message: 'Board not found' });
+    if (!board) {
+      return res.status(404).json({ message: "Board not found" });
+    }
 
-    res.json({ message: 'Board deleted successfully' });
+    // Delete all tasks belonging to this board
+    await Task.deleteMany({
+      board: board._id,
+      organizationId: req.user.organizationId,
+    });
+
+    // Delete the board itself
+    await Board.deleteOne({
+      _id: board._id,
+      organizationId: req.user.organizationId,
+    });
+
     await pusher.trigger(
       `organization-${req.user.organizationId}`,
       "board-deleted",
@@ -110,6 +129,13 @@ exports.deleteBoard = async (req, res, next) => {
         _id: board._id,
       }
     );
+
+    await pusher.trigger(
+      `organization-${req.user.organizationId}`,
+      "metrics-updated",
+      {}
+    );
+
     await createAuditLog({
       action: "DELETE_BOARD",
       resourceType: "Board",
@@ -117,6 +143,8 @@ exports.deleteBoard = async (req, res, next) => {
       userId: req.user.userId,
       organizationId: req.user.organizationId,
     });
+
+    res.json({ message: "Board deleted successfully" });
   } catch (err) {
     next(err);
   }

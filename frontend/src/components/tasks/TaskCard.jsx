@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { formatDate } from "../../utils/formatDate";
@@ -6,7 +7,15 @@ export default function TaskCard({
   task,
   onClick,
   dragOverlay = false,
-}) {  const isOverdue =
+  canDrag = true,
+}) {  
+
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  const hasLongDescription =
+  Boolean(task.description) && task.description.length > 150;
+  
+  const isOverdue =
   task.dueDate &&
   new Date(task.dueDate) < new Date() &&
   task.status !== "done";
@@ -21,7 +30,7 @@ export default function TaskCard({
     id: dragOverlay
       ? `overlay-${task._id}`
       : task._id,
-    disabled: dragOverlay,
+    disabled: dragOverlay || !canDrag,
   });
 
   const style = {
@@ -65,18 +74,23 @@ overflow: "hidden",
 >
       
       {/* Drag handle ONLY */}
-      <div
-  {...(!dragOverlay ? attributes : {})}
-  {...(!dragOverlay ? listeners : {})}
-  style={{
-    cursor: dragOverlay ? "grabbing" : "grab",
-    paddingBottom: "10px",
-    color: "#9ca3af",
-    fontSize: "18px",
-  }}
->
-  ☰
-</div>
+      {(canDrag || dragOverlay) && (
+  <div
+    {...(!dragOverlay && canDrag ? attributes : {})}
+    {...(!dragOverlay && canDrag ? listeners : {})}
+    style={{
+      cursor: dragOverlay ? "grabbing" : "grab",
+      paddingBottom: "10px",
+      color: "#9ca3af",
+      fontSize: "18px",
+      touchAction: "none",
+      userSelect: "none",
+      WebkitUserSelect: "none",
+    }}
+  >
+    ☰
+  </div>
+)}
 
       {/* Click area */}
       <div
@@ -111,22 +125,59 @@ overflow: "hidden",
     overflowWrap: "anywhere",
     wordBreak: "break-word",
     whiteSpace: "normal",
+    display: "-webkit-box",
+    WebkitLineClamp: 3,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
   }}
 >
   {task.title}
 </div>
 
-<p
-  style={{
-    fontSize: "14px",
-    color: "#666",
-    marginTop: "8px",
-    overflowWrap: "anywhere",
-    wordBreak: "break-word",
-  }}
->
-  {task.description || "No description"}
-</p>
+<div style={{ marginTop: "8px" }}>
+  <p
+    style={{
+      fontSize: "14px",
+      color: "#666",
+      margin: 0,
+      overflowWrap: "anywhere",
+      wordBreak: "break-word",
+
+      ...(!isDescriptionExpanded && hasLongDescription
+        ? {
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }
+        : {}),
+    }}
+  >
+    {task.description || "No description"}
+  </p>
+
+  {hasLongDescription && !dragOverlay && (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        setIsDescriptionExpanded((current) => !current);
+      }}
+      style={{
+        marginTop: "6px",
+        padding: 0,
+        border: "none",
+        background: "transparent",
+        color: "#2563eb",
+        fontSize: "13px",
+        fontWeight: "600",
+        cursor: "pointer",
+      }}
+    >
+      {isDescriptionExpanded ? "Show less" : "Show more"}
+    </button>
+  )}
+</div>
 
 {task.assignedTo && (
   <p

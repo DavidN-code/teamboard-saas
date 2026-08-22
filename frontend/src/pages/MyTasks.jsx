@@ -3,24 +3,46 @@ import api from "../api/axios";
 
 import TaskCard from "../components/tasks/TaskCard";
 import TaskDetailsModal from "../components/tasks/TaskDetailsModal";
+import PageLayout from "../components/layout/PageLayout";
+
+import { useAuth } from "../context/useAuth";
+import pusher from "../services/pusher";
 
 export default function MyTasks() {
+  const { user } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchMyTasks = async () => {
-      try {
-        const res = await api.get("/tasks/my-tasks");
-        setTasks(res.data);
-      } catch (err) {
-        console.error("Failed to load assigned tasks", err);
-      }
-    };
+  const fetchMyTasks = async () => {
+    try {
+      const res = await api.get("/tasks/my-tasks");
+      setTasks(res.data);
+    } catch (err) {
+      console.error("Failed to load assigned tasks", err);
+    }
+  };
 
+  useEffect(() => {
     fetchMyTasks();
   }, []);
+
+  useEffect(() => {
+    if (!user?.organizationId) return;
+  
+    const channelName = `organization-${user.organizationId}`;
+    const channel = pusher.subscribe(channelName);
+  
+    const handleTasksUpdated = () => {
+      fetchMyTasks();
+    };
+  
+    channel.bind("metrics-updated", handleTasksUpdated);
+  
+    return () => {
+      channel.unbind("metrics-updated", handleTasksUpdated);
+    };
+  }, [user?.organizationId]);
 
   const todoTasks = tasks.filter(
     (task) => task.status === "todo"
@@ -35,8 +57,7 @@ export default function MyTasks() {
   );
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>My Tasks</h1>
+    <PageLayout title="My Tasks">
 
       <div
         style={{
@@ -109,6 +130,5 @@ export default function MyTasks() {
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
       />
-    </div>
-  );
+</PageLayout>  );
 }

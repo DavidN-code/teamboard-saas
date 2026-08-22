@@ -1,0 +1,244 @@
+.members-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  
+  .members-section {
+    margin-bottom: 28px;
+    padding: 24px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+  
+  .section-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .section-heading h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #111827;
+  }
+  
+  .section-heading p {
+    margin: 6px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+  }
+  
+  .member-count {
+    flex-shrink: 0;
+    padding: 5px 10px;
+    background: #f3f4f6;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+  }
+  
+  .members-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+  }
+  
+  .members-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+  }
+  
+  .members-table th,
+  .members-table td {
+    padding: 13px 14px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+  }
+  
+  .members-table th {
+    background: #f8fafc;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  
+  .members-table td {
+    color: #374151;
+    font-size: 14px;
+  }
+  
+  .members-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .member-role-badge {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: capitalize;
+  }
+  
+  .role-select {
+    min-width: 110px;
+    padding: 7px 9px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: #ffffff;
+  }
+  
+  .member-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .primary-button,
+  .secondary-button,
+  .danger-button {
+    border: none;
+    border-radius: 7px;
+    padding: 8px 11px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .primary-button {
+    background: #2563eb;
+    color: #ffffff;
+  }
+  
+  .secondary-button {
+    background: #e5e7eb;
+    color: #374151;
+  }
+  
+  .danger-button {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+  
+  .muted-text {
+    color: #9ca3af;
+    font-size: 13px;
+  }
+  
+  .invite-form {
+    display: flex;
+    gap: 10px;
+    max-width: 560px;
+  }
+  
+  .invite-form input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  
+  .success-message {
+    color: #15803d;
+  }
+  
+  .error-message {
+    color: #dc2626;
+  }
+  
+  .empty-members-state {
+    padding: 24px;
+    border: 1px dashed #d1d5db;
+    border-radius: 10px;
+    text-align: center;
+    color: #6b7280;
+  }
+  
+  @media (max-width: 768px) {
+    .members-page {
+      width: 100%;
+      max-width: 100%;
+    }
+  
+    .members-section {
+      padding: 16px;
+    }
+  
+    .section-heading {
+      align-items: center;
+    }
+  
+    .members-table-wrapper {
+      overflow: visible;
+      border: none;
+    }
+  
+    .members-table,
+    .members-table thead,
+    .members-table tbody,
+    .members-table tr,
+    .members-table th,
+    .members-table td {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+    }
+  
+    .members-table thead {
+      display: none;
+    }
+  
+    .members-table tr {
+      margin-bottom: 14px;
+      padding: 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #ffffff;
+    }
+  
+    .members-table td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 8px 0;
+      border: none;
+      overflow-wrap: anywhere;
+    }
+  
+    .members-table td::before {
+      content: attr(data-label);
+      flex-shrink: 0;
+      color: #6b7280;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+  
+    .member-actions {
+      justify-content: flex-end;
+    }
+  
+    .invite-form {
+      flex-direction: column;
+      max-width: none;
+    }
+  
+    .invite-form input,
+    .invite-form button {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }

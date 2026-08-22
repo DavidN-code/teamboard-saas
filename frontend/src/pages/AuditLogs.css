@@ -141,3 +141,12 @@
     min-height: 14px;
     display: block;
   }
+
+  @media (max-width: 768px) {
+  .audit-page {
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import "./AuditLogs.css";
+import PageLayout from "../components/layout/PageLayout";
 
 const formatAction = (action) => {
   const actionMap = {
@@ -77,17 +78,50 @@ const AuditLogs = () => {
     fetchData();
   }, [actionFilter, resourceFilter, page]);
 
+  const getPageNumbers = () => {
+    const pages = [];
+  
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i += 1) {
+        pages.push(i);
+      }
+  
+      return pages;
+    }
+  
+    pages.push(1);
+  
+    if (page > 4) {
+      pages.push("start-ellipsis");
+    }
+  
+    const start = Math.max(2, page - 1);
+    const end = Math.min(totalPages - 1, page + 1);
+  
+    for (let i = start; i <= end; i += 1) {
+      pages.push(i);
+    }
+  
+    if (page < totalPages - 3) {
+      pages.push("end-ellipsis");
+    }
+  
+    pages.push(totalPages);
+  
+    return pages;
+  };
+
   return (
-    <div className="audit-page">
+    <PageLayout title="Audit Logs">
+      <div className="audit-page">
   
       {loading && logs.length === 0 && (
         <p style={{ marginBottom: "10px" }}>Loading...</p>
       )}
   
-      <div className="audit-header">
-        <h1>Audit Logs</h1>
-        <p>Track activity across your organization.</p>
-      </div>
+  <div className="audit-header">
+  <p>Track activity across your organization.</p>
+</div>
   
       <div className="filter-bar">
         <select
@@ -126,12 +160,12 @@ const AuditLogs = () => {
             </thead>
   
             <tbody>
-              {loading ? (
-                [...Array(6)].map((_, i) => (
-                  <SkeletonRow key={i} />
-                ))
-              ) : (
-                logs.map((log) => (
+            {loading && logs.length === 0 ? (
+  [...Array(6)].map((_, i) => (
+    <SkeletonRow key={i} />
+  ))
+) : (
+  logs.map((log) => (
                   <tr key={log._id}>
                     <td>{log.userId?.name || "Unknown"}</td>
   
@@ -154,26 +188,55 @@ const AuditLogs = () => {
         </>
       )}
   
-      <div className="pagination">
-        <button
-          disabled={page === 1}
-          onClick={() => setPage((p) => p - 1)}
-        >
-          Previous
-        </button>
-  
-        <span>
-          Page {page} of {totalPages}
+  <div className="pagination">
+  <button
+    disabled={page === 1}
+    onClick={() => setPage((p) => p - 1)}
+  >
+    Previous
+  </button>
+
+  {getPageNumbers().map((item) => {
+    if (
+      item === "start-ellipsis" ||
+      item === "end-ellipsis"
+    ) {
+      return (
+        <span key={item}>
+          …
         </span>
-  
-        <button
-          disabled={page === totalPages}
-          onClick={() => setPage((p) => p + 1)}
-        >
-          Next
-        </button>
-      </div>
+      );
+    }
+
+    return (
+      <button
+        key={item}
+        type="button"
+        onClick={() => setPage(item)}
+        aria-current={page === item ? "page" : undefined}
+        style={{
+          fontWeight: page === item ? "700" : "400",
+          background: page === item ? "#e5e7eb" : undefined,
+        }}
+      >
+        {item}
+      </button>
+    );
+  })}
+
+  <button
+    disabled={page === totalPages}
+    onClick={() => setPage((p) => p + 1)}
+  >
+    Next
+  </button>
+
+  <span>
+    Page {page} of {totalPages}
+  </span>
+</div>
     </div>
+    </PageLayout>
   );
 };
 

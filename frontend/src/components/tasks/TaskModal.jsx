@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getUsers } from "../../api/users";
 
 export default function TaskModal({
@@ -13,6 +13,8 @@ export default function TaskModal({
   const [users, setUsers] = useState([]);
   const [assignedTo, setAssignedTo] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -67,6 +69,10 @@ const hasUnsavedChanges =
   const handleSubmit = async (e) => {
     e.preventDefault();
   
+    if (submittingRef.current) return;
+  
+    submittingRef.current = true;
+    setIsSubmitting(true);
     setError("");
   
     try {
@@ -77,15 +83,17 @@ const hasUnsavedChanges =
         priority,
         dueDate,
         assignedTo: assignedTo || null,
-            });
+      });
   
-            resetForm();
-  
+      resetForm();
     } catch (err) {
       setError(
         err.response?.data?.message ||
-        "You do not have permission to create tasks."
+        "Failed to create task."
       );
+    } finally {
+      submittingRef.current = false;
+      setIsSubmitting(false);
     }
   };
 
@@ -137,6 +145,7 @@ const hasUnsavedChanges =
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
+              maxLength={100}
               style={{
                 width: "100%",
                 padding: "10px",
@@ -151,9 +160,14 @@ const hasUnsavedChanges =
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
+              maxLength={5000}
               style={{
                 width: "100%",
                 padding: "10px",
+                resize: "vertical",
+                minHeight: "100px",
+                maxHeight: "300px",
+                overflowY: "auto",
               }}
             />
           </div>
@@ -189,6 +203,8 @@ const hasUnsavedChanges =
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
+              min="1900-01-01"
+              max="2100-12-31"
               style={{
                 width: "100%",
                 padding: "10px",
@@ -244,9 +260,12 @@ const hasUnsavedChanges =
             </button>
 
 
-            <button type="submit">
-              Create Task
-            </button>
+            <button
+  type="submit"
+  disabled={isSubmitting}
+>
+  {isSubmitting ? "Creating..." : "Create Task"}
+</button>
 
           </div>
 

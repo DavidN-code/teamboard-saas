@@ -10,7 +10,9 @@ import pusher from "../../services/pusher";
 export default function NotificationBell({ onOpenTask }) {
     const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
+  const [mobileMenuTop, setMobileMenuTop] = useState(0);
   const notificationRef = useRef(null);
+  const notificationButtonRef = useRef(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -167,26 +169,72 @@ export default function NotificationBell({ onOpenTask }) {
   ref={notificationRef}
   style={{ position: "relative" }}
 >      <button
-        onClick={() => setOpen(!open)}
-      >
-        🔔 {unreadCount}
-      </button>
+  ref={notificationButtonRef}
+  onClick={() => {
+    if (!open && notificationButtonRef.current) {
+      const rect =
+        notificationButtonRef.current.getBoundingClientRect();
+  
+      setMobileMenuTop(rect.bottom + 8);
+    }
+  
+    setOpen((current) => !current);
+  }}  style={{
+    whiteSpace: "nowrap",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "4px",
+  }}
+>
+  🔔 {unreadCount}
+</button>
 
       {open && (
         <div
-          style={{
-            position: "absolute",
-            top: "40px",
-            right: 0,
-            width: "320px",
-            background: "white",
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            padding: "12px",
-            zIndex: 1000,
-            boxShadow:
-              "0 4px 12px rgba(0,0,0,0.15)",
-          }}
+        style={{
+          position:
+            window.innerWidth <= 768
+              ? "fixed"
+              : "absolute",
+        
+          top:
+            window.innerWidth <= 768
+              ? `${mobileMenuTop}px`
+              : "40px",
+        
+          right:
+            window.innerWidth <= 768
+              ? "16px"
+              : 0,
+        
+          left:
+            window.innerWidth <= 768
+              ? "16px"
+              : "auto",
+        
+          width:
+            window.innerWidth <= 768
+              ? "auto"
+              : "320px",
+        
+          maxWidth:
+            window.innerWidth <= 768
+              ? "none"
+              : "320px",
+
+              maxHeight: "70vh",
+              overflowY: "auto",
+              overscrollBehavior: "contain",
+              WebkitOverflowScrolling: "touch",
+        
+          boxSizing: "border-box",
+          background: "white",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          padding: "12px",
+          zIndex: 1000,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        }}
         >
           <div
   style={{
@@ -250,10 +298,17 @@ export default function NotificationBell({ onOpenTask }) {
     {getNotificationIcon(notification.type)}
   </span>
 
-  <div>
-    <div>
-      {notification.message}
-    </div>
+  <div style={{ minWidth: 0, flex: 1 }}>
+  <div
+  style={{
+    minWidth: 0,
+    overflowWrap: "anywhere",
+    wordBreak: "break-word",
+    whiteSpace: "normal",
+  }}
+>
+  {notification.message}
+</div>
 
     <small
       style={{

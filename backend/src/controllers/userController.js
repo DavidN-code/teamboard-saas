@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const pusher = require("../services/pusherService");
 
 // GET all users in current organization
 exports.getUsers = async (req, res, next) => {
@@ -53,9 +54,19 @@ exports.updateUserRole = async (req, res, next) => {
 
     user.role = role;
 
-    await user.save();
+await user.save();
 
-    res.json(user);
+await pusher.trigger(
+  `organization-${req.user.organizationId}`,
+  "user-role-updated",
+  {
+    userId: user._id.toString(),
+    role: user.role,
+  }
+);
+
+res.json(user);
+
   } catch (error) {
     next(error);
   }

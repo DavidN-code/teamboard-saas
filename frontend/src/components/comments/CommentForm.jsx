@@ -62,7 +62,10 @@ const handleSubmit = async (e) => {
   borderRadius: "6px",
   fontSize: "14px",
   resize: "vertical",
-  boxSizing: "border-box",
+minHeight: "80px",
+maxHeight: "220px",
+overflowY: "auto",
+boxSizing: "border-box",
         }}
       />
 

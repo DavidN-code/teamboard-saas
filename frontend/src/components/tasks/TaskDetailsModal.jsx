@@ -730,6 +730,9 @@ const hasUnsavedChanges =
       fontSize: "15px",
       lineHeight: 1.5,
       resize: "vertical",
+      minHeight: "100px",
+      maxHeight: "300px",
+      overflowY: "auto",
       outline: "none",
     }}
   />

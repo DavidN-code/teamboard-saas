@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { useAuth } from "../context/useAuth";
+import PageLayout from "../components/layout/PageLayout";
+import "./OrganizationMembers.css";
 
 const OrganizationMembers = () => {
   const { user } = useAuth();
@@ -137,155 +139,241 @@ if (user?.role === "owner") {
   };
 
   return (
-    <div>
-      <h1>Organization Members</h1>
-      
-
-      <table>
-        <thead>
-        <tr>
-  <th>Name</th>
-  <th>Email</th>
-  <th>Role</th>
-  {user?.role === "owner" && <th>Actions</th>}
-</tr>
-        </thead>
-
-        <tbody>
-          {users.map((u) => (
-            <tr key={u._id}>
-              <td>{u.name}</td>
-              <td>{u.email}</td>
-              <td>
-  {u.role === "owner" ? (
-    <span
-      className={`px-2 py-1 rounded text-xs font-medium ${getRoleBadgeClass(
-        u.role
-      )}`}
-    >
-      👑 OWNER
-    </span>
-  ) : user?.role === "owner" ? (
-    <select
-  value={u.role}
-  onChange={(e) =>
-    handleRoleChange(u, e.target.value)
-  }
->
-      <option value="admin">Admin</option>
-      <option value="member">Member</option>
-    </select>
-  ) : (
-    <span
-      className={`px-2 py-1 rounded text-xs font-medium ${getRoleBadgeClass(
-        u.role
-      )}`}
-    >
-      {u.role.toUpperCase()}
-    </span>
-  )}
-</td>
-{user?.role === "owner" && (
-  <td>
-    {user._id !== u._id && (
-      <button
-        onClick={() => handleDeleteUser(u._id)}
-        className="bg-red-500 text-white px-2 py-1 rounded text-xs"
-      >
-        Remove
-      </button>
-    )}
-  </td>
-)}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {user?.role === "owner" && (
-        <>
-      <h3>Pending Invitations</h3>
-      <table>
-  <thead>
-  <tr>
-  <th>Email</th>
-  <th>Invited By</th>
-  <th>Created</th>
-  {user?.role === "owner" && <th>Actions</th>}
-</tr>
-  </thead>
-
-  <tbody>
-    {invitations.map((invite) => (
-      <tr key={invite._id}>
-        <td>{invite.email}</td>
-
-        <td>
-          {invite.invitedBy?.name || invite.invitedBy?.email || "Unknown"}
-        </td>
-
-        <td>
-          {new Date(invite.createdAt).toLocaleDateString()}
-        </td>
-
-        <td>
-  <button
-    onClick={() => handleResendInvitation(invite._id)}
-    className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
-  >
-    Resend
-  </button>
-
-  <button
-    onClick={() => handleRevokeInvitation(invite._id)}
-    className="bg-red-500 text-white px-2 py-1 rounded text-xs"
-  >
-    Revoke
-  </button>
-</td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-</>
-)}
-
-{user?.role === "owner" && (
-      <div style={{ marginBottom: "20px" }}>
-
-      
-  <h3>Invite User</h3>
-
-
-  {inviteMessage && (
-  <p style={{ color: "green" }}>{inviteMessage}</p>
-)}
-
-{inviteError && (
-  <p style={{ color: "red" }}>{inviteError}</p>
-)}
-
-<form
-  onSubmit={(e) => {
-    e.preventDefault();
-    handleInviteUser();
-  }}
->
-  <input
-    type="email"
-    placeholder="email@example.com"
-    value={inviteEmail}
-    onChange={(e) => setInviteEmail(e.target.value)}
-  />
-
-  <button type="submit">
-    Send Invite
-  </button>
-</form>
-
-</div>
-
-)}
-    </div>
+    <PageLayout title="Organization Members">
+      <div className="members-page">
+  
+        <section className="members-section">
+          <div className="section-heading">
+            <div>
+              <h2>Members</h2>
+              <p>
+                Manage people in your organization and review their roles.
+              </p>
+            </div>
+  
+            <span className="member-count">
+              {users.length} {users.length === 1 ? "member" : "members"}
+            </span>
+          </div>
+  
+          <div className="members-table-wrapper">
+            <table className="members-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+  
+                  {user?.role === "owner" && (
+                    <th>Actions</th>
+                  )}
+                </tr>
+              </thead>
+  
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u._id}>
+                    <td data-label="Name">
+                      <strong>{u.name}</strong>
+                    </td>
+  
+                    <td data-label="Email">
+                      {u.email}
+                    </td>
+  
+                    <td data-label="Role">
+                      {u.role === "owner" ? (
+                        <span
+                          className={`member-role-badge ${getRoleBadgeClass(
+                            u.role
+                          )}`}
+                        >
+                          👑 Owner
+                        </span>
+                      ) : user?.role === "owner" ? (
+                        <select
+                          className="role-select"
+                          value={u.role}
+                          onChange={(e) =>
+                            handleRoleChange(u, e.target.value)
+                          }
+                        >
+                          <option value="admin">Admin</option>
+                          <option value="member">Member</option>
+                        </select>
+                      ) : (
+                        <span
+                          className={`member-role-badge ${getRoleBadgeClass(
+                            u.role
+                          )}`}
+                        >
+                          {u.role}
+                        </span>
+                      )}
+                    </td>
+  
+                    {user?.role === "owner" && (
+                      <td data-label="Actions">
+                        {user._id !== u._id ? (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteUser(u._id)}
+                            className="danger-button"
+                          >
+                            Remove
+                          </button>
+                        ) : (
+                          <span className="muted-text">
+                            Current user
+                          </span>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+  
+        {user?.role === "owner" && (
+          <>
+            <section className="members-section">
+              <div className="section-heading">
+                <div>
+                  <h2>Pending Invitations</h2>
+                  <p>
+                    Invitations that have been sent but not yet accepted.
+                  </p>
+                </div>
+  
+                <span className="member-count">
+                  {invitations.length}
+                </span>
+              </div>
+  
+              {invitations.length === 0 ? (
+                <div className="empty-members-state">
+                  No pending invitations.
+                </div>
+              ) : (
+                <div className="members-table-wrapper">
+                  <table className="members-table invitations-table">
+                    <thead>
+                      <tr>
+                        <th>Email</th>
+                        <th>Invited By</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+  
+                    <tbody>
+                      {invitations.map((invite) => (
+                        <tr key={invite._id}>
+                          <td data-label="Email">
+                            {invite.email}
+                          </td>
+  
+                          <td data-label="Invited By">
+                            {invite.invitedBy?.name ||
+                              invite.invitedBy?.email ||
+                              "Unknown"}
+                          </td>
+  
+                          <td data-label="Created">
+                            {new Date(
+                              invite.createdAt
+                            ).toLocaleDateString()}
+                          </td>
+  
+                          <td data-label="Actions">
+                            <div className="member-actions">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleResendInvitation(
+                                    invite._id
+                                  )
+                                }
+                                className="secondary-button"
+                              >
+                                Resend
+                              </button>
+  
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleRevokeInvitation(
+                                    invite._id
+                                  )
+                                }
+                                className="danger-button"
+                              >
+                                Revoke
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+  
+            <section className="members-section invite-section">
+              <div className="section-heading">
+                <div>
+                  <h2>Invite User</h2>
+                  <p>
+                    Send an invitation to join this organization.
+                  </p>
+                </div>
+              </div>
+  
+              {inviteMessage && (
+                <p className="success-message">
+                  {inviteMessage}
+                </p>
+              )}
+  
+              {inviteError && (
+                <p className="error-message">
+                  {inviteError}
+                </p>
+              )}
+  
+              <form
+                className="invite-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleInviteUser();
+                }}
+              >
+                <input
+                  type="email"
+                  placeholder="email@example.com"
+                  value={inviteEmail}
+                  onChange={(e) =>
+                    setInviteEmail(e.target.value)
+                  }
+                  required
+                />
+  
+                <button
+                  type="submit"
+                  className="primary-button"
+                >
+                  Send Invite
+                </button>
+              </form>
+            </section>
+          </>
+        )}
+  
+      </div>
+    </PageLayout>
   );
 };
 

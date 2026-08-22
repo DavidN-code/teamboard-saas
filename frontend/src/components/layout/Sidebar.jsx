@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/useAuth";
 import pusher from "../../services/pusher";
 import api from "../../api/axios";
 import { useActiveBoard } from "../../context/useActiveBoard";
-import { Link } from "react-router-dom";
-
+import {
+  NavLink,
+  useNavigate,
+} from "react-router-dom";
 export default function Sidebar({
   isMobile = false,
   isOpen = true,
@@ -13,7 +15,12 @@ export default function Sidebar({
   const [newBoardName, setNewBoardName] = useState("");
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [openBoardMenu, setOpenBoardMenu] = useState(null);
+  const [boardMenuPlacement, setBoardMenuPlacement] =
+  useState("down");
+  const boardMenuRef = useRef(null);
+  const boardMenuButtonRef = useRef(null);
   const [renamingBoardId, setRenamingBoardId] = useState(null);
   const [renameBoardName, setRenameBoardName] = useState("");
 
@@ -134,6 +141,34 @@ useEffect(() => {
     };
   }, [user?.organizationId, setActiveBoard]);
 
+  useEffect(() => {
+    if (!openBoardMenu) return;
+  
+    const handlePointerDown = (event) => {
+      const clickedInsideMenu =
+        boardMenuRef.current?.contains(event.target);
+  
+      const clickedMenuButton =
+        boardMenuButtonRef.current?.contains(event.target);
+  
+      if (!clickedInsideMenu && !clickedMenuButton) {
+        setOpenBoardMenu(null);
+      }
+    };
+  
+    document.addEventListener(
+      "pointerdown",
+      handlePointerDown
+    );
+  
+    return () => {
+      document.removeEventListener(
+        "pointerdown",
+        handlePointerDown
+      );
+    };
+  }, [openBoardMenu]);
+
   // Create board
   const handleCreateBoard = async (e) => {
     e.preventDefault();
@@ -195,6 +230,7 @@ useEffect(() => {
   
     try {
       await api.delete(`/boards/${board._id}`);
+        
       setOpenBoardMenu(null);
     } catch (err) {
       console.error("Failed to delete board", err);
@@ -203,7 +239,7 @@ useEffect(() => {
 
   return (
     <aside
-    style={{
+  style={{
       width: "250px",
       minWidth: "250px",
       height: "100vh",
@@ -287,34 +323,72 @@ useEffect(() => {
       </div>
   
       <nav style={{ marginBottom: "28px" }}>
-        <Link
+        <NavLink
           to="/dashboard"
-          style={{
+          style={({ isActive }) => ({
             display: "block",
             padding: "10px 12px",
             marginBottom: "6px",
             borderRadius: "8px",
             textDecoration: "none",
-            color: "#374151",
+            color: isActive ? "#1d4ed8" : "#374151",
+            background: isActive ? "#eff6ff" : "transparent",
             fontWeight: "600",
-          }}
+          })}
         >
           📊 Dashboard
-        </Link>
+        </NavLink>
   
-        <Link
+        <NavLink
           to="/my-tasks"
-          style={{
+          style={({ isActive }) => ({
             display: "block",
             padding: "10px 12px",
+            marginBottom: "6px",
             borderRadius: "8px",
             textDecoration: "none",
-            color: "#374151",
+            color: isActive ? "#1d4ed8" : "#374151",
+            background: isActive ? "#eff6ff" : "transparent",
             fontWeight: "600",
-          }}
+          })}
         >
           ✅ My Tasks
-        </Link>
+        </NavLink>
+        {user && ["owner", "admin"].includes(user.role) && (
+  <>
+    <NavLink
+      to="/members"
+      style={({ isActive }) => ({
+        display: "block",
+        padding: "10px 12px",
+        marginBottom: "6px",
+        borderRadius: "8px",
+        textDecoration: "none",
+        color: isActive ? "#1d4ed8" : "#374151",
+        background: isActive ? "#eff6ff" : "transparent",
+        fontWeight: "600",
+      })}
+    >
+      👥 Members
+    </NavLink>
+
+    <NavLink
+      to="/audit-logs"
+      style={({ isActive }) => ({
+        display: "block",
+        padding: "10px 12px",
+        marginBottom: "6px",
+        borderRadius: "8px",
+        textDecoration: "none",
+        color: isActive ? "#1d4ed8" : "#374151",
+        background: isActive ? "#eff6ff" : "transparent",
+        fontWeight: "600",
+      })}
+    >
+      📋 Audit Logs
+    </NavLink>
+  </>
+)}
       </nav>
 
       {user && ["owner", "admin"].includes(user.role) && (
@@ -493,8 +567,11 @@ useEffect(() => {
 ) : (
   <button
     type="button"
-    onClick={() => setActiveBoard(board)}
-    style={{
+    onClick={() => {
+      setActiveBoard(board); 
+      navigate("/dashboard");
+    }}
+        style={{
       flex: 1,
       minWidth: 0,
       padding: "10px 12px",
@@ -517,11 +594,30 @@ useEffect(() => {
               {user?.role === "owner" &&
   renamingBoardId !== board._id && (
                     <button
+                      ref={openBoardMenu === board._id ? boardMenuButtonRef : null}
                       type="button"
                       aria-label={`Manage ${board.name}`}
                       onClick={(e) => {
                         e.stopPropagation();
-              
+                      
+                        const willOpen = openBoardMenu !== board._id;
+                      
+                        if (willOpen) {
+                          const buttonRect =
+                            e.currentTarget.getBoundingClientRect();
+                      
+                          const estimatedMenuHeight = 90;
+                      
+                          const spaceBelow =
+                            window.innerHeight - buttonRect.bottom;
+                      
+                          setBoardMenuPlacement(
+                            spaceBelow < estimatedMenuHeight
+                              ? "up"
+                              : "down"
+                          );
+                        }
+                      
                         setOpenBoardMenu((current) =>
                           current === board._id ? null : board._id
                         );
@@ -547,10 +643,20 @@ useEffect(() => {
                   {user?.role === "owner" &&
                     openBoardMenu === board._id && (
                       <div
+                        ref={boardMenuRef}
                         style={{
                           position: "absolute",
-                          top: "40px",
                           right: "4px",
+
+                          top:
+                            boardMenuPlacement === "down"
+                              ? "40px"
+                              : "auto",
+
+                          bottom:
+                            boardMenuPlacement === "up"
+                              ? "40px"
+                              : "auto",
                           zIndex: 20,
                           width: "140px",
                           padding: "6px",

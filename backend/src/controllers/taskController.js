@@ -62,6 +62,12 @@ exports.createTask = async (req, res, next) => {
           "task-created",
           populatedTask
         );
+
+        await pusher.trigger(
+          `organization-${req.user.organizationId}`,
+          "metrics-updated",
+          {}
+        );
       
       res.status(201).json(populatedTask);
 
@@ -212,14 +218,37 @@ const assigneeChanged =
     if (updates.dueDate !== undefined) {
       const oldDate = existingTask.dueDate
         ? new Date(existingTask.dueDate).toISOString().split("T")[0]
-        : null;
-
-      if (updates.dueDate !== oldDate) {
+        : "";
+    
+      const newDate = updates.dueDate || "";
+    
+      if (newDate !== oldDate) {
         changes.push(
-          `changed due date from ${oldDate || "none"} to ${updates.dueDate}`
+          `changed due date from ${oldDate || "none"} to ${newDate || "none"}`
         );
       }
     }
+
+    const hasOtherChanges = changes.length > 0;
+
+if (assigneeChanged && hasOtherChanges) {
+  const previousAssignee = existingAssigneeId
+    ? await User.findById(existingAssigneeId).select("name")
+    : null;
+
+  const previousName = previousAssignee?.name || "unassigned";
+  const newName = task.assignedTo?.name || "unassigned";
+
+  if (!existingAssigneeId && task.assignedTo) {
+    changes.push(`assigned task to ${newName}`);
+  } else if (existingAssigneeId && !task.assignedTo) {
+    changes.push(`unassigned task from ${previousName}`);
+  } else {
+    changes.push(
+      `reassigned task from ${previousName} to ${newName}`
+    );
+  }
+}
 
     // -------------------------
     // NOTIFICATION
@@ -245,8 +274,8 @@ const assigneeChanged =
 // AUDIT LOGGING
 // -------------------------
 
-if (assigneeChanged) {
-  await createAuditLog({
+if (assigneeChanged && !hasOtherChanges) {
+    await createAuditLog({
     action: "ASSIGN_TASK",
     resourceType: "Task",
     resourceId: task._id,
@@ -291,6 +320,12 @@ const response = await pusher.trigger(
   populatedTask
 );
 
+await pusher.trigger(
+  `organization-${req.user.organizationId}`,
+  "metrics-updated",
+  {}
+);
+
 return res.json(populatedTask);
   } catch (err) {
     next(err);
@@ -326,6 +361,12 @@ exports.deleteTask = async (req, res, next) => {
       {
         taskId: task._id,
       }
+    );
+
+    await pusher.trigger(
+      `organization-${req.user.organizationId}`,
+      "metrics-updated",
+      {}
     );
   
     res.json({ message: 'Task deleted successfully' });

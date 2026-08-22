@@ -94,6 +94,9 @@ maxWidth: "100%",
     borderRadius: "6px",
     fontSize: "14px",
     resize: "vertical",
+    minHeight: "80px",
+    maxHeight: "220px",
+    overflowY: "auto",
     boxSizing: "border-box",
   }}
 />
