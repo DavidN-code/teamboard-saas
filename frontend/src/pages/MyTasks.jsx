@@ -24,7 +24,16 @@ export default function MyTasks() {
   };
 
   useEffect(() => {
-    fetchMyTasks();
+    const loadInitialTasks = async () => {
+      try {
+        const res = await api.get("/tasks/my-tasks");
+        setTasks(res.data);
+      } catch (err) {
+        console.error("Failed to load assigned tasks", err);
+      }
+    };
+  
+    loadInitialTasks();
   }, []);
 
   useEffect(() => {
