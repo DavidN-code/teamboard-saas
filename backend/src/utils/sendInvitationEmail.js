@@ -12,43 +12,25 @@ const sendInvitationEmail = async (email, inviteLink) => {
       to: email,
       subject: "You're invited to join TeamBoard",
       html: `
-        <div style="font-family: Arial, sans-serif;">
-          <h2>You're invited to TeamBoard</h2>
-
-          <p>
-            You have been invited to join an organization on TeamBoard.
-          </p>
-
-          <p>
-            Click the button below to accept your invitation:
-          </p>
-
-          <a
-            href="${inviteLink}"
-            style="
-              display:inline-block;
-              padding:12px 18px;
-              background:#4f46e5;
-              color:white;
-              text-decoration:none;
-              border-radius:6px;
-              font-weight:bold;
-            "
-          >
-            Accept Invitation
-          </a>
-
-          <p style="margin-top:20px;">
-            If the button doesn't work, copy and paste this link:
-          </p>
-
-          <p>${inviteLink}</p>
-        </div>
+        ...
       `,
     });
-
-    console.log(`✅ Invitation email sent to ${email}`);
-    return response;
+    
+    if (response.error) {
+      console.error(
+        `❌ Invitation email failed for ${email}:`,
+        response.error
+      );
+    
+      throw new Error(response.error.message);
+    }
+    
+    console.log(
+      `✅ Invitation email sent to ${email}`,
+      response.data
+    );
+    
+    return response.data;
 
   } catch (error) {
     console.error("❌ Email send failed:", error);

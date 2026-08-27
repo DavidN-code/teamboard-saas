@@ -290,14 +290,20 @@ useEffect(() => {
         </h2>
   
         <p
-          style={{
-            margin: "4px 0 0",
-            fontSize: "13px",
-            color: "#9ca3af",
-          }}
-        >
-          Project workspace
-        </p>
+  style={{
+    margin: "4px 0 0",
+    fontSize: "13px",
+    color: "#6b7280",
+    fontWeight: "500",
+    maxWidth: "165px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  }}
+  title={user?.organizationName || ""}
+>
+  {user?.organizationName || "Project workspace"}
+</p>
         </div>
 
 {isMobile && (

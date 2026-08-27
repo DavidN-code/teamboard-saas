@@ -1,4 +1,5 @@
 const Invitation = require("../models/Invitation");
+const User = require("../models/User");
 const crypto = require("crypto");
 const sendInvitationEmail = require("../utils/sendInvitationEmail");
 const createAuditLog = require("../services/auditLogService");
@@ -6,7 +7,21 @@ const createAuditLog = require("../services/auditLogService");
 exports.createInvitation = async (req, res, next) => {
   try {
     const token = crypto.randomBytes(32).toString("hex");
-    const { email } = req.body;
+    const email = req.body.email?.trim().toLowerCase();
+    if (!email) {
+      return res.status(400).json({
+        message: "Email address is required.",
+      });
+    }
+    const existingUser = await User.findOne({
+      email,
+    });
+    
+    if (existingUser) {
+      return res.status(400).json({
+        message: "A TeamBoard account already exists with this email address.",
+      });
+    }
     const existingInvitation = await Invitation.findOne({
         email,
         organizationId: req.user.organizationId,
@@ -68,7 +83,8 @@ exports.getInvitationByToken = async (req, res, next) => {
   
       if (!invitation) {
         return res.status(404).json({
-          message: "Invitation not found or expired",
+          message: "This invitation is no longer available. It may have already been accepted or expired.",
+
         });
       }
 
@@ -144,26 +160,23 @@ exports.getInvitationByToken = async (req, res, next) => {
   
   
       const newToken = crypto.randomBytes(32).toString("hex");
-  
-  
-      invitation.token = newToken;
-  
-      invitation.expiresAt = new Date(
-        Date.now() + 7 * 24 * 60 * 60 * 1000
-      );
-  
-  
-      await invitation.save();
-  
-  
-      const inviteLink =
-        `http://localhost:5173/register?token=${newToken}`;
-  
-  
-      await sendInvitationEmail(
-        invitation.email,
-        inviteLink
-      );
+
+const newExpiresAt = new Date(
+  Date.now() + 7 * 24 * 60 * 60 * 1000
+);
+
+const inviteLink =
+  `${process.env.FRONTEND_URL}/register?token=${newToken}`;
+
+await sendInvitationEmail(
+  invitation.email,
+  inviteLink
+);
+
+invitation.token = newToken;
+invitation.expiresAt = newExpiresAt;
+
+await invitation.save();
 
       await createAuditLog({
         action: "RESEND_INVITATION",

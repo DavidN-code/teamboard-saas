@@ -11,6 +11,8 @@ const OrganizationMembers = () => {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteMessage, setInviteMessage] = useState("");
 const [inviteError, setInviteError] = useState("");
+const [resendMessage, setResendMessage] = useState("");
+const [resendError, setResendError] = useState("");
 const [invitations, setInvitations] = useState([]);
 
   useEffect(() => {
@@ -86,6 +88,9 @@ if (user?.role === "owner") {
       await api.post("/invitations", {
         email: inviteEmail,
       });
+
+      const invitationsRes = await api.get("/invitations");
+setInvitations(invitationsRes.data);
       
       setInviteMessage("Invitation sent");
       setInviteEmail("");
@@ -126,14 +131,18 @@ if (user?.role === "owner") {
 
   const handleResendInvitation = async (invitationId) => {
     try {
+      setResendError("");
+      setResendMessage("");
+  
       await api.put(`/invitations/${invitationId}/resend`);
   
-      setInviteMessage("Invitation resent successfully");
-  
+      setResendMessage("Invitation resent successfully");
     } catch (err) {
-      console.error(
+      setResendMessage("");
+  
+      setResendError(
         err.response?.data?.message ||
-        "Failed to resend invitation"
+          "Failed to resend invitation"
       );
     }
   };
@@ -251,6 +260,18 @@ if (user?.role === "owner") {
                   {invitations.length}
                 </span>
               </div>
+
+              {resendMessage && (
+  <p className="success-message">
+    {resendMessage}
+  </p>
+)}
+
+{resendError && (
+  <p className="error-message">
+    {resendError}
+  </p>
+)}
   
               {invitations.length === 0 ? (
                 <div className="empty-members-state">
