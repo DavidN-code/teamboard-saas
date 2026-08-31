@@ -171,68 +171,76 @@ const [sortBy, setSortBy] = useState("");
     fetchTasks();
   }, [activeBoard]);
 
-  /* ---------------- REAL-TIME TASK UPDATES ---------------- */
-  useEffect(() => {
-    if (!activeBoardId) return;
-  
-    const channelName = `board-${activeBoardId}`;
-    const channel = pusher.subscribe(channelName);
+/* ---------------- REAL-TIME TASK UPDATES ---------------- */
+useEffect(() => {
+  if (!activeBoardId) return;
 
-    channel.bind("task-created", (newTask) => {
-      setTasks((prev) => {
-        const exists = prev.some(
-          (task) => task._id === newTask._id
-        );
-  
-        if (exists) {
-          return prev;
-        }
-  
-        return [...prev, newTask];
-      });
-  
-      setActivityRefresh((prev) => prev + 1);
-    });
-  
-  
-    channel.bind("task-updated", (updatedTask) => {
+  const channelName = `board-${activeBoardId}`;
+  const channel = pusher.subscribe(channelName);
 
-      setTasks((prev) =>
-        prev.map((task) =>
-          task._id === updatedTask._id
-            ? updatedTask
-            : task
-        )
+  const handleTaskCreated = (newTask) => {
+    setTasks((prev) => {
+      const exists = prev.some(
+        (task) => task._id === newTask._id
       );
-  
-      setActivityRefresh((prev) => prev + 1);
+
+      if (exists) {
+        return prev;
+      }
+
+      return [...prev, newTask];
     });
-  
-  
-    channel.bind("task-deleted", (data) => {
-      setTasks((prev) =>
-        prev.filter(
-          (task) => task._id !== data.taskId
-        )
-      );
-    
-      setSelectedTask((currentTask) => {
-        if (currentTask?._id === data.taskId) {
-          setIsDetailsModalOpen(false);
-          return null;
-        }
-    
-        return currentTask;
-      });
-    
-      setActivityRefresh((prev) => prev + 1);
+
+    setActivityRefresh((prev) => prev + 1);
+  };
+
+  const handleTaskUpdated = (updatedTask) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task._id === updatedTask._id
+          ? updatedTask
+          : task
+      )
+    );
+
+    setActivityRefresh((prev) => prev + 1);
+  };
+
+  const handleTaskDeleted = (data) => {
+    setTasks((prev) =>
+      prev.filter(
+        (task) => task._id !== data.taskId
+      )
+    );
+
+    setSelectedTask((currentTask) => {
+      if (currentTask?._id === data.taskId) {
+        setIsDetailsModalOpen(false);
+        return null;
+      }
+
+      return currentTask;
     });
-  
-    channel.bind("activity-updated", () => {
-      setActivityRefresh((prev) => prev + 1);
-    });
-  
-  }, [activeBoardId]);
+
+    setActivityRefresh((prev) => prev + 1);
+  };
+
+  const handleActivityUpdated = () => {
+    setActivityRefresh((prev) => prev + 1);
+  };
+
+  channel.bind("task-created", handleTaskCreated);
+  channel.bind("task-updated", handleTaskUpdated);
+  channel.bind("task-deleted", handleTaskDeleted);
+  channel.bind("activity-updated", handleActivityUpdated);
+
+  return () => {
+    channel.unbind("task-created", handleTaskCreated);
+    channel.unbind("task-updated", handleTaskUpdated);
+    channel.unbind("task-deleted", handleTaskDeleted);
+    channel.unbind("activity-updated", handleActivityUpdated);
+  };
+}, [activeBoardId]);
 
   const fetchMetrics = async () => {
     try {
@@ -397,11 +405,25 @@ const [sortBy, setSortBy] = useState("");
   
       setSelectedTask(task);
       setIsDetailsModalOpen(true);
+  
+      return { success: true };
     } catch (err) {
       console.error(
         "Failed to open task from notification",
         err
       );
+  
+      if (err.response?.status === 404) {
+        return {
+          success: false,
+          message: "This task is no longer available.",
+        };
+      }
+  
+      return {
+        success: false,
+        message: "Unable to open this task. Please try again.",
+      };
     }
   };
 

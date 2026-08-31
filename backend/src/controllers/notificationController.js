@@ -63,3 +63,20 @@ exports.markAllAsRead = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.clearReadNotifications = async (req, res, next) => {
+  try {
+    const result = await Notification.deleteMany({
+      userId: req.user.userId,
+      organizationId: req.user.organizationId,
+      read: true,
+    });
+
+    res.json({
+      message: "Read notifications cleared",
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

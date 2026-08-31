@@ -200,17 +200,23 @@ const hasUnsavedChanges =
             </label>
 
             <input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              min="1900-01-01"
-              max="2100-12-31"
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginTop: "6px",
-              }}
-            />
+  type="date"
+  value={dueDate}
+  onChange={(e) => setDueDate(e.target.value)}
+  onClick={(e) => {
+    if (typeof e.currentTarget.showPicker === "function") {
+      e.currentTarget.showPicker();
+    }
+  }}
+  min="1900-01-01"
+  max="2100-12-31"
+  style={{
+    width: "100%",
+    padding: "10px",
+    marginTop: "6px",
+    cursor: "pointer",
+  }}
+/>
           </div>
 
 

@@ -683,20 +683,29 @@ const hasUnsavedChanges =
     </label>
 
     <input
-      type="date"
-      value={dueDate}
-      onChange={(e) => setDueDate(e.target.value)}
-      disabled={!canEditTask}
-      style={{
-        width: "100%",
-        boxSizing: "border-box",
-        padding: "10px 12px",
-        border: "1px solid #d1d5db",
-        borderRadius: "8px",
-        background: canEditTask ? "#fff" : "#f9fafb",
-        fontSize: "15px",
-      }}
-    />
+  type="date"
+  value={dueDate}
+  onChange={(e) => setDueDate(e.target.value)}
+  onClick={(e) => {
+    if (
+      canEditTask &&
+      typeof e.currentTarget.showPicker === "function"
+    ) {
+      e.currentTarget.showPicker();
+    }
+  }}
+  disabled={!canEditTask}
+  style={{
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "10px 12px",
+    border: "1px solid #d1d5db",
+    borderRadius: "8px",
+    background: canEditTask ? "#fff" : "#f9fafb",
+    fontSize: "15px",
+    cursor: canEditTask ? "pointer" : "default",
+  }}
+/>
   </div>
 </div>
 

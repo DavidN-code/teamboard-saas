@@ -73,22 +73,32 @@ overflow: "hidden",
   }}
 >
       
-      {/* Drag handle ONLY */}
-      {(canDrag || dragOverlay) && (
+      {/* Drag handle */}
+{(canDrag || dragOverlay) && (
   <div
     {...(!dragOverlay && canDrag ? attributes : {})}
     {...(!dragOverlay && canDrag ? listeners : {})}
     style={{
-      cursor: dragOverlay ? "grabbing" : "grab",
-      paddingBottom: "10px",
+      display: "flex",
+      alignItems: "center",
+      gap: "7px",
+      margin: "-6px -6px 10px",
+      padding: "6px 8px",
+      borderRadius: "6px",
+      background: "#f8fafc",
       color: "#9ca3af",
-      fontSize: "18px",
+      fontSize: "13px",
+      fontWeight: "500",
+      cursor: dragOverlay ? "grabbing" : "grab",
       touchAction: "none",
       userSelect: "none",
       WebkitUserSelect: "none",
     }}
   >
-    ☰
+    <span style={{ fontSize: "17px", lineHeight: 1 }}>
+      ☰
+    </span>
+
   </div>
 )}
 

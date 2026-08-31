@@ -61,12 +61,15 @@ export default function Sidebar({
     }
   };
 
-  // Initial board hydration only.
-// Making fetchBoards reactive causes repeated requests because it can update activeBoard.
+  // Load boards after the active-board state has been restored
+// from localStorage. This prevents a first-time user from
+// landing on the dashboard with no board selected.
 useEffect(() => {
+  if (!boardInitialized) return;
+
   fetchBoards();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
+}, [boardInitialized]);
 
   useEffect(() => {
     if (!user?.organizationId) return;

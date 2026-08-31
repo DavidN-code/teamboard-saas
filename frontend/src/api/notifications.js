@@ -10,3 +10,6 @@ export const markNotificationRead = (id) => {
 
 export const markAllNotificationsRead = () =>
   api.put("/notifications/read-all");
+
+export const clearReadNotifications = () =>
+  api.delete("/notifications/read");

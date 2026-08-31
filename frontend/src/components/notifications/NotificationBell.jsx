@@ -3,6 +3,7 @@ import {
   getNotifications,
   markNotificationRead,
   markAllNotificationsRead,
+  clearReadNotifications,
 } from "../../api/notifications";
 import { useAuth } from "../../context/useAuth";
 import pusher from "../../services/pusher";
@@ -10,6 +11,8 @@ import pusher from "../../services/pusher";
 export default function NotificationBell({ onOpenTask }) {
     const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
+  const [notificationError, setNotificationError] = useState(null);
+
   const [mobileMenuTop, setMobileMenuTop] = useState(0);
   const notificationRef = useRef(null);
   const notificationButtonRef = useRef(null);
@@ -105,26 +108,42 @@ export default function NotificationBell({ onOpenTask }) {
   ).length;
 
   const handleNotificationClick = async (notification) => {
-    try {
-      await markNotificationRead(notification._id);
-  
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n._id === notification._id
-            ? { ...n, read: true }
-            : n
-        )
-      );
-  
-      if (notification.resourceId) {
-        onOpenTask(notification.resourceId);
+  try {
+    await markNotificationRead(notification._id);
+
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n._id === notification._id
+          ? { ...n, read: true }
+          : n
+      )
+    );
+
+    setNotificationError(null);
+
+    if (notification.resourceId) {
+      const result = await onOpenTask(notification.resourceId);
+
+      if (result?.success) {
         setOpen(false);
+      } else {
+        setNotificationError({
+          notificationId: notification._id,
+          message:
+            result?.message ||
+            "Unable to open this task. Please try again.",
+        });
       }
-  
-    } catch (err) {
-      console.error(err);
     }
-  };
+  } catch (err) {
+    console.error(err);
+
+    setNotificationError({
+      notificationId: notification._id,
+      message: "Unable to open this notification. Please try again.",
+    });
+  }
+};
 
   const handleMarkAllRead = async () => {
     try {
@@ -139,6 +158,20 @@ export default function NotificationBell({ onOpenTask }) {
   
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleClearRead = async () => {
+    try {
+      await clearReadNotifications();
+  
+      setNotifications((prev) =>
+        prev.filter((notification) => !notification.read)
+      );
+  
+      setNotificationError(null);
+    } catch (err) {
+      console.error("Failed to clear read notifications", err);
     }
   };
 
@@ -245,6 +278,14 @@ export default function NotificationBell({ onOpenTask }) {
 >
   <h4>Notifications</h4>
 
+  <div
+  style={{
+    display: "flex",
+    gap: "8px",
+    alignItems: "center",
+  }}
+>
+
   {unreadCount > 0 && (
     <button
       onClick={handleMarkAllRead}
@@ -256,6 +297,20 @@ export default function NotificationBell({ onOpenTask }) {
       Mark all read
     </button>
   )}
+
+  {visibleNotifications.some((notification) => notification.read) && (
+    <button
+      onClick={handleClearRead}
+      style={{
+        fontSize: "12px",
+        cursor: "pointer",
+      }}
+    >
+      Clear read
+    </button>
+  )}
+</div>
+
 </div>
 
           {visibleNotifications.length === 0 ? (
@@ -309,6 +364,25 @@ export default function NotificationBell({ onOpenTask }) {
 >
   {notification.message}
 </div>
+
+{notificationError?.notificationId === notification._id && (
+  <div
+    role="alert"
+    style={{
+      marginTop: "6px",
+      padding: "6px 8px",
+      background: "#fef2f2",
+      border: "1px solid #fecaca",
+      borderRadius: "6px",
+      color: "#b91c1c",
+      fontSize: "12px",
+      fontWeight: "500",
+      lineHeight: "1.4",
+    }}
+  >
+    {notificationError.message}
+  </div>
+)}
 
     <small
       style={{
