@@ -10,14 +10,23 @@ exports.createComment = async (req, res, next) => {
   try {
     const { content, taskId } = req.body;
 
+    const task = await Task.findOne({
+      _id: taskId,
+      organizationId: req.user.organizationId,
+    });
+    
+    if (!task) {
+      return res.status(400).json({
+        message: "Invalid task for this organization",
+      });
+    }
+
     const comment = await Comment.create({
       content,
       taskId,
       organizationId: req.user.organizationId,
       createdBy: req.user.userId,
     });
-
-    const task = await Task.findById(comment.taskId);
 
     await createAuditLog({
       action: "CREATE_COMMENT",
@@ -137,8 +146,10 @@ if (!isOwner && !isAdminOrOwner) {
     comment.content = req.body.content;
     await comment.save();
 
-    const task = await Task.findById(comment.taskId);
-
+    const task = await Task.findOne({
+      _id: comment.taskId,
+      organizationId: req.user.organizationId,
+    });
     await createAuditLog({
       action: "UPDATE_COMMENT",
       resourceType: "Task",
@@ -195,8 +206,10 @@ exports.deleteComment = async (req, res, next) => {
 
     await comment.deleteOne();
 
-    const task = await Task.findById(comment.taskId);
-
+    const task = await Task.findOne({
+      _id: comment.taskId,
+      organizationId: req.user.organizationId,
+    });
     await createAuditLog({
       action: "DELETE_COMMENT",
       resourceType: "Task",
