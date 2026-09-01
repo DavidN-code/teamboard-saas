@@ -2,12 +2,37 @@ const Task = require('../models/Task');
 const createAuditLog = require("../services/auditLogService");
 const createNotification = require("../services/notificationService");
 const User = require("../models/User");
+const Board = require("../models/Board");
 const pusher = require("../services/pusherService");
 
 // CREATE a new Task
 exports.createTask = async (req, res, next) => {
   try {
     const { title, description, status, priority, dueDate, assignedTo, board } = req.body;
+
+    const validBoard = await Board.findOne({
+      _id: board,
+      organizationId: req.user.organizationId,
+    });
+    
+    if (!validBoard) {
+      return res.status(400).json({
+        message: "Invalid board for this organization",
+      });
+    }
+    
+    if (assignedTo) {
+      const validAssignee = await User.findOne({
+        _id: assignedTo,
+        organizationId: req.user.organizationId,
+      });
+    
+      if (!validAssignee) {
+        return res.status(400).json({
+          message: "Invalid assignee for this organization",
+        });
+      }
+    }
 
     const task = await Task.create({
       title,
@@ -145,11 +170,36 @@ exports.getTaskById = async (req, res, next) => {
 // UPDATE a task
 exports.updateTask = async (req, res, next) => {
   try {
-    const updates = req.body;
-
+    const allowedUpdates = [
+      "title",
+      "description",
+      "status",
+      "priority",
+      "dueDate",
+      "assignedTo",
+    ];
+    
+    const updates = Object.fromEntries(
+      Object.entries(req.body).filter(([key]) =>
+        allowedUpdates.includes(key)
+      )
+    );
     // normalize empty assignment
     if (updates.assignedTo === "") {
       updates.assignedTo = null;
+    }
+
+    if (updates.assignedTo) {
+      const validAssignee = await User.findOne({
+        _id: updates.assignedTo,
+        organizationId: req.user.organizationId,
+      });
+    
+      if (!validAssignee) {
+        return res.status(400).json({
+          message: "Invalid assignee for this organization",
+        });
+      }
     }
 
     // fetch existing task FIRST
