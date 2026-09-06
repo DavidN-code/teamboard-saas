@@ -4,8 +4,12 @@ const router = express.Router();
 const protect = require("../middleware/authMiddleware");
 const allowRoles = require("../middleware/roleMiddleware");
 
-const { createTaskValidator } = require("../validators/taskValidator");
-const validateRequest = require("../middleware/validation");
+const {
+  createTaskValidator,
+  updateTaskValidator,
+  taskIdValidator,
+  boardIdParamValidator,
+} = require("../validators/taskValidator");const validateRequest = require("../middleware/validation");
 
 const {
   createTask,
@@ -27,11 +31,19 @@ router.get("/my-tasks", getMyTasks);
 router.get("/", getTasks);
 
 // Get by board
-router.get("/board/:boardId", getTasksByBoard);
-
+router.get(
+  "/board/:boardId",
+  boardIdParamValidator,
+  validateRequest,
+  getTasksByBoard
+);
 // Get single task
-router.get("/:id", getTaskById);
-
+router.get(
+  "/:id",
+  taskIdValidator,
+  validateRequest,
+  getTaskById
+);
 // Create
 router.post(
   "/",
@@ -42,9 +54,19 @@ router.post(
 );
 
 // Update
-router.put("/:id", allowRoles("owner", "admin"), updateTask);
-
+router.put(
+  "/:id",
+  allowRoles("owner", "admin"),
+  updateTaskValidator,
+  validateRequest,
+  updateTask
+);
 // Delete
-router.delete("/:id", allowRoles("owner", "admin"), deleteTask);
-
+router.delete(
+  "/:id",
+  allowRoles("owner", "admin"),
+  taskIdValidator,
+  validateRequest,
+  deleteTask
+);
 module.exports = router;
