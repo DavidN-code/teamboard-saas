@@ -13,6 +13,7 @@ const invitationRoutes = require("./routes/invitationRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 const activityFeedRoutes = require("./routes/activityFeedRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const pusherRoutes = require("./routes/pusherRoutes");
 const helmet = require("helmet");
 const authLimiter = require("./middleware/authLimiter");
 const apiLimiter = require("./middleware/apiLimiter");
@@ -40,6 +41,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // Health check
 app.get("/api/health", (req, res) => {
@@ -60,6 +62,7 @@ app.use("/api/audit-logs", auditLogRoutes);
 app.use("/api/metrics/dashboard", metricsRoutes);
 app.use("/api/invitations", invitationRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/pusher", pusherRoutes);
 
 app.use(errorMiddleware);
 

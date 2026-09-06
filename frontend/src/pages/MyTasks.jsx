@@ -39,7 +39,7 @@ export default function MyTasks() {
   useEffect(() => {
     if (!user?.organizationId) return;
   
-    const channelName = `organization-${user.organizationId}`;
+    const channelName = `private-organization-${user.organizationId}`;
     const channel = pusher.subscribe(channelName);
   
     const handleTasksUpdated = () => {

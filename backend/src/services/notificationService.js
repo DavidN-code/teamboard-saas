@@ -17,7 +17,7 @@ const createNotification = async ({
   });
 
   await pusher.trigger(
-    `user-${userId}`,
+    `private-user-${userId}`,
     "notification-created",
     notification
   );

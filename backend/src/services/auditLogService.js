@@ -25,7 +25,7 @@ const logAction = async ({
     if (boardId) {
     
       await pusher.trigger(
-        `board-${boardId}`,
+        `private-board-${boardId}`,
         "activity-updated",
         {
           action,

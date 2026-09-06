@@ -47,12 +47,12 @@ exports.createBoard = async (req, res, next) => {
     });
     res.status(201).json(board);
     await pusher.trigger(
-      `organization-${req.user.organizationId}`,
+      `private-organization-${req.user.organizationId}`,
       "board-created",
       board
     );
     await pusher.trigger(
-      `organization-${req.user.organizationId}`,
+      `private-organization-${req.user.organizationId}`,
       "metrics-updated",
       {}
     );
@@ -82,7 +82,7 @@ exports.updateBoard = async (req, res, next) => {
 
     res.json(board);
     await pusher.trigger(
-      `organization-${req.user.organizationId}`,
+      `private-organization-${req.user.organizationId}`,
       "board-updated",
       board
     );
@@ -123,7 +123,7 @@ exports.deleteBoard = async (req, res, next) => {
     });
 
     await pusher.trigger(
-      `organization-${req.user.organizationId}`,
+      `private-organization-${req.user.organizationId}`,
       "board-deleted",
       {
         _id: board._id,
@@ -131,7 +131,7 @@ exports.deleteBoard = async (req, res, next) => {
     );
 
     await pusher.trigger(
-      `organization-${req.user.organizationId}`,
+      `private-organization-${req.user.organizationId}`,
       "metrics-updated",
       {}
     );

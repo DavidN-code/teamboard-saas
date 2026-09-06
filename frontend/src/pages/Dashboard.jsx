@@ -175,7 +175,7 @@ const [sortBy, setSortBy] = useState("");
 useEffect(() => {
   if (!activeBoardId) return;
 
-  const channelName = `board-${activeBoardId}`;
+  const channelName = `private-board-${activeBoardId}`;
   const channel = pusher.subscribe(channelName);
 
   const handleTaskCreated = (newTask) => {
@@ -258,7 +258,7 @@ useEffect(() => {
   useEffect(() => {
     if (!user?.organizationId) return;
   
-    const channelName = `organization-${user.organizationId}`;
+    const channelName = `private-organization-${user.organizationId}`;
     const channel = pusher.subscribe(channelName);
   
     const handleMetricsUpdated = () => {

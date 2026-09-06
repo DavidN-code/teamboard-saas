@@ -51,7 +51,7 @@ export default function NotificationBell({ onOpenTask }) {
   useEffect(() => {
     if (!user?.id) return;
   
-    const channelName = `user-${user.id}`;
+    const channelName = `private-user-${user.id}`;
     const channel = pusher.subscribe(channelName);
   
     const handleNotificationCreated = (newNotification) => {

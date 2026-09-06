@@ -94,7 +94,7 @@ const populatedComment =
     .populate("createdBy", "name email");
 
 await pusher.trigger(
-  `task-${task._id}`,
+  `private-task-${task._id}`,
   "comment-created",
   populatedComment
 );
@@ -172,7 +172,7 @@ const populatedComment =
     .populate("createdBy", "name email");
 
 await pusher.trigger(
-  `task-${task._id}`,
+  `private-task-${task._id}`,
   "comment-updated",
   populatedComment
 );
@@ -228,7 +228,7 @@ exports.deleteComment = async (req, res, next) => {
 // -------------------------
 
 await pusher.trigger(
-  `task-${task._id}`,
+  `private-task-${task._id}`,
   "comment-deleted",
   {
     commentId: comment._id,

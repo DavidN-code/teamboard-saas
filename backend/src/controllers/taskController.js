@@ -83,13 +83,13 @@ exports.createTask = async (req, res, next) => {
         .populate("createdBy", "name email");
 
         await pusher.trigger(
-          `board-${task.board}`,
+          `private-board-${task.board}`,
           "task-created",
           populatedTask
         );
 
         await pusher.trigger(
-          `organization-${req.user.organizationId}`,
+          `private-organization-${req.user.organizationId}`,
           "metrics-updated",
           {}
         );
@@ -365,13 +365,13 @@ const populatedTask = await Task.findOne({
 .lean();
 
 const response = await pusher.trigger(
-  `board-${populatedTask.board}`,
+  `private-board-${populatedTask.board}`,
   "task-updated",
   populatedTask
 );
 
 await pusher.trigger(
-  `organization-${req.user.organizationId}`,
+  `private-organization-${req.user.organizationId}`,
   "metrics-updated",
   {}
 );
@@ -406,7 +406,7 @@ exports.deleteTask = async (req, res, next) => {
     });
     
     await pusher.trigger(
-      `board-${task.board}`,
+      `private-board-${task.board}`,
       "task-deleted",
       {
         taskId: task._id,
@@ -414,7 +414,7 @@ exports.deleteTask = async (req, res, next) => {
     );
 
     await pusher.trigger(
-      `organization-${req.user.organizationId}`,
+      `private-organization-${req.user.organizationId}`,
       "metrics-updated",
       {}
     );

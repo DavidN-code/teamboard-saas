@@ -188,7 +188,7 @@ const boardId = task?.board;
 useEffect(() => {
   if (!taskId || !boardId) return;
 
-  const channelName = `board-${boardId}`;
+  const channelName = `private-board-${boardId}`;
   const channel = pusher.subscribe(channelName);
 
   const handleTaskUpdated = (updatedTask) => {
@@ -283,7 +283,7 @@ if (onActivityChange) {
     if (!taskId) return;
   
     const channel = pusher.subscribe(
-      `task-${taskId}`
+      `private-task-${taskId}`
     );
   
     // -------------------------

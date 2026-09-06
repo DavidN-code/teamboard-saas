@@ -57,7 +57,7 @@ exports.updateUserRole = async (req, res, next) => {
 await user.save();
 
 await pusher.trigger(
-  `organization-${req.user.organizationId}`,
+  `private-organization-${req.user.organizationId}`,
   "user-role-updated",
   {
     userId: user._id.toString(),

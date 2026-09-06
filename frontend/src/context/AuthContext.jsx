@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (!user?.organizationId || !user?.id) return;
   
-    const channelName = `organization-${user.organizationId}`;
+    const channelName = `private-organization-${user.organizationId}`;
     const channel = pusher.subscribe(channelName);
   
     const handleRoleUpdated = ({ userId, role }) => {
