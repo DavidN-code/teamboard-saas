@@ -1,10 +1,12 @@
+process.env.JWT_SECRET = "teamboard-test-secret";
+process.env.RESEND_API_KEY = "re_test_key";
+
 const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 
 let mongoServer;
 
 beforeAll(async () => {
-    process.env.JWT_SECRET = "teamboard-test-secret";
   
     mongoServer = await MongoMemoryServer.create();
   
