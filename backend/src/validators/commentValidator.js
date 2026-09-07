@@ -1,4 +1,4 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 
 const createCommentValidator = [
   body("content")
@@ -10,10 +10,16 @@ const createCommentValidator = [
 
   body("taskId")
     .notEmpty()
-    .withMessage("Task ID is required"),
+    .withMessage("Task ID is required")
+    .isMongoId()
+    .withMessage("Invalid task ID"),
 ];
 
 const updateCommentValidator = [
+  param("id")
+    .isMongoId()
+    .withMessage("Invalid comment ID"),
+
   body("content")
     .trim()
     .notEmpty()
@@ -22,7 +28,21 @@ const updateCommentValidator = [
     .withMessage("Comment cannot exceed 1000 characters"),
 ];
 
+const commentIdValidator = [
+  param("id")
+    .isMongoId()
+    .withMessage("Invalid comment ID"),
+];
+
+const taskIdParamValidator = [
+  param("taskId")
+    .isMongoId()
+    .withMessage("Invalid task ID"),
+];
+
 module.exports = {
   createCommentValidator,
   updateCommentValidator,
+  commentIdValidator,
+  taskIdParamValidator,
 };

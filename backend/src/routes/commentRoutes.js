@@ -11,6 +11,8 @@ const {
 const {
   createCommentValidator,
   updateCommentValidator,
+  commentIdValidator,
+  taskIdParamValidator,
 } = require("../validators/commentValidator");
 
 const validateRequest = require("../middleware/validation");
@@ -32,7 +34,18 @@ router.put(
   validateRequest,
   updateComment
 );
-router.get("/task/:taskId", getCommentsByTask);
-router.delete("/:id", deleteComment);
+router.get(
+  "/task/:taskId",
+  taskIdParamValidator,
+  validateRequest,
+  getCommentsByTask
+);
+
+router.delete(
+  "/:id",
+  commentIdValidator,
+  validateRequest,
+  deleteComment
+);
 
 module.exports = router;
