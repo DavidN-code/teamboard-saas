@@ -24,7 +24,7 @@ app.use(helmet());
 const allowedOrigins = [
   "http://localhost:5173",
   "http://192.168.254.66:5173",
-  "https://teamboard-saas-7icq.vercel.app",
+  "https://teamboard-saas.vercel.app",
 ];
 
 app.use(
