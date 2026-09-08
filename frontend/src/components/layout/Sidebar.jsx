@@ -233,8 +233,20 @@ useEffect(() => {
   
     try {
       await api.delete(`/boards/${board._id}`);
-        
-      setOpenBoardMenu(null);
+
+setBoards((prevBoards) => {
+  const remainingBoards = prevBoards.filter(
+    (existingBoard) => existingBoard._id !== board._id
+  );
+
+  if (activeBoard?._id === board._id) {
+    setActiveBoard(remainingBoards[0] || null);
+  }
+
+  return remainingBoards;
+});
+
+setOpenBoardMenu(null);
     } catch (err) {
       console.error("Failed to delete board", err);
     }
