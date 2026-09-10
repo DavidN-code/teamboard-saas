@@ -119,6 +119,7 @@ export default function TaskDetailsModal({
   const [comments, setComments] = useState([]);
   const [users, setUsers] = useState([]);
   const [assignedTo, setAssignedTo] = useState("");
+  const [assignedUser, setAssignedUser] = useState(null);
   const [activity, setActivity] = useState([]);
   const { user } = useAuth();
   const canEditTask = user?.role === "owner" || user?.role === "admin";
@@ -131,6 +132,7 @@ useEffect(() => {
   if (!task) return;
 
   setAssignedTo(task.assignedTo?._id || "");
+  setAssignedUser(task.assignedTo || null);
   setTitle(task.title || "");
   setDescription(task.description || "");
   setStatus(task.status || "todo");
@@ -144,8 +146,10 @@ useEffect(() => {
 }, [task]);
 
 
-// Load users when task modal opens
+// Load organization users only for roles allowed to manage task assignments
 useEffect(() => {
+  if (!canEditTask) return;
+
   const loadUsers = async () => {
     try {
       const res = await getUsers();
@@ -156,8 +160,7 @@ useEffect(() => {
   };
 
   loadUsers();
-
-}, []);
+}, [canEditTask]);
 
 
 // Load comments and activity when task changes
@@ -208,7 +211,7 @@ useEffect(() => {
     );
 
     setAssignedTo(updatedTask.assignedTo?._id || "");
-
+    setAssignedUser(updatedTask.assignedTo || null);
     setActivityRefresh((prev) => prev + 1);
   };
 
@@ -346,9 +349,9 @@ if (onActivityChange) {
   // Prevent rendering if modal is closed or task data is missing
   if (!isOpen || !task) return null;
 
-  const selectedAssignee = users.find(
-    (member) => member._id === assignedTo
-  );
+  const selectedAssignee =
+  users.find((member) => member._id === assignedTo) ||
+  (assignedUser?._id === assignedTo ? assignedUser : null);
 
   const originalDueDate = task.dueDate
   ? task.dueDate.split("T")[0]
@@ -395,6 +398,7 @@ const hasUnsavedChanges =
         : ""
     );
     setAssignedTo(task.assignedTo?._id || "");
+    setAssignedUser(task.assignedTo || null);
   };
 
   const handleSave = async () => {
@@ -612,28 +616,45 @@ const hasUnsavedChanges =
       Assigned To
     </label>
 
-    <select
-      value={assignedTo}
-      onChange={(e) => setAssignedTo(e.target.value)}
-      disabled={!canEditTask}
-      style={{
-        width: "100%",
-        boxSizing: "border-box",
-        padding: "11px 12px",
-        border: "1px solid #d1d5db",
-        borderRadius: "8px",
-        background: canEditTask ? "#fff" : "#f9fafb",
-        fontSize: "15px",
-      }}
-    >
-      <option value="">Unassigned</option>
+    {canEditTask ? (
+  <select
+    value={assignedTo}
+    onChange={(e) => setAssignedTo(e.target.value)}
+    style={{
+      width: "100%",
+      boxSizing: "border-box",
+      padding: "11px 12px",
+      border: "1px solid #d1d5db",
+      borderRadius: "8px",
+      background: "#fff",
+      fontSize: "15px",
+    }}
+  >
+    <option value="">Unassigned</option>
 
-      {users.map((user) => (
-        <option key={user._id} value={user._id}>
-          {user.name}
-        </option>
-      ))}
-    </select>
+    {users.map((user) => (
+      <option key={user._id} value={user._id}>
+        {user.name}
+      </option>
+    ))}
+  </select>
+) : (
+  <input
+    type="text"
+    value={selectedAssignee?.name || "Unassigned"}
+    disabled
+    style={{
+      width: "100%",
+      boxSizing: "border-box",
+      padding: "11px 12px",
+      border: "1px solid #d1d5db",
+      borderRadius: "8px",
+      background: "#f9fafb",
+      color: "#111827",
+      fontSize: "15px",
+    }}
+  />
+)}
   </div>
 
   <div>
