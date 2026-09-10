@@ -1,497 +1,417 @@
-# 🚀 TeamBoard – Multi-Tenant Project Management SaaS
+# TeamBoard
 
-TeamBoard is a full-stack SaaS project management application being built as a portfolio-quality project to demonstrate modern software engineering practices.
+**A full-stack, multi-tenant project management SaaS application built with React, Node.js, Express, MongoDB, and real-time collaboration.**
 
-The application is inspired by platforms such as Asana, Jira, ClickUp, Trello, and Monday.com, with a strong emphasis on multi-tenant architecture, security, collaboration, and production-ready design.
+TeamBoard is a production-style project management platform where organizations can manage boards, tasks, members, comments, notifications, and activity in a secure shared workspace.
 
-Primary goals:
+The project was built to demonstrate full-stack software engineering beyond basic CRUD, with particular emphasis on **multi-tenant data isolation, role-based authorization, real-time collaboration, backend security, automated testing, and CI**.
 
-* Full-stack application development
-* SaaS architecture
-* Authentication and security
-* Multi-tenant systems
-* Role-Based Access Control (RBAC)
-* REST API development
-* React frontend architecture
-* MongoDB data modeling
-* Real-time collaboration
-* Production-style engineering practices
+> **Live Demo:** [Open TeamBoard](YOUR_FRONTEND_URL)
 
-# 🧱 Tech Stack
+---
 
-## Backend
+## Screenshots
 
-* Node.js
-* Express.js
-* MongoDB Atlas
-* Mongoose
-* JWT Authentication
-* bcrypt password hashing
-* Nodemailer
-* Pusher (real-time events)
+<!-- Replace these with actual screenshots -->
+<!--
+![TeamBoard Dashboard](docs/images/dashboard.png)
+![Task Details](docs/images/task-details.png)
+![Members](docs/images/members.png)
+-->
 
-## Frontend
+---
 
-* React
-* Vite
-* React Router
-* Axios
-* @dnd-kit/core
-* @dnd-kit/sortable
-* Pusher JS
+## Key Features
 
-# 🏢 Multi-Tenant Architecture
+### Project Management
 
-TeamBoard uses organization-based tenancy.
+- Kanban boards with Todo, In Progress, and Done columns
+- Drag-and-drop task management
+- Task creation, editing, deletion, and assignment
+- Priorities and due dates
+- Task search, filtering, and sorting
+- Personal **My Tasks** view
+- Dashboard metrics
 
-Every resource is scoped by `organizationId`, ensuring complete data isolation between organizations.
+### Collaboration
 
-Implemented:
+- Task-specific comment threads
+- Real-time task synchronization
+- Real-time comments and activity updates
+- Assignment and comment notifications
+- Organization-wide activity feed
+- Per-task activity timeline
+- Multi-tab and multi-client synchronization
 
-* Organizations
-* Organization-scoped users
-* Boards
-* Tasks
-* Comments
-* Notifications
-* Audit logs
-* Organization member management
+### Organizations & Access Control
 
-# 🔐 Authentication & Security
+- Organization-based multi-tenancy
+- Owner, Admin, and Member roles
+- Server-enforced Role-Based Access Control (RBAC)
+- Organization member management
+- Secure invitation-based onboarding
+- Email invitation workflow
+- Role-aware frontend controls
 
-Implemented:
+### Audit & Accountability
 
-* User registration
-* Login
-* JWT authentication
-* bcrypt password hashing
-* Protected backend routes
-* Authentication middleware
-* Axios JWT token injection
-* Persistent frontend login
-* Automatic logout on expired tokens (401 handling)
-* Centralized error handling
+TeamBoard records important workspace activity including:
 
-# 🛡 Role-Based Access Control (RBAC)
+- Board creation, updates, and deletion
+- Task creation, updates, assignment, and deletion
+- Comment creation, editing, and deletion
+- Invitations
+- User role changes
+- Member removal
 
-### Owner
+Audit records include user attribution and timestamps and are surfaced through both organization-level and task-level activity views.
 
-* Full organization access
-* Manage members
-* Change user roles
-* Create invitations
-* View audit logs
+---
 
-### Admin
+## Engineering Highlights
 
-* Manage project resources
-* Invite users
-* Limited organization management
+### Multi-Tenant Data Isolation
 
-### Member
+TeamBoard uses organization-based tenancy. Application resources are scoped to an `organizationId`, and authorization is enforced by the backend rather than relying on frontend visibility.
 
-* Workspace access
-* Task collaboration
-* Comments
-* Notifications
+Cross-organization access controls cover resources including:
 
-Implemented:
+- Users
+- Boards
+- Tasks
+- Comments
+- Audit logs
+- Invitations
 
-* User roles
-* Backend authorization checks
-* Role-protected routes
-* Member management UI
-* Role updates
-* User removal workflow
+Automated security tests verify that users from one organization cannot read, modify, delete, assign, or otherwise access protected resources belonging to another organization.
 
-# 👥 Organization Invitations
+### Role-Based Authorization
 
-Implemented:
+TeamBoard implements three roles:
 
-* Invitation creation
-* Secure invitation tokens
-* Invitation validation
-* Email invitations
-* Invitation registration flow
-* Automatic organization joining
-* Pending / accepted invitation tracking
+| Role | Access |
+| --- | --- |
+| **Owner** | Full workspace access, member/role management, board management, invitations, and audit logs |
+| **Admin** | Project management, member access, invitations, and audit logs |
+| **Member** | Dashboard, assigned tasks, task collaboration, comments, and notifications |
 
-# 📧 Email Integration
+Authorization is enforced server-side with authentication and role middleware.
 
-Implemented:
+The backend reloads the authenticated user's current authorization state from the database, preventing an old JWT from preserving permissions after a user's role has been changed.
 
-* Nodemailer
-* Gmail SMTP
-* HTML invitation emails
-* Invitation acceptance links
+### Secure Real-Time Collaboration
 
-# 📋 Boards & Tasks
+Real-time functionality is implemented with Pusher.
 
-## Boards
+TeamBoard uses authenticated private channels for:
 
-Implemented:
+- Organizations
+- Boards
+- Tasks
+- Individual users
 
-* Create boards
-* Update boards
-* Delete boards
-* View boards
-* Active board switching
+Channel authorization verifies organization membership and resource ownership before allowing subscriptions, preventing users from subscribing to another organization's real-time events.
 
-# 📋 Tasks
+Real-time events synchronize task changes, comments, activity, notifications, and other workspace updates across active clients.
 
-Implemented:
+### API Security & Validation
 
-* Create, edit, and delete tasks
-* Status management
-* Priority levels
-* Due dates
-* Task assignment
-* Task creator attribution (`createdBy`)
-* Task Details Modal
-* Comments
-* Task activity timeline
+Backend protections include:
 
-# 👤 Task Assignment
+- JWT authentication
+- bcrypt password hashing
+- Role-based authorization
+- Tenant-scoped database queries
+- Request validation with `express-validator`
+- MongoDB ObjectId validation
+- Helmet security headers
+- Rate limiting
+- Centralized error handling
+- Restricted update fields
+- Server-side resource ownership validation
 
-Implemented:
+---
 
-* Assign tasks to organization members
-* Reassign tasks
-* Unassign tasks
-* Assignment dropdown
-* Assignment notifications
-* Assignment audit logging
+## Automated Testing
 
-Audit Event:
+The backend includes **32 automated integration and security regression tests** using:
 
-* `ASSIGN_TASK`
+- Jest
+- Supertest
+- `mongodb-memory-server`
 
-# 💬 Comments System
+The suite verifies critical behavior including:
 
-Implemented:
+- Registration and login
+- Protected-route authentication
+- Role-based authorization
+- Current-role enforcement after role changes
+- Cross-organization user isolation
+- Board tenant isolation
+- Task tenant isolation
+- Assignment restrictions
+- Comment tenant isolation
+- Audit-log and activity isolation
+- Request and ObjectId validation
 
-### Backend
+```bash
+npm test
+```
 
-* Comment model
-* Comment controller
-* Comment API routes
-* Organization-scoped comments
-* User attribution
-* Comment permissions
+Current test status:
+
+```text
+Test Suites: 4 passed, 4 total
+Tests:       32 passed, 32 total
+```
+
+### Continuous Integration
+
+GitHub Actions automatically installs the backend dependencies and runs the complete test suite on pushes and pull requests.
+
+This provides regression protection for TeamBoard's authentication, authorization, validation, and tenant-isolation rules.
+
+---
+
+## Tech Stack
 
 ### Frontend
 
-Location:
+- React
+- Vite
+- React Router
+- Axios
+- Tailwind CSS
+- dnd-kit
+- Pusher JS
 
-`frontend/src/components/comments/`
+### Backend
 
-Components:
+- Node.js
+- Express
+- MongoDB Atlas
+- Mongoose
+- JWT
+- bcrypt
+- express-validator
+- Helmet
+- express-rate-limit
+- Pusher
+- Resend
 
-* CommentForm.jsx
-* CommentList.jsx
-* CommentItem.jsx
+### Testing & Infrastructure
 
-Features:
+- Jest
+- Supertest
+- mongodb-memory-server
+- GitHub Actions
+- MongoDB Atlas
 
-* Create comments
-* Edit comments
-* Delete comments
-* Comment timestamps
-* Task-specific discussion threads
+---
 
-Audit Events:
+## Architecture
 
-* `CREATE_COMMENT`
-* `UPDATE_COMMENT`
-* `DELETE_COMMENT`
+```text
+React / Vite Frontend
+        |
+        | REST API + JWT
+        v
+Node.js / Express API
+        |
+        +---- Authentication & RBAC
+        |
+        +---- Tenant-scoped controllers
+        |
+        +---- Request validation
+        |
+        +---- Pusher authorization
+        |
+        v
+MongoDB Atlas
 
-Notifications:
+        +
+        |
+        v
 
-* Task creators receive notifications when another user comments on their task.
+Pusher Private Channels
+        |
+        v
+Real-Time React Clients
+```
 
-# 🔔 Notification System
+Core data models include:
 
-Implemented:
+```text
+Organization
+    |
+    +-- Users
+    +-- Boards
+    |     |
+    |     +-- Tasks
+    |           |
+    |           +-- Comments
+    |
+    +-- Invitations
+    +-- Notifications
+    +-- Audit Logs
+```
 
-* Notification model
-* Notification API
-* Notification Bell UI
-* Unread notification count
-* Mark notifications as read
-* Open related task directly from a notification
+---
 
-Notification Types:
+## Core API
 
-* `TASK_ASSIGNED`
-* `TASK_COMMENT`
+### Authentication
 
-# 🖱 Kanban Board
+```text
+POST /api/auth/register
+POST /api/auth/login
+```
 
-Implemented using **@dnd-kit**
+### Boards & Tasks
 
-Features:
-
-* Todo
-* In Progress
-* Done
-* Drag-and-drop
-* Backend synchronization
-* Optimistic UI updates
-
-# 📜 Audit Logging
-
-Implemented:
-
-* Audit Log model
-* Audit Log API
-* Organization Activity Feed
-* Task activity timeline
-* Organization-scoped audit logs
-* User attribution
-* Task-specific audit history endpoint
-
-Tracked Events:
-
-### Boards
-
-* `CREATE_BOARD`
-* `UPDATE_BOARD`
-* `DELETE_BOARD`
-
-### Tasks
-
-* `CREATE_TASK`
-* `UPDATE_TASK`
-* `DELETE_TASK`
-* `ASSIGN_TASK`
+```text
+GET    /api/tasks/board/:boardId
+POST   /api/tasks
+PUT    /api/tasks/:id
+DELETE /api/tasks/:id
+```
 
 ### Comments
 
-* `CREATE_COMMENT`
-* `UPDATE_COMMENT`
-* `DELETE_COMMENT`
+```text
+GET    /api/comments/task/:taskId
+POST   /api/comments
+PUT    /api/comments/:id
+DELETE /api/comments/:id
+```
 
-### Organization
+### Users & Audit Logs
 
-* `CREATE_INVITATION`
-* `ACCEPT_INVITATION`
-* `UPDATE_USER_ROLE`
-* `REMOVE_USER`
+```text
+GET    /api/users
+PUT    /api/users/:id/role
+DELETE /api/users/:id
 
-# 📈 Activity System
+GET    /api/audit-logs
+GET    /api/audit-logs/task/:taskId
+```
 
-TeamBoard includes two activity views.
+---
 
-## Organization Activity Feed
+## Running Locally
 
-Displays organization-wide activity, including:
+### Prerequisites
 
-* Task creation
-* Task updates
-* Task assignments
-* Comments
-* Organization user actions
+- Node.js
+- npm
+- MongoDB database
 
-## Task Activity Timeline
+### Clone the repository
+
+```bash
+git clone https://github.com/DavidN-code/teamboard-saas.git
+cd teamboard-saas
+```
 
-Each task maintains its own audit history.
+### Install backend dependencies
 
-Displays:
+```bash
+cd backend
+npm install
+```
 
-* Task creation
-* Task updates
-* Task assignments
-* Comment creation
-* Comment edits
-* Comment deletion
-* Task deletion
+### Install frontend dependencies
 
-Includes:
+```bash
+cd ../frontend
+npm install
+```
 
-* User attribution
-* Timestamps
-* Icons
-* Human-readable activity descriptions
+### Environment Variables
 
-# 📊 Dashboard Metrics
+Create the required environment configuration for the backend.
 
-Implemented
+TeamBoard uses environment variables for services such as:
 
-Endpoint:
+```text
+MONGO_URI
+JWT_SECRET
+FRONTEND_URL
+RESEND_API_KEY
+PUSHER_APP_ID
+PUSHER_KEY
+PUSHER_SECRET
+PUSHER_CLUSTER
+```
 
-`GET /api/metrics/dashboard`
+Do not commit `.env` files or credentials to source control.
 
-Returns:
+### Start the backend
 
-* Total users
-* Total boards
-* Total tasks
-* Todo tasks
-* In Progress tasks
-* Completed tasks
+```bash
+cd backend
+npm run dev
+```
 
-Displayed as dashboard metric cards.
+### Start the frontend
 
-# 📌 My Tasks
+In another terminal:
 
-Purpose:
+```bash
+cd frontend
+npm run dev
+```
 
-Display tasks assigned to the currently logged-in user.
+---
 
-Implemented:
+## Project Status
 
-* Dedicated My Tasks page
-* User-specific task list
-* Built on the existing task assignment system
+TeamBoard's core application is feature-complete and deployed.
 
-# 🔎 Task Search & Filtering
+Completed areas include:
 
-Dashboard supports:
-
-* Task search
-* Status filtering
-* Priority filtering
-* Sorting
-
-# ⚡ API Overview
-
-## Authentication
-
-* `POST /api/auth/register`
-* `POST /api/auth/login`
-
-## Tasks
-
-* `GET /api/tasks/board/:boardId`
-* `POST /api/tasks`
-* `PUT /api/tasks/:id`
-* `DELETE /api/tasks/:id`
-
-## Comments
-
-* `GET /api/comments/task/:taskId`
-* `POST /api/comments`
-* `PUT /api/comments/:id`
-* `DELETE /api/comments/:id`
-
-## Notifications
-
-* `GET /api/notifications`
-* `PUT /api/notifications/:id/read`
-
-## Users
-
-* `GET /api/users`
-* `PUT /api/users/:id/role`
-* `DELETE /api/users/:id`
-
-## Audit Logs
-
-* `GET /api/audit-logs`
-* `GET /api/audit-logs/task/:taskId`
-
-## Metrics
-
-* `GET /api/metrics/dashboard`
-
-# 📁 Key Frontend Components
-
-## Task Details
-
-`frontend/src/components/tasks/TaskDetailsModal.jsx`
-
-Responsibilities:
-
-* Edit tasks
-* Assign and unassign users
-* Manage comments
-* Display task activity timeline
-
-## Comments
-
-Location:
-
-`frontend/src/components/comments/`
-
-Components:
-
-* CommentForm.jsx
-* CommentList.jsx
-* CommentItem.jsx
-
-API:
-
-`frontend/src/api/comments.js`
-
-# 📍 Current Project Status
-
-Completed
-
-* ✅ Authentication
-* ✅ Multi-tenancy
-* ✅ RBAC
-* ✅ Organization invitations
-* ✅ Email workflow
-* ✅ Boards
-* ✅ Tasks
-* ✅ Kanban board
-* ✅ Task assignment
-* ✅ Notifications
-* ✅ Dashboard metrics
-* ✅ Audit logging
-* ✅ Organization Activity Feed
-* ✅ Task Activity Timeline
-* ✅ Comments system
-* ✅ My Tasks page
-* ✅ Task search, filtering, and sorting
-* ✅ Organization member management
-* ✅ Invitation-based onboarding
-* ✅ Security middleware (Helmet, Rate Limiting, Validation)
-* ✅ Role-based UI restrictions
-the app has been deployed -frontend and backend
-
-# 🚧 Current Focus
-
-Current work is centered on improving real-time collaboration.
-
-### Real-Time Synchronization
-
-Implemented:
-
-* Pusher integration
-* Real-time task creation
-* Real-time task updates
-* Real-time task deletion
-* Real-time assignment notifications
-* Multi-tab synchronization
-
-Current blocker:
-
-* The Organization Activity Feed does not always refresh immediately across already-open browser tabs after task assignment/unassignment.  -this is what I'm currently focused on fixing.
-* Backend broadcasting and Pusher delivery have been verified.
-
-# 📝 Latest Development Work
-
-Recent work includes:
-
-* Real-time synchronization improvements
-* Assignment / unassignment audit logging
-* Activity Feed refinement
-* Dashboard synchronization debugging
-* Multi-tab collaboration improvements
-
-# 👨‍💻 Project Goal
-
-Complete TeamBoard as a production-quality SaaS portfolio application demonstrating:
-
-* Modern full-stack architecture
-* Secure multi-tenant design
-* Real-time collaboration
-* Clean engineering practices
-* Production-ready code quality
-
-After completion:
-
-* Polish README for employers
-* Publish the GitHub repository
-* Use TeamBoard as a flagship software engineering portfolio project
+- Authentication and onboarding
+- Multi-tenant resource isolation
+- Role-based authorization
+- Boards and Kanban task management
+- Task assignment
+- Comments
+- Notifications
+- Invitations
+- Member management
+- Audit logging
+- Activity feeds
+- Dashboard metrics
+- Search and filtering
+- Real-time collaboration
+- Responsive desktop/mobile UI
+- Backend security hardening
+- Automated integration/security testing
+- Continuous Integration with GitHub Actions
+
+---
+
+## What This Project Demonstrates
+
+TeamBoard was built as a flagship full-stack portfolio project and demonstrates experience with:
+
+- Designing a multi-tenant SaaS architecture
+- Building REST APIs with Node.js and Express
+- Modeling application data with MongoDB and Mongoose
+- Building responsive React interfaces
+- Implementing authentication and server-side authorization
+- Enforcing tenant boundaries across application resources
+- Securing real-time communication
+- Designing role-based product behavior
+- Building collaborative real-time features
+- Writing integration and security regression tests
+- Configuring continuous integration
+- Debugging behavior across multiple clients and application layers
+
+---
+
+## Author
+
+**David Neagoy**
+
+GitHub: [DavidN-code](https://github.com/DavidN-code)
