@@ -1,0 +1,19 @@
+.task-modal-overlay {
+    padding: 24px 0;
+  }
+  
+  /* Phone portrait */
+  @media (max-width: 600px) and (orientation: portrait) {
+    .task-modal-overlay {
+      padding-top: 90px;
+      padding-bottom: 24px;
+    }
+  }
+  
+  /* Phone landscape */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .task-modal-overlay {
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+  }

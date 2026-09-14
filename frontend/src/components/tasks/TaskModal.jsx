@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getUsers } from "../../api/users";
+import "./TaskModal.css";
 
 export default function TaskModal({
   isOpen,
@@ -97,29 +98,47 @@ const hasUnsavedChanges =
     }
   };
 
+  const fieldStyle = {
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "11px 12px",
+    border: "1px solid #d1d5db",
+    borderRadius: "8px",
+    background: "#ffffff",
+    color: "#111827",
+    fontSize: "15px",
+    outline: "none",
+  };
 
   return (
     <div
+      className="task-modal-overlay"
       onClick={handleRequestClose}
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(0,0,0,0.5)",
+        background: "rgba(15, 23, 42, 0.55)",
         display: "flex",
         justifyContent: "center",
-        alignItems: "center",
+        alignItems: "flex-start",
+        overflowY: "auto",
+        boxSizing: "border-box",
       }}
     >
 
 <div
   onClick={(e) => e.stopPropagation()}
   style={{
-    background: "white",
-          padding: "20px",
-          borderRadius: "8px",
-          width: "400px",
-        }}
-      >
+    background: "#ffffff",
+    width: "100%",
+    maxWidth: "640px",
+    borderRadius: "14px",
+    boxShadow: "0 24px 60px rgba(0, 0, 0, 0.22)",
+    padding: "28px 32px 32px",
+    margin: "0 16px",
+    boxSizing: "border-box",
+  }}
+>
 
         <h2>Create Task</h2>
 
@@ -138,118 +157,143 @@ const hasUnsavedChanges =
         <form onSubmit={handleSubmit}>
 
 
-          <div style={{ marginBottom: "12px" }}>
-            <input
-              type="text"
-              placeholder="Task title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              maxLength={100}
-              style={{
-                width: "100%",
-                padding: "10px",
-              }}
-            />
-          </div>
+        <div style={{ marginBottom: "20px" }}>
+  <label
+    style={{
+      display: "block",
+      marginBottom: "7px",
+      fontSize: "14px",
+      fontWeight: "600",
+      color: "#374151",
+    }}
+  >
+    Title
+  </label>
+
+  <input
+    type="text"
+    value={title}
+    onChange={(e) => setTitle(e.target.value)}
+    required
+    maxLength={100}
+    style={fieldStyle}
+  />
+</div>
 
 
-          <div style={{ marginBottom: "12px" }}>
-            <textarea
-              placeholder="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              maxLength={5000}
-              style={{
-                width: "100%",
-                padding: "10px",
-                resize: "vertical",
-                minHeight: "100px",
-                maxHeight: "300px",
-                overflowY: "auto",
-              }}
-            />
-          </div>
+<div style={{ marginBottom: "20px" }}>
+  <label
+    style={{
+      display: "block",
+      marginBottom: "7px",
+      fontSize: "14px",
+      fontWeight: "600",
+      color: "#374151",
+    }}
+  >
+    Description
+  </label>
+
+  <textarea
+    value={description}
+    onChange={(e) => setDescription(e.target.value)}
+    rows={4}
+    maxLength={5000}
+    style={{
+      ...fieldStyle,
+      resize: "vertical",
+      minHeight: "100px",
+      maxHeight: "300px",
+      overflowY: "auto",
+    }}
+  />
+</div>
 
 
-          <div style={{ marginBottom: "12px" }}>
-            <label>
-              <strong>Priority</strong>
-            </label>
+<div style={{ marginBottom: "20px" }}>
+  <label
+    style={{
+      display: "block",
+      marginBottom: "7px",
+      fontSize: "14px",
+      fontWeight: "600",
+      color: "#374151",
+    }}
+  >
+    Priority
+  </label>
 
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginTop: "6px",
-              }}
-            >
-              <option value="low">🟢 Low</option>
-              <option value="medium">🟡 Medium</option>
-              <option value="high">🔴 High</option>
-            </select>
-          </div>
-
-
-          <div style={{ marginBottom: "12px" }}>
-            <label>
-              <strong>Due Date</strong>
-            </label>
-
-            <input
-  type="date"
-  value={dueDate}
-  onChange={(e) => setDueDate(e.target.value)}
-  onClick={(e) => {
-    if (typeof e.currentTarget.showPicker === "function") {
-      e.currentTarget.showPicker();
-    }
-  }}
-  min="1900-01-01"
-  max="2100-12-31"
-  style={{
-    width: "100%",
-    padding: "10px",
-    marginTop: "6px",
-    cursor: "pointer",
-  }}
-/>
-          </div>
+  <select
+    value={priority}
+    onChange={(e) => setPriority(e.target.value)}
+    style={fieldStyle}
+  >
+    <option value="low">🟢 Low</option>
+    <option value="medium">🟡 Medium</option>
+    <option value="high">🔴 High</option>
+  </select>
+</div>
 
 
-          <div style={{ marginBottom: "12px" }}>
-            <label>
-              <strong>Assign To</strong>
-            </label>
+<div style={{ marginBottom: "20px" }}>
+  <label
+    style={{
+      display: "block",
+      marginBottom: "7px",
+      fontSize: "14px",
+      fontWeight: "600",
+      color: "#374151",
+    }}
+  >
+    Due Date
+  </label>
 
-            <select
-              value={assignedTo}
-              onChange={(e) => setAssignedTo(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginTop: "6px",
-              }}
-            >
+  <input
+    type="date"
+    value={dueDate}
+    onChange={(e) => setDueDate(e.target.value)}
+    onClick={(e) => {
+      if (typeof e.currentTarget.showPicker === "function") {
+        e.currentTarget.showPicker();
+      }
+    }}
+    min="1900-01-01"
+    max="2100-12-31"
+    style={{
+      ...fieldStyle,
+      cursor: "pointer",
+    }}
+  />
+</div>
 
-              <option value="">
-                Unassigned
-              </option>
 
-              {users.map((user) => (
-                <option
-                  key={user._id}
-                  value={user._id}
-                >
-                  {user.name}
-                </option>
-              ))}
+<div style={{ marginBottom: "20px" }}>
+  <label
+    style={{
+      display: "block",
+      marginBottom: "7px",
+      fontSize: "14px",
+      fontWeight: "600",
+      color: "#374151",
+    }}
+  >
+    Assign To
+  </label>
 
-            </select>
-          </div>
+  <select
+    value={assignedTo}
+    onChange={(e) => setAssignedTo(e.target.value)}
+    style={fieldStyle}
+  >
+    <option value="">Unassigned</option>
+
+    {users.map((user) => (
+      <option key={user._id} value={user._id}>
+        {user.name}
+      </option>
+    ))}
+  </select>
+</div>
 
 
           <div

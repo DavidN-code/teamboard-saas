@@ -23,6 +23,47 @@ export default function MyTasks() {
     }
   };
 
+  const handleUpdateTask = async (taskId, updates) => {
+    try {
+      const res = await api.put(`/tasks/${taskId}`, updates);
+      const updatedTask = res.data;
+  
+      setTasks((prev) =>
+        prev.map((task) =>
+          task._id === taskId ? updatedTask : task
+        )
+      );
+  
+      setSelectedTask(updatedTask);
+      setIsDetailsModalOpen(false);
+    } catch (err) {
+      console.error(
+        "Failed to update task",
+        err.response?.data || err
+      );
+    }
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    if (!window.confirm("Delete this task?")) return;
+  
+    try {
+      await api.delete(`/tasks/${taskId}`);
+  
+      setTasks((prev) =>
+        prev.filter((task) => task._id !== taskId)
+      );
+  
+      setSelectedTask(null);
+      setIsDetailsModalOpen(false);
+    } catch (err) {
+      console.error(
+        "Failed to delete task",
+        err.response?.data || err
+      );
+    }
+  };
+
   useEffect(() => {
     const loadInitialTasks = async () => {
       try {
@@ -135,9 +176,11 @@ export default function MyTasks() {
       </div>
 
       <TaskDetailsModal
-        task={selectedTask}
-        isOpen={isDetailsModalOpen}
-        onClose={() => setIsDetailsModalOpen(false)}
-      />
+  task={selectedTask}
+  isOpen={isDetailsModalOpen}
+  onClose={() => setIsDetailsModalOpen(false)}
+  onUpdateTask={handleUpdateTask}
+  onDeleteTask={handleDeleteTask}
+/>
 </PageLayout>  );
 }

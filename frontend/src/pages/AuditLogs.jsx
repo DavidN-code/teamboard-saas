@@ -8,13 +8,14 @@ const formatAction = (action) => {
     CREATE_TASK: "Created Task",
     UPDATE_TASK: "Updated Task",
     DELETE_TASK: "Deleted Task",
+    ASSIGN_TASK: "Assigned Task",
 
     CREATE_COMMENT: "Created Comment",
     UPDATE_COMMENT: "Updated Comment",
     DELETE_COMMENT: "Deleted Comment",
 
     CREATE_BOARD: "Created Board",
-    UPDATE_BOARD: "Updated Board",
+    UPDATE_BOARD: "Renamed Board",
     DELETE_BOARD: "Deleted Board",
   };
 
@@ -22,6 +23,7 @@ const formatAction = (action) => {
 };
 
 const getActionClass = (action) => {
+  if (action === "ASSIGN_TASK") return "action-assign";
   if (action.startsWith("CREATE")) return "action-create";
   if (action.startsWith("UPDATE")) return "action-update";
   if (action.startsWith("DELETE")) return "action-delete";
@@ -129,9 +131,19 @@ const AuditLogs = () => {
           onChange={(e) => setActionFilter(e.target.value)}
         >
           <option value="">All Actions</option>
-          <option value="CREATE_TASK">Created Task</option>
-          <option value="UPDATE_TASK">Updated Task</option>
-          <option value="DELETE_TASK">Deleted Task</option>
+
+<option value="CREATE_TASK">Created Task</option>
+<option value="UPDATE_TASK">Updated Task</option>
+<option value="DELETE_TASK">Deleted Task</option>
+<option value="ASSIGN_TASK">Assigned Task</option>
+
+<option value="CREATE_COMMENT">Created Comment</option>
+<option value="UPDATE_COMMENT">Updated Comment</option>
+<option value="DELETE_COMMENT">Deleted Comment</option>
+
+<option value="CREATE_BOARD">Created Board</option>
+<option value="UPDATE_BOARD">Renamed Board</option>
+<option value="DELETE_BOARD">Deleted Board</option>
         </select>
   
         <select

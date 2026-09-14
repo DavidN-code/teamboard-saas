@@ -39,6 +39,11 @@
     color: #991b1b;
   }
 
+  .action-assign {
+    background-color: #f3e8ff;
+    color: #6b21a8;
+  }
+
   .audit-header {
     margin-bottom: 24px;
   }
