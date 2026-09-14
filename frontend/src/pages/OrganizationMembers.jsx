@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { useAuth } from "../context/useAuth";
 import PageLayout from "../components/layout/PageLayout";
+import pusher from "../services/pusher";
 import "./OrganizationMembers.css";
 
 const OrganizationMembers = () => {
@@ -15,31 +16,60 @@ const [resendMessage, setResendMessage] = useState("");
 const [resendError, setResendError] = useState("");
 const [invitations, setInvitations] = useState([]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await api.get("/users");
-        setUsers(res.data);
-      } catch (err) {
-        console.error("Failed to load users:", err);
-      }
-    };
+const fetchUsers = async () => {
+  try {
+    const res = await api.get("/users");
+    setUsers(res.data);
+  } catch (err) {
+    console.error("Failed to load users:", err);
+  }
+};
 
-    const fetchInvitations = async () => {
-      try {
-        const res = await api.get("/invitations");
-        setInvitations(res.data);
-      } catch (err) {
-        console.error("Failed to load invitations:", err);
-      }
-    };
+const fetchInvitations = async () => {
+  try {
+    const res = await api.get("/invitations");
+    setInvitations(res.data);
+  } catch (err) {
+    console.error("Failed to load invitations:", err);
+  }
+};
 
+useEffect(() => {
+  fetchUsers();
+
+  if (user?.role === "owner") {
+    fetchInvitations();
+  }
+}, [user]);
+
+useEffect(() => {
+  if (!user?.organizationId) return;
+
+  const channelName =
+    `private-organization-${user.organizationId}`;
+
+  const channel = pusher.subscribe(channelName);
+
+  const handleMembershipUpdated = () => {
     fetchUsers();
 
-if (user?.role === "owner") {
-  fetchInvitations();
-}
-}, [user]);
+    if (user?.role === "owner") {
+      fetchInvitations();
+    }
+  };
+
+  channel.bind(
+    "membership-updated",
+    handleMembershipUpdated
+  );
+
+  return () => {
+    channel.unbind(
+      "membership-updated",
+      handleMembershipUpdated
+    );
+  };
+}, [user?.organizationId, user?.role]);
   const getRoleBadgeClass = (role) => {
     switch (role) {
       case "owner":
@@ -303,9 +333,9 @@ setInvitations(invitationsRes.data);
                           </td>
   
                           <td data-label="Created">
-                            {new Date(
-                              invite.createdAt
-                            ).toLocaleDateString()}
+                          {invite.createdAt
+  ? new Date(invite.createdAt).toLocaleDateString()
+  : "—"}
                           </td>
   
                           <td data-label="Actions">

@@ -41,21 +41,16 @@ export default function Sidebar({
         return;
       }
   
-      const savedBoardExists = activeBoard
-        ? res.data.some(
-            (board) => board._id === activeBoard._id
-          )
-        : false;
-  
-      if (savedBoardExists) {
-        const updatedBoard = res.data.find(
-          (board) => board._id === activeBoard._id
-        );
-  
-        setActiveBoard(updatedBoard);
-      } else if (boardInitialized) {
-        setActiveBoard(res.data[0]);
-      }
+      setActiveBoard((currentBoard) => {
+        const matchingBoard = currentBoard
+          ? res.data.find(
+              (board) => board._id === currentBoard._id
+            )
+          : null;
+      
+        return matchingBoard || res.data[0];
+      });
+      
     } catch (err) {
       console.error("Failed to load boards", err);
     }

@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const Organization = require('../models/Organization');
 const Invitation = require("../models/Invitation");
+const pusher = require("../services/pusherService");
 
 const register = async (req, res, next) => {
     try {
@@ -129,6 +130,28 @@ const user = await User.create({
 if (invitation) {
   invitation.status = "accepted";
   await invitation.save();
+
+  try {
+    await pusher.trigger(
+      `private-organization-${organization._id}`,
+      "membership-updated",
+      {
+        userId: user._id,
+        invitationId: invitation._id,
+      }
+    );
+
+    await pusher.trigger(
+      `private-organization-${organization._id}`,
+      "metrics-updated",
+      {}
+    );
+  } catch (pusherError) {
+    console.error(
+      "Failed to send membership realtime update:",
+      pusherError
+    );
+  }
 }
 
 // 6. Only set owner if NOT invited user
