@@ -166,7 +166,7 @@
     color: #6b7280;
   }
   
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     .members-page {
       width: 100%;
       max-width: 100%;
