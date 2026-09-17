@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { useOutletContext } from "react-router-dom";
-
+import {
+  useLocation,
+  useNavigate,
+  useOutletContext,
+} from "react-router-dom";
 import { useActiveBoard } from "../context/useActiveBoard";
 import { useAuth } from "../context/useAuth";
 import api from "../api/axios";
@@ -10,7 +13,6 @@ import TaskDetailsModal from "../components/tasks/TaskDetailsModal";
 import TaskCard from "../components/tasks/TaskCard";
 
 import ActivityFeed from "../components/ActivityFeed";
-
 import NotificationBell from "../components/notifications/NotificationBell";
 
 import pusher from "../services/pusher";
@@ -107,6 +109,9 @@ export default function Dashboard() {
   const activeBoardId = activeBoard?._id;
   const { user } = useAuth();
   const { isMobile } = useOutletContext();
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const canManageTasks = user && ["owner", "admin"].includes(user.role);
 
   const sensors = useSensors(
@@ -427,6 +432,29 @@ useEffect(() => {
     }
   };
 
+  useEffect(() => {
+    const notificationTaskId =
+      location.state?.notificationTaskId;
+  
+    if (!notificationTaskId) return;
+  
+    const openNotificationTask = async () => {
+      await handleOpenNotificationTask(
+        notificationTaskId
+      );
+  
+      navigate("/dashboard", {
+        replace: true,
+        state: {},
+      });
+    };
+  
+    openNotificationTask();
+    // handleOpenNotificationTask intentionally uses
+  // the current Dashboard state when this navigation event arrives.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [location.state?.notificationTaskId]);
+
   /* ---------------- DRAG ---------------- */
   const handleDragStart = (event) => {
     if (!canManageTasks) return;
@@ -594,26 +622,25 @@ return (
     marginBottom: "24px",
   }}
 >
-<div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    minWidth: 0,
-  }}
->
-
-  <h1
+  <div
     style={{
-      margin: isMobile ? "0 0 0 52px" : 0,
-      fontSize: isMobile ? "22px" : "32px",
-      color: "#111827",
-      whiteSpace: "nowrap",
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      minWidth: 0,
     }}
   >
-    Dashboard Overview
-  </h1>
-</div>
+    <h1
+      style={{
+        margin: isMobile ? "0 0 0 52px" : 0,
+        fontSize: isMobile ? "22px" : "32px",
+        color: "#111827",
+        whiteSpace: "nowrap",
+      }}
+    >
+      Dashboard Overview
+    </h1>
+  </div>
 
   <div
     style={{
@@ -628,24 +655,23 @@ return (
     <NotificationBell onOpenTask={handleOpenNotificationTask} />
 
     {user && (
-  <div
-    style={{
-      fontSize: "14px",
-      color: "#6b7280",
-      whiteSpace: "nowrap",
-    }}
-  >
-    <strong style={{ color: "#374151" }}>
-      {user.name}
-    </strong>
-    {" · "}
-    {user.role
-      ? user.role.charAt(0).toUpperCase() +
-        user.role.slice(1)
-      : ""}
-  </div>
-)}
-
+      <div
+        style={{
+          fontSize: "14px",
+          color: "#6b7280",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <strong style={{ color: "#374151" }}>
+          {user.name}
+        </strong>
+        {" · "}
+        {user.role
+          ? user.role.charAt(0).toUpperCase() +
+            user.role.slice(1)
+          : ""}
+      </div>
+    )}
   </div>
 </div>
 
