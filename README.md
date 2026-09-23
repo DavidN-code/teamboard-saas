@@ -358,20 +358,6 @@ Vite serves the frontend locally, while the Express API runs separately.
 
 ------------------------------------------------------------------------
 
-## Project Status
-
-TeamBoard's planned portfolio scope is **feature-complete and
-deployed**.
-
-The finished project includes authentication and onboarding,
-multi-tenant isolation, RBAC, Kanban task management, assignments,
-comments, notifications, invitations, member management, audit logging,
-activity feeds, metrics, search/filtering/sorting, real-time
-collaboration, responsive UI, security hardening, automated
-integration/security tests, CI, and production deployment.
-
-------------------------------------------------------------------------
-
 ## What This Project Demonstrates
 
 TeamBoard was built as a flagship full-stack portfolio project and
