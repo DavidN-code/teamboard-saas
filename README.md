@@ -134,21 +134,11 @@ organization.
 
 ### Role-Based Authorization
 
-  -----------------------------------------------------------------------
-  Role                                Access
-  ----------------------------------- -----------------------------------
-  **Owner**                           Full workspace access, role/member
-                                      management, board management,
-                                      invitations, and audit logs
-
-  **Admin**                           Task management, member access,
-                                      invitations, board creation, and
-                                      audit logs
-
-  **Member**                          Dashboard, My Tasks, task
-                                      viewing/collaboration, comments,
-                                      and notifications
-  -----------------------------------------------------------------------
+| Role | Access |
+| --- | --- |
+| **Owner** | Full workspace access, role/member management, board management, invitations, and audit logs |
+| **Admin** | Task management, member access, invitations, board creation, and audit logs |
+| **Member** | Dashboard, My Tasks, task viewing/collaboration, comments, and notifications |
 
 Authorization is enforced server-side with authentication and role
 middleware. The backend reloads the authenticated user's current
