@@ -282,19 +282,13 @@ DELETE /api/tasks/:id
 ``` text
 GET    /api/comments/task/:taskId
 POST   /api/comments
-PUT    /api/comments/:id
-DELETE /api/comments/:id
 ```
 
 ### Users & Audit Logs
 
 ``` text
 GET    /api/users
-PUT    /api/users/:id/role
-DELETE /api/users/:id
-
 GET    /api/audit-logs
-GET    /api/audit-logs/task/:taskId
 ```
 
 ------------------------------------------------------------------------
