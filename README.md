@@ -226,49 +226,28 @@ behavior.
 
 ## Architecture
 
-``` text
-React / Vite Frontend
-        |
-        | REST API + JWT
-        v
+React / Vite Client
+        │
+        │ REST API + JWT
+        ▼
 Node.js / Express API
-        |
-        +---- Authentication & RBAC
-        |
-        +---- Tenant-scoped controllers
-        |
-        +---- Request validation
-        |
-        +---- Pusher authorization
-        |
-        v
+        │
+        ├── Authentication & RBAC
+        ├── Tenant-scoped controllers
+        ├── Request validation
+        └── Pusher authorization
+        │
+        ▼
 MongoDB Atlas
 
-Node.js / Express API
-        |
-        v
-Pusher Private Channels
-        |
-        v
-Real-Time React Clients
-```
-
-Core application data is organized around an organization boundary:
-
-``` text
 Organization
-    |
-    +-- Users
-    +-- Boards
-    |     |
-    |     +-- Tasks
-    |           |
-    |           +-- Comments
-    |
-    +-- Invitations
-    +-- Notifications
-    +-- Audit Logs
-```
+├── Users
+├── Boards
+│   └── Tasks
+│       └── Comments
+├── Invitations
+├── Notifications
+└── Audit Logs
 
 For additional design notes, see
 [`docs/system-design.md`](docs/system-design.md).
