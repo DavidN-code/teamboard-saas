@@ -358,27 +358,6 @@ Vite serves the frontend locally, while the Express API runs separately.
 
 ------------------------------------------------------------------------
 
-## What This Project Demonstrates
-
-TeamBoard was built as a flagship full-stack portfolio project and
-demonstrates experience with:
-
--   Designing a multi-tenant SaaS architecture
--   Building REST APIs with Node.js and Express
--   Modeling application data with MongoDB and Mongoose
--   Building responsive React interfaces
--   Implementing authentication and server-side authorization
--   Enforcing tenant boundaries across application resources
--   Securing real-time communication
--   Designing role-based product behavior
--   Building collaborative real-time features
--   Writing integration and security regression tests
--   Configuring continuous integration
--   Deploying and debugging a full-stack application across multiple
-    services
-
-------------------------------------------------------------------------
-
 ## Author
 
 **David Neagoy**
