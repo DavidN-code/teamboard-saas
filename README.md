@@ -220,31 +220,16 @@ behavior.
 
 ## Tech Stack
 
-  -----------------------------------------------------------------------
-  Area                                Technologies
-  ----------------------------------- -----------------------------------
-  **Frontend**                        React, Vite, React Router, Axios,
-                                      dnd-kit, CSS, Pusher JS
-
-  **Backend**                         Node.js, Express, Mongoose, JWT,
-                                      bcrypt, express-validator, Helmet,
-                                      express-rate-limit
-
-  **Database**                        MongoDB Atlas
-
-  **Real-Time**                       Pusher private channels
-
-  **Email**                           Resend
-
-  **Testing**                         Jest, Supertest,
-                                      mongodb-memory-server
-
-  **CI**                              GitHub Actions
-
-  **Deployment**                      Vercel (frontend), Render (backend)
-  -----------------------------------------------------------------------
-
-------------------------------------------------------------------------
+| Area | Technologies |
+| --- | --- |
+| **Frontend** | React, Vite, React Router, Axios, dnd-kit, CSS, Pusher JS |
+| **Backend** | Node.js, Express, Mongoose, JWT, bcrypt, express-validator, Helmet, express-rate-limit |
+| **Database** | MongoDB Atlas |
+| **Real-Time** | Pusher private channels |
+| **Email** | Resend |
+| **Testing** | Jest, Supertest, mongodb-memory-server |
+| **CI** | GitHub Actions |
+| **Deployment** | Vercel (frontend), Render (backend) |
 
 ## Architecture
 
