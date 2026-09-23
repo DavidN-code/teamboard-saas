@@ -226,6 +226,7 @@ behavior.
 
 ## Architecture
 
+```text
 React / Vite Client
         │
         │ REST API + JWT
@@ -239,7 +240,11 @@ Node.js / Express API
         │
         ▼
 MongoDB Atlas
+```
 
+Core application data is organized around an organization boundary:
+
+```text
 Organization
 ├── Users
 ├── Boards
@@ -248,9 +253,9 @@ Organization
 ├── Invitations
 ├── Notifications
 └── Audit Logs
+```
 
-For additional design notes, see
-[`docs/system-design.md`](docs/system-design.md).
+For additional design notes, see [`docs/system-design.md`](docs/system-design.md).
 
 ------------------------------------------------------------------------
 
