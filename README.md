@@ -14,8 +14,9 @@ CRUD, with particular emphasis on **multi-tenant data isolation,
 role-based authorization, real-time collaboration, backend security,
 responsive UX, automated testing, and continuous integration**.
 
-**Live Demo:** https://teamboard-saas.vercel.app\
-**Repository:** https://github.com/DavidN-code/teamboard-saas
+### 🚀 [Live Demo](https://teamboard-saas.vercel.app)
+
+**React · Node.js · Express · MongoDB · Pusher · 32 automated tests · GitHub Actions**
 
 ------------------------------------------------------------------------
 
@@ -75,47 +76,39 @@ through organization-level and task-level views.
 
 ### Task Details & Collaboration
 
-Task details combine status, assignment, priority, due dates,
-descriptions, and threaded comments in one workflow.
+Task details combine status, assignment, priority, due dates, descriptions, and threaded comments in one workflow.
 
-![TeamBoard task details](docs/screenshots/task-details.png)
+<img src="docs/screenshots/task-details.png" alt="TeamBoard task details" width="850">
 
 ### My Tasks
 
-Members can see work assigned to them across the organization's boards
-in a single view.
+Members can see work assigned to them across the organization's boards in a single view.
 
-![TeamBoard My Tasks](docs/screenshots/my-tasks.png)
+<img src="docs/screenshots/my-tasks.png" alt="TeamBoard My Tasks" width="850">
 
 ### Members & RBAC
 
-Owners and admins can review organization membership and manage
-role-appropriate access.
+Owners and admins can review organization membership and manage role-appropriate access.
 
-![TeamBoard members and role
-management](docs/screenshots/members-rbac.png)
+<img src="docs/screenshots/members-rbac.png" alt="TeamBoard members and role management" width="850">
 
 ### Organization Activity
 
-The activity feed provides a human-readable history of collaboration and
-task changes.
+The activity feed provides a human-readable history of collaboration and task changes.
 
-![TeamBoard organization activity
-feed](docs/screenshots/activity-feed.png)
+<img src="docs/screenshots/activity-feed.png" alt="TeamBoard organization activity feed" width="850">
 
 ### Audit Logs
 
-Administrative audit logs provide structured filtering and visibility
-into organization activity.
+Administrative audit logs provide structured filtering and visibility into organization activity.
 
-![TeamBoard audit logs](docs/screenshots/audit-logs.png)
+<img src="docs/screenshots/audit-logs.png" alt="TeamBoard audit logs" width="850">
 
 ### Responsive Mobile UI
 
-The application is designed to remain usable across desktop, tablet,
-portrait, and landscape layouts.
+The application is designed to remain usable across desktop, tablet, portrait, and landscape layouts.
 
-![TeamBoard mobile dashboard](docs/screenshots/mobile-dashboard.png)
+<img src="docs/screenshots/mobile-dashboard.png" alt="TeamBoard mobile dashboard" width="350">
 
 ------------------------------------------------------------------------
 
