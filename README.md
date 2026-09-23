@@ -1,217 +1,264 @@
 # TeamBoard
 
-**A full-stack, multi-tenant project management SaaS application built with React, Node.js, Express, MongoDB, and real-time collaboration.**
+**A production-style, multi-tenant project management SaaS application
+built with React, Node.js, Express, MongoDB, and real-time
+collaboration.**
 
-TeamBoard is a production-style project management platform where organizations can manage boards, tasks, members, comments, notifications, and activity in a secure shared workspace.
+TeamBoard is a full-stack project management platform where
+organizations can manage boards, tasks, members, comments,
+notifications, invitations, and activity within a secure shared
+workspace.
 
-The project was built to demonstrate full-stack software engineering beyond basic CRUD, with particular emphasis on **multi-tenant data isolation, role-based authorization, real-time collaboration, backend security, automated testing, and CI**.
+The project was built to demonstrate software engineering beyond basic
+CRUD, with particular emphasis on **multi-tenant data isolation,
+role-based authorization, real-time collaboration, backend security,
+responsive UX, automated testing, and continuous integration**.
 
-> **Live Demo:** [Open TeamBoard](YOUR_FRONTEND_URL)
+**Live Demo:** https://teamboard-saas.vercel.app\
+**Repository:** https://github.com/DavidN-code/teamboard-saas
 
----
+------------------------------------------------------------------------
 
-## Screenshots
+## Product Preview
 
-<!-- Replace these with actual screenshots -->
-<!--
-![TeamBoard Dashboard](docs/images/dashboard.png)
-![Task Details](docs/images/task-details.png)
-![Members](docs/images/members.png)
--->
+![TeamBoard Kanban dashboard](docs/screenshots/dashboard-kanban.png)
 
----
+TeamBoard combines organization-scoped Kanban boards with task
+assignment, comments, notifications, activity tracking, member
+management, and role-based permissions.
+
+------------------------------------------------------------------------
 
 ## Key Features
 
 ### Project Management
 
-- Kanban boards with Todo, In Progress, and Done columns
-- Drag-and-drop task management
-- Task creation, editing, deletion, and assignment
-- Priorities and due dates
-- Task search, filtering, and sorting
-- Personal **My Tasks** view
-- Dashboard metrics
+-   Kanban boards with **Todo**, **In Progress**, and **Done** workflows
+-   Drag-and-drop task management for authorized users
+-   Task creation, editing, deletion, and assignment
+-   Priority levels and due dates
+-   Task search, status/priority filters, and sorting
+-   Personal **My Tasks** view across boards
+-   Organization and task metrics
 
 ### Collaboration
 
-- Task-specific comment threads
-- Real-time task synchronization
-- Real-time comments and activity updates
-- Assignment and comment notifications
-- Organization-wide activity feed
-- Per-task activity timeline
-- Multi-tab and multi-client synchronization
+-   Task-specific comment threads
+-   Assignment and comment notifications
+-   Organization-wide activity feed
+-   Per-task activity history
+-   Real-time task, comment, activity, and notification updates
+-   Multi-tab and multi-client synchronization
 
 ### Organizations & Access Control
 
-- Organization-based multi-tenancy
-- Owner, Admin, and Member roles
-- Server-enforced Role-Based Access Control (RBAC)
-- Organization member management
-- Secure invitation-based onboarding
-- Email invitation workflow
-- Role-aware frontend controls
+-   Organization-based multi-tenancy
+-   **Owner**, **Admin**, and **Member** roles
+-   Server-enforced Role-Based Access Control (RBAC)
+-   Organization member management
+-   Secure invitation-based onboarding
+-   Email invitation workflow
+-   Role-aware navigation and controls
 
 ### Audit & Accountability
 
-TeamBoard records important workspace activity including:
+TeamBoard records important workspace activity, including task creation
+and updates, assignments, comments, invitations, role changes, member
+removal, and other organization activity.
 
-- Board creation, updates, and deletion
-- Task creation, updates, assignment, and deletion
-- Comment creation, editing, and deletion
-- Invitations
-- User role changes
-- Member removal
+Audit records include user attribution and timestamps and are available
+through organization-level and task-level views.
 
-Audit records include user attribution and timestamps and are surfaced through both organization-level and task-level activity views.
+------------------------------------------------------------------------
 
----
+## Application Screenshots
+
+### Task Details & Collaboration
+
+Task details combine status, assignment, priority, due dates,
+descriptions, and threaded comments in one workflow.
+
+![TeamBoard task details](docs/screenshots/task-details.png)
+
+### My Tasks
+
+Members can see work assigned to them across the organization's boards
+in a single view.
+
+![TeamBoard My Tasks](docs/screenshots/my-tasks.png)
+
+### Members & RBAC
+
+Owners and admins can review organization membership and manage
+role-appropriate access.
+
+![TeamBoard members and role
+management](docs/screenshots/members-rbac.png)
+
+### Organization Activity
+
+The activity feed provides a human-readable history of collaboration and
+task changes.
+
+![TeamBoard organization activity
+feed](docs/screenshots/activity-feed.png)
+
+### Audit Logs
+
+Administrative audit logs provide structured filtering and visibility
+into organization activity.
+
+![TeamBoard audit logs](docs/screenshots/audit-logs.png)
+
+### Responsive Mobile UI
+
+The application is designed to remain usable across desktop, tablet,
+portrait, and landscape layouts.
+
+![TeamBoard mobile dashboard](docs/screenshots/mobile-dashboard.png)
+
+------------------------------------------------------------------------
 
 ## Engineering Highlights
 
 ### Multi-Tenant Data Isolation
 
-TeamBoard uses organization-based tenancy. Application resources are scoped to an `organizationId`, and authorization is enforced by the backend rather than relying on frontend visibility.
+TeamBoard uses organization-based tenancy. Protected resources are
+scoped to an `organizationId`, and authorization is enforced by the
+backend rather than relying on frontend visibility.
 
-Cross-organization access controls cover resources including:
-
-- Users
-- Boards
-- Tasks
-- Comments
-- Audit logs
-- Invitations
-
-Automated security tests verify that users from one organization cannot read, modify, delete, assign, or otherwise access protected resources belonging to another organization.
+Tenant boundaries cover resources including users, boards, tasks,
+comments, audit logs, and invitations. Automated security tests verify
+that users cannot access protected resources belonging to another
+organization.
 
 ### Role-Based Authorization
 
-TeamBoard implements three roles:
+  -----------------------------------------------------------------------
+  Role                                Access
+  ----------------------------------- -----------------------------------
+  **Owner**                           Full workspace access, role/member
+                                      management, board management,
+                                      invitations, and audit logs
 
-| Role | Access |
-| --- | --- |
-| **Owner** | Full workspace access, member/role management, board management, invitations, and audit logs |
-| **Admin** | Project management, member access, invitations, and audit logs |
-| **Member** | Dashboard, assigned tasks, task collaboration, comments, and notifications |
+  **Admin**                           Task management, member access,
+                                      invitations, board creation, and
+                                      audit logs
 
-Authorization is enforced server-side with authentication and role middleware.
+  **Member**                          Dashboard, My Tasks, task
+                                      viewing/collaboration, comments,
+                                      and notifications
+  -----------------------------------------------------------------------
 
-The backend reloads the authenticated user's current authorization state from the database, preventing an old JWT from preserving permissions after a user's role has been changed.
+Authorization is enforced server-side with authentication and role
+middleware. The backend reloads the authenticated user's current
+authorization state from the database so authorization changes are not
+determined solely by stale client-side state.
 
 ### Secure Real-Time Collaboration
 
-Real-time functionality is implemented with Pusher.
+Real-time functionality is implemented with **Pusher** using
+authenticated private channels for organizations, boards, tasks, and
+individual users.
 
-TeamBoard uses authenticated private channels for:
-
-- Organizations
-- Boards
-- Tasks
-- Individual users
-
-Channel authorization verifies organization membership and resource ownership before allowing subscriptions, preventing users from subscribing to another organization's real-time events.
-
-Real-time events synchronize task changes, comments, activity, notifications, and other workspace updates across active clients.
+Channel authorization verifies the requesting user's relationship to the
+requested resource before allowing a subscription. This keeps real-time
+events subject to the same tenant boundaries as the REST API.
 
 ### API Security & Validation
 
 Backend protections include:
 
-- JWT authentication
-- bcrypt password hashing
-- Role-based authorization
-- Tenant-scoped database queries
-- Request validation with `express-validator`
-- MongoDB ObjectId validation
-- Helmet security headers
-- Rate limiting
-- Centralized error handling
-- Restricted update fields
-- Server-side resource ownership validation
+-   JWT authentication
+-   bcrypt password hashing
+-   Server-enforced RBAC
+-   Tenant-scoped database queries
+-   Request validation with `express-validator`
+-   MongoDB ObjectId validation
+-   Helmet security headers
+-   API rate limiting
+-   Centralized error handling
+-   Restricted update fields
+-   Server-side resource ownership validation
 
----
+### Invitation Security
+
+Invitation onboarding validates invitation tokens and normalized email
+addresses before creating a user in the invited organization. Pending
+invitations are organization-scoped, and invitation email delivery is
+handled through **Resend**.
+
+------------------------------------------------------------------------
 
 ## Automated Testing
 
-The backend includes **32 automated integration and security regression tests** using:
+The backend includes **32 automated integration and security regression
+tests** using **Jest**, **Supertest**, and **mongodb-memory-server**.
 
-- Jest
-- Supertest
-- `mongodb-memory-server`
+The suite covers critical behavior including:
 
-The suite verifies critical behavior including:
+-   Registration and login
+-   Protected-route authentication
+-   Role-based authorization
+-   Current-role enforcement after role changes
+-   Cross-organization user isolation
+-   Board and task tenant isolation
+-   Assignment restrictions
+-   Comment tenant isolation
+-   Audit-log and activity isolation
+-   Request and ObjectId validation
 
-- Registration and login
-- Protected-route authentication
-- Role-based authorization
-- Current-role enforcement after role changes
-- Cross-organization user isolation
-- Board tenant isolation
-- Task tenant isolation
-- Assignment restrictions
-- Comment tenant isolation
-- Audit-log and activity isolation
-- Request and ObjectId validation
-
-```bash
+``` bash
 npm test
 ```
 
 Current test status:
 
-```text
+``` text
 Test Suites: 4 passed, 4 total
 Tests:       32 passed, 32 total
 ```
 
 ### Continuous Integration
 
-GitHub Actions automatically installs the backend dependencies and runs the complete test suite on pushes and pull requests.
+**GitHub Actions** installs backend dependencies and runs the automated
+test suite on pushes and pull requests, providing regression protection
+for authentication, authorization, validation, and tenant-isolation
+behavior.
 
-This provides regression protection for TeamBoard's authentication, authorization, validation, and tenant-isolation rules.
-
----
+------------------------------------------------------------------------
 
 ## Tech Stack
 
-### Frontend
+  -----------------------------------------------------------------------
+  Area                                Technologies
+  ----------------------------------- -----------------------------------
+  **Frontend**                        React, Vite, React Router, Axios,
+                                      dnd-kit, CSS, Pusher JS
 
-- React
-- Vite
-- React Router
-- Axios
-- Tailwind CSS
-- dnd-kit
-- Pusher JS
+  **Backend**                         Node.js, Express, Mongoose, JWT,
+                                      bcrypt, express-validator, Helmet,
+                                      express-rate-limit
 
-### Backend
+  **Database**                        MongoDB Atlas
 
-- Node.js
-- Express
-- MongoDB Atlas
-- Mongoose
-- JWT
-- bcrypt
-- express-validator
-- Helmet
-- express-rate-limit
-- Pusher
-- Resend
+  **Real-Time**                       Pusher private channels
 
-### Testing & Infrastructure
+  **Email**                           Resend
 
-- Jest
-- Supertest
-- mongodb-memory-server
-- GitHub Actions
-- MongoDB Atlas
+  **Testing**                         Jest, Supertest,
+                                      mongodb-memory-server
 
----
+  **CI**                              GitHub Actions
+
+  **Deployment**                      Vercel (frontend), Render (backend)
+  -----------------------------------------------------------------------
+
+------------------------------------------------------------------------
 
 ## Architecture
 
-```text
+``` text
 React / Vite Frontend
         |
         | REST API + JWT
@@ -229,19 +276,18 @@ Node.js / Express API
         v
 MongoDB Atlas
 
-        +
+Node.js / Express API
         |
         v
-
 Pusher Private Channels
         |
         v
 Real-Time React Clients
 ```
 
-Core data models include:
+Core application data is organized around an organization boundary:
 
-```text
+``` text
 Organization
     |
     +-- Users
@@ -256,20 +302,23 @@ Organization
     +-- Audit Logs
 ```
 
----
+For additional design notes, see
+[`docs/system-design.md`](docs/system-design.md).
 
-## Core API
+------------------------------------------------------------------------
+
+## Selected API Endpoints
 
 ### Authentication
 
-```text
+``` text
 POST /api/auth/register
 POST /api/auth/login
 ```
 
-### Boards & Tasks
+### Tasks
 
-```text
+``` text
 GET    /api/tasks/board/:boardId
 POST   /api/tasks
 PUT    /api/tasks/:id
@@ -278,7 +327,7 @@ DELETE /api/tasks/:id
 
 ### Comments
 
-```text
+``` text
 GET    /api/comments/task/:taskId
 POST   /api/comments
 PUT    /api/comments/:id
@@ -287,7 +336,7 @@ DELETE /api/comments/:id
 
 ### Users & Audit Logs
 
-```text
+``` text
 GET    /api/users
 PUT    /api/users/:id/role
 DELETE /api/users/:id
@@ -296,44 +345,38 @@ GET    /api/audit-logs
 GET    /api/audit-logs/task/:taskId
 ```
 
----
+------------------------------------------------------------------------
 
 ## Running Locally
 
 ### Prerequisites
 
-- Node.js
-- npm
-- MongoDB database
+-   Node.js
+-   npm
+-   MongoDB
 
-### Clone the repository
+### Clone and install
 
-```bash
+``` bash
 git clone https://github.com/DavidN-code/teamboard-saas.git
 cd teamboard-saas
-```
 
-### Install backend dependencies
-
-```bash
 cd backend
 npm install
-```
 
-### Install frontend dependencies
-
-```bash
 cd ../frontend
 npm install
 ```
 
-### Environment Variables
+### Environment Configuration
 
-Create the required environment configuration for the backend.
+Configure the required environment variables for the backend and
+frontend. Backend services include MongoDB, JWT authentication, Resend,
+and Pusher.
 
-TeamBoard uses environment variables for services such as:
+Example backend variable names:
 
-```text
+``` text
 MONGO_URI
 JWT_SECRET
 FRONTEND_URL
@@ -344,74 +387,68 @@ PUSHER_SECRET
 PUSHER_CLUSTER
 ```
 
+The frontend also requires its deployed/local API URL and Pusher client
+configuration.
+
 Do not commit `.env` files or credentials to source control.
 
-### Start the backend
+### Start the application
 
-```bash
+Run the backend:
+
+``` bash
 cd backend
 npm run dev
 ```
 
-### Start the frontend
+In another terminal, run the frontend:
 
-In another terminal:
-
-```bash
+``` bash
 cd frontend
 npm run dev
 ```
 
----
+Vite serves the frontend locally, while the Express API runs separately.
+
+------------------------------------------------------------------------
 
 ## Project Status
 
-TeamBoard's core application is feature-complete and deployed.
+TeamBoard's planned portfolio scope is **feature-complete and
+deployed**.
 
-Completed areas include:
+The finished project includes authentication and onboarding,
+multi-tenant isolation, RBAC, Kanban task management, assignments,
+comments, notifications, invitations, member management, audit logging,
+activity feeds, metrics, search/filtering/sorting, real-time
+collaboration, responsive UI, security hardening, automated
+integration/security tests, CI, and production deployment.
 
-- Authentication and onboarding
-- Multi-tenant resource isolation
-- Role-based authorization
-- Boards and Kanban task management
-- Task assignment
-- Comments
-- Notifications
-- Invitations
-- Member management
-- Audit logging
-- Activity feeds
-- Dashboard metrics
-- Search and filtering
-- Real-time collaboration
-- Responsive desktop/mobile UI
-- Backend security hardening
-- Automated integration/security testing
-- Continuous Integration with GitHub Actions
-
----
+------------------------------------------------------------------------
 
 ## What This Project Demonstrates
 
-TeamBoard was built as a flagship full-stack portfolio project and demonstrates experience with:
+TeamBoard was built as a flagship full-stack portfolio project and
+demonstrates experience with:
 
-- Designing a multi-tenant SaaS architecture
-- Building REST APIs with Node.js and Express
-- Modeling application data with MongoDB and Mongoose
-- Building responsive React interfaces
-- Implementing authentication and server-side authorization
-- Enforcing tenant boundaries across application resources
-- Securing real-time communication
-- Designing role-based product behavior
-- Building collaborative real-time features
-- Writing integration and security regression tests
-- Configuring continuous integration
-- Debugging behavior across multiple clients and application layers
+-   Designing a multi-tenant SaaS architecture
+-   Building REST APIs with Node.js and Express
+-   Modeling application data with MongoDB and Mongoose
+-   Building responsive React interfaces
+-   Implementing authentication and server-side authorization
+-   Enforcing tenant boundaries across application resources
+-   Securing real-time communication
+-   Designing role-based product behavior
+-   Building collaborative real-time features
+-   Writing integration and security regression tests
+-   Configuring continuous integration
+-   Deploying and debugging a full-stack application across multiple
+    services
 
----
+------------------------------------------------------------------------
 
 ## Author
 
 **David Neagoy**
 
-GitHub: [DavidN-code](https://github.com/DavidN-code)
+GitHub: https://github.com/DavidN-code
